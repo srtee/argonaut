@@ -439,14 +439,35 @@ h3 {
     transition: all 0.2s;
 }
 
+/* Default state (tags inactive) */
 .tag:hover {
     opacity: 0.8;
 }
 
+/* Selected state (when tags are active and this tag is selected) */
 .tag.selected {
     background: var(--text-color);
     color: var(--bg-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tag.deselected {
+    opacity: 0.5;
+    filter: grayscale(30%);
+}
+
+.tag.selected:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+/* Deselected state (when tags are active but this tag is not selected) */
+.tag.deselected {
+    opacity: 0.4;
+}
+
+.tag.deselected:hover {
+    opacity: 0.6;
 }
 
 /* Dimmed state for papers without selected tags */

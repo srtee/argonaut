@@ -14,14 +14,33 @@ const status = document.getElementById('status');
 // State
 let papersData = {};
 let selectedTags = new Set();
+let selectedTagsCount = 0; // Number of currently selected tags
 let processedPapersData = []; // Store processed papers for filtering
 
 // Toggle tag selection and filter papers
 function toggleTag(tag) {
-    if (selectedTags.has(tag)) {
-        selectedTags.delete(tag);
-    } else {
+    if (selectedTagsCount === 0) {
+        // Tags inactive - select this tag, clear any others, activate tags
+        selectedTags.clear();
         selectedTags.add(tag);
+        selectedTagsCount = 1;
+    } else {
+        // Tags active
+        if (selectedTags.has(tag)) {
+            if (selectedTagsCount === 1) {
+                // Deselecting the only selected tag - go back to inactive
+                selectedTags.delete(tag);
+                selectedTagsCount = 0;
+            } else {
+                // Deselect this tag
+                selectedTags.delete(tag);
+                selectedTagsCount--;
+            }
+        } else {
+            // Select this tag
+            selectedTags.add(tag);
+            selectedTagsCount++;
+        }
     }
     filterPapersByTags();
 }
@@ -30,13 +49,16 @@ function toggleTag(tag) {
 function filterPapersByTags() {
     const cards = Array.from(papersList.querySelectorAll('.paper-card'));
 
-    if (selectedTags.size === 0) {
-        // No tags selected - reset all cards
+    if (selectedTagsCount === 0) {
+        // No tags selected - reset all cards and tags
         cards.forEach(card => {
             card.style.order = '';
             card.classList.remove('dimmed');
             const tags = card.querySelectorAll('.tag');
-            tags.forEach(tag => tag.classList.remove('selected'));
+            tags.forEach(tag => {
+                tag.classList.remove('selected');
+                tag.classList.remove('deselected');
+            });
         });
         return;
     }
@@ -51,13 +73,15 @@ function filterPapersByTags() {
 
         const hasSelectedTag = Array.from(selectedTags).some(tag => cardTags.includes(tag));
 
-        // Update tag styling
+        // Update tag styling based on selectedTagsCount
         const tags = card.querySelectorAll('.tag');
         tags.forEach(tag => {
             if (selectedTags.has(tag.dataset.tag)) {
                 tag.classList.add('selected');
+                tag.classList.remove('deselected');
             } else {
                 tag.classList.remove('selected');
+                tag.classList.add('deselected');
             }
         });
 
