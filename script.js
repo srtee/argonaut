@@ -458,6 +458,15 @@ async function processPapers(data) {
             const bibtex = await fetchBibTeX(paper._doi);
             if (bibtex) {
                 result.bibInfo = parseBibTeX(bibtex);
+                // Check if BibTeX has page numbers
+                let pages = result.bibInfo.pages;
+                if (!pages) {
+                    // Try Crossref API for page numbers
+                    pages = await fetchPagesFromCrossref(paper._doi);
+                    if (pages) {
+                        result.bibInfo.pages = pages;
+                    }
+                }
             }
 
             const abstract = await fetchAbstract(paper._doi);
