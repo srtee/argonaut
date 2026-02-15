@@ -69,6 +69,73 @@ async function fetchAbstract(doi) {
     }
 }
 
+// Fetch page numbers from Crossref API
+async function fetchPagesFromCrossref(doi) {
+    try {
+        const response = await fetch(
+            `https://api.crossref.org/works/${encodeURIComponent(doi)}`,
+            {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const data = await response.json();
+        if (data.message) {
+            // Check for page field first
+            if (data.message.page) {
+                return data.message.page;
+            }
+            // Some journals use article-number instead of pages
+            if (data.message['article-number']) {
+                return data.message['article-number'];
+            }
+        }
+        return null;
+    } catch (err) {
+        console.error('Error fetching pages from Crossref:', err);
+        return null;
+    }
+}
+
+// Add pages to BibTeX if they're not already present
+function addPagesToBibTeX(bibtex, pages) {
+    if (!pages) return bibtex;
+
+    // Check if pages field already exists
+    const pagesRegex = /pages\s*=\s*(?:\{([^}]*)\}|"([^"]*)")/i;
+    const match = bibtex.match(pagesRegex);
+
+    if (match) {
+        // Update existing pages field
+        const currentPages = match[1] || match[2];
+        return bibtex.replace(match[0], `pages = {${pages}}`);
+    } else {
+        // Add pages field after the year field (common convention)
+        const yearRegex = /year\s*=\s*(?:\{([^}]*)\}|"([^"]*)")/i;
+        const yearMatch = bibtex.match(yearRegex);
+
+        if (yearMatch) {
+            return bibtex.replace(yearMatch[0], `${yearMatch[0]},\n  pages = {${pages}}`);
+        } else {
+            // If no year field, add pages after the first field
+            const firstFieldRegex = /(\w+)\s*=\s*(?:\{([^}]*)\}|"([^"]*)")/;
+            const firstMatch = bibtex.match(firstFieldRegex);
+
+            if (firstMatch) {
+                return bibtex.replace(firstMatch[0], `${firstMatch[0]},\n  pages = {${pages}}`);
+            }
+        }
+    }
+
+    return bibtex;
+}
+
 // Parse BibTeX to extract bibliographic information
 function parseBibTeX(bibtex) {
     const result = {
@@ -274,8 +341,21 @@ async function exportBibTeX() {
             await new Promise(resolve => setTimeout(resolve, 0));
 
             if (paper._doi) {
-                const bibtex = await fetchBibTeX(paper._doi);
+                let bibtex = await fetchBibTeX(paper._doi);
                 if (bibtex) {
+                    // Check if BibTeX has page numbers
+                    const parsed = parseBibTeX(bibtex);
+                    let pages = parsed.pages;
+
+                    if (!pages) {
+                        // Try Crossref API for page numbers
+                        pages = await fetchPagesFromCrossref(paper._doi);
+                    }
+
+                    if (pages) {
+                        bibtex = addPagesToBibTeX(bibtex, pages);
+                    }
+
                     bibtexContent += bibtex + '\n\n';
                 } else {
                     // Fallback entry if BibTeX fetch fails
