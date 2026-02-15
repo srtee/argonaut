@@ -1,0 +1,20 @@
+{
+  "ELECTRODE: An Electrochemistry Package For Atomistic Simulations": {
+    "_doi": "10.1063/5.0099239",
+    "_comments": "Mainstream CPM MD package",
+    "_tags": ["constant potential", "software", "LAMMPS"],
+    "_alsoread": []
+  },
+  "TeeBernhardt2022": {
+    "_doi": "10.1063/5.0086986",
+    "_comments": "showed various periodic alternatives to CPM slab mode",
+    "_tags": ["constant potential", "user-conp-2", "theory"],
+    "_alsoread": []
+  },
+  "Lin2024": {
+    "_doi": "10.1021/acs.jctc.3c00940",
+    "_comments": "extended CPM to heteroatomic systems -- example used was MXene",
+    "_tags": ["constant potentials", "software", "theory", "user-conp-2"],
+    "_alsoread": []
+  }
+}

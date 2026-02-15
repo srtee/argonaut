@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BibTeX my DOIs (Batch)</title>
+    <title>Paper Viewer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <a href="#mainContent" class="skip-link">Skip to main content</a>
     <main class="container" id="mainContent" tabindex="-1">
-        <h1>BibTeX my DOIs (Batch)</h1>
+        <h1>Paper Viewer</h1>
         <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
             <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
                 <!-- Sun icon (shown in dark mode) -->
@@ -24,31 +24,55 @@
             </svg>
         </button>
 
-        <div class="doi-rows-container" id="doiRowsContainer">
-            <!-- DOI input rows will be added here -->
-        </div>
+        <!-- JSON Input Section -->
+        <section class="input-section" id="inputSection">
+            <h2>Load Papers</h2>
+            <div class="input-options">
+                <div class="input-option active" data-input="file">
+                    <label class="input-option-label">
+                        <input type="radio" name="inputMethod" value="file" checked>
+                        Upload JSON File
+                    </label>
+                    <div class="input-option-content">
+                        <input type="file" id="fileInput" accept=".json" class="file-input">
+                    </div>
+                </div>
+                <div class="input-option" data-input="url">
+                    <label class="input-option-label">
+                        <input type="radio" name="inputMethod" value="url">
+                        Load from URL
+                    </label>
+                    <div class="input-option-content" style="display: none;">
+                        <input type="text" id="urlInput" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input">
+                        <button id="loadUrlBtn" type="button" class="secondary-btn">Load</button>
+                    </div>
+                </div>
+                <div class="input-option" data-input="default">
+                    <label class="input-option-label">
+                        <input type="radio" name="inputMethod" value="default">
+                        Use Default (papers.json)
+                    </label>
+                    <div class="input-option-content" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
 
-        <div class="button-group">
-            <button id="addRowBtn" type="button" class="secondary-btn">Add DOI Row</button>
-            <button id="retrieveBtn" type="button">Retrieve Citations</button>
-        </div>
-
-        <div class="output-wrapper">
-            <textarea id="output" class="output" readonly placeholder="BibTeX will appear here..." aria-label="BibTeX output"></textarea>
-            <button id="copyBtn" class="copy-btn" aria-label="Copy BibTeX to clipboard">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                <span class="copy-text">Copy</span>
-            </button>
-        </div>
+        <!-- Papers List Section -->
+        <section class="papers-section" id="papersSection" style="display: none;">
+            <div class="papers-header">
+                <h2>Papers</h2>
+                <button id="loadNewBtn" type="button" class="secondary-btn">Load New Papers</button>
+            </div>
+            <div id="papersList" class="papers-list">
+                <!-- Papers will be rendered here -->
+            </div>
+        </section>
 
         <div id="error" class="error" role="alert" aria-live="polite" aria-atomic="true"></div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
 
         <footer class="attribution">
-            <small>BibTeX my DOIs (Batch) - Reuses CSS and JS from bibmydoi</small>
+            <small>Paper Viewer - Load, view, and explore your paper collection</small>
         </footer>
     </main>
 
