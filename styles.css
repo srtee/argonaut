@@ -22,32 +22,6 @@
     --doi-link-color: #2563eb;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Dark theme colors */
-        --bg-color: #1f2937;
-        --container-bg: #374151;
-        --text-color: #f9fafb;
-        --input-border: #4b5563;
-        --input-bg: #1f2937;
-        --paper-card-bg: #1e3a8a;
-        --paper-card-border: #1e40af;
-        --paper-card-hover: #2563eb;
-        --tag-bg: #1e40af;
-        --tag-color: #bfdbfe;
-        --alsoread-bg: #78350f;
-        --alsoread-color: #fcd34d;
-        --abstract-bg: #1f2937;
-        --abstract-border: #374151;
-        --comments-color: #9ca3af;
-        --attribution-color: #9ca3af;
-        --theme-icon-color: #f9fafb;
-        --error-color: #fca5a5;
-        --status-color: #34d399;
-        --doi-link-color: #60a5fa;
-    }
-}
-
 [data-theme="dark"] {
     /* Dark theme colors */
     --bg-color: #1f2937;

@@ -751,8 +751,13 @@ function initTheme() {
         setTheme(storedTheme);
     } else {
         const isDark = getSystemPreference();
-        setTheme(isDark ? 'dark' : 'light');
-        localStorage.removeItem(THEME_KEY);
+        // Set initial theme without saving to localStorage
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        updateThemeIcons(isDark);
     }
 }
 
