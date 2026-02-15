@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BibTeX my DOIs (Batch)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <main class="container" id="mainContent" tabindex="-1">
+        <h1>BibTeX my DOIs (Batch)</h1>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
+            <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+                <!-- Sun icon (shown in dark mode) -->
+                <g class="sun-icon" style="display: none;">
+                    <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </g>
+                <!-- Moon icon (shown in light mode) -->
+                <g class="moon-icon">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" fill="none"/>
+                </g>
+            </svg>
+        </button>
+
+        <div class="doi-rows-container" id="doiRowsContainer">
+            <!-- DOI input rows will be added here -->
+        </div>
+
+        <div class="button-group">
+            <button id="addRowBtn" type="button" class="secondary-btn">Add DOI Row</button>
+            <button id="retrieveBtn" type="button">Retrieve Citations</button>
+        </div>
+
+        <div class="output-wrapper">
+            <textarea id="output" class="output" readonly placeholder="BibTeX will appear here..." aria-label="BibTeX output"></textarea>
+            <button id="copyBtn" class="copy-btn" aria-label="Copy BibTeX to clipboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span class="copy-text">Copy</span>
+            </button>
+        </div>
+
+        <div id="error" class="error" role="alert" aria-live="polite" aria-atomic="true"></div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+
+        <footer class="attribution">
+            <small>BibTeX my DOIs (Batch) - Reuses CSS and JS from bibmydoi</small>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
