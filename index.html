@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View and manage research papers with filtering, abstracts, and export options.">
     <title>Paper Viewer</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.3">
+    <link rel="stylesheet" href="styles.css?v=1.0.4">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -51,28 +51,35 @@
             </div>
         </section>
 
-        <!-- Papers List Section -->
-        <section class="papers-section" id="papersSection" style="display: none;" aria-labelledby="papersHeading" aria-live="polite">
-            <header class="papers-header">
-                <h2 id="papersHeading">Papers</h2>
-                <div class="header-buttons">
-                    <button id="exportJsonBtn" type="button" class="secondary-btn" aria-label="Export all papers as JSON file">Export JSON</button>
-                    <button id="exportBibtexAllBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
-                    <button id="exportBibtexTaggedBtn" type="button" class="secondary-btn" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
-                    <button id="loadNewBtn" type="button" class="secondary-btn" aria-label="Reset all papers, comments, and tags">Reset All</button>
+        <!-- Add DOI Section (always visible) -->
+        <section class="add-doi-section" id="addDoiSection" aria-labelledby="addDoiHeading">
+            <h2 id="addDoiHeading">Add Paper by DOI</h2>
+            <div class="add-doi-inputs">
+                <div class="input-group">
+                    <label for="doiInput" class="input-label">DOI or URL</label>
+                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx" aria-label="Enter DOI or URL containing DOI">
                 </div>
-            </header>
-
-            <!-- Add DOI Section -->
-            <div class="add-doi-section">
-                <h3>Add Paper by DOI</h3>
-                <div class="add-doi-inputs">
-                    <input type="text" id="doiInput" placeholder="DOI or URL (e.g., 10.1038/nature12373)" class="doi-input" aria-label="Enter DOI or URL containing DOI">
-                    <input type="text" id="doiKeyInput" placeholder="Key (optional, defaults to Author+Year)" class="doi-key-input" aria-label="Optional key for the paper">
-                    <button id="addDoiBtn" type="button" aria-label="Add paper with specified DOI">Add DOI</button>
+                <div class="input-group">
+                    <label for="doiKeyInput" class="input-label">Key (optional)</label>
+                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024" aria-label="Enter optional citation key">
                 </div>
+                <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
             </div>
+        </section>
 
+        <!-- Export Buttons Section (hidden until papers are loaded) -->
+        <section class="export-section" id="exportSection" style="display: none;" aria-labelledby="exportHeading">
+            <h2 id="exportHeading" class="visually-hidden">Export Options</h2>
+            <div class="export-buttons">
+                <button id="exportJsonBtn" type="button" class="secondary-btn" aria-label="Export all papers as JSON file">Export JSON</button>
+                <button id="exportBibtexAllBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
+                <button id="exportBibtexTaggedBtn" type="button" class="secondary-btn" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
+                <button id="loadNewBtn" type="button" class="secondary-btn" aria-label="Reset all papers, comments, and tags">Reset All</button>
+            </div>
+        </section>
+
+        <!-- Papers List Section -->
+        <section class="papers-section" id="papersSection" style="display: none;" aria-live="polite">
             <div id="papersList" class="papers-list" role="list" aria-label="List of papers">
                 <!-- Papers will be rendered here -->
             </div>
@@ -86,7 +93,7 @@
             <nav class="social-links" aria-label="Social media links">
                 <a href="https://github.com/srtee/bibmydoi" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub (opens in new tab)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.7 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                     </svg>
                 </a>
                 <a href="https://www.linkedin.com/in/shern-tee-phd-8172241b3/" target="_blank" rel="noopener noreferrer" aria-label="Connect on LinkedIn (opens in new tab)">
@@ -100,6 +107,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.0.3"></script>
+    <script src="script.js?v=1.0.4"></script>
 </body>
 </html>
