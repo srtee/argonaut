@@ -272,7 +272,9 @@ async function processPapers(data) {
 
     for (let i = 0; i < entries.length; i++) {
         const [key, paper] = entries[i];
-        updateStatus(`Fetching ${i + 1} of ${entries.length}: ${key}`);
+        status.textContent = `Fetching ${i + 1} of ${entries.length}: ${key}`;
+        // Force UI update before async operations
+        await new Promise(resolve => setTimeout(resolve, 0));
 
         const result = {
             key,
