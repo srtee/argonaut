@@ -43,7 +43,7 @@
                         Load from URL
                     </label>
                     <div class="input-option-content" style="display: none;">
-                        <input type="text" id="urlInput" value="https://gist.github.com/srtee/04ee671f6f27d64de800f00eb9280a21" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input">
+                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/papers.json" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input">
                         <button id="loadUrlBtn" type="button" class="secondary-btn">Load</button>
                     </div>
                 </div>
@@ -54,7 +54,11 @@
         <section class="papers-section" id="papersSection" style="display: none;">
             <div class="papers-header">
                 <h2>Papers</h2>
-                <button id="loadNewBtn" type="button" class="secondary-btn">Load New Papers</button>
+                <div class="header-buttons">
+                    <button id="exportJsonBtn" type="button" class="secondary-btn">Export JSON</button>
+                    <button id="exportBibtexBtn" type="button" class="secondary-btn">Export BibTeX</button>
+                    <button id="loadNewBtn" type="button" class="secondary-btn">Load New Papers</button>
+                </div>
             </div>
             <div id="papersList" class="papers-list">
                 <!-- Papers will be rendered here -->

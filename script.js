@@ -6,6 +6,8 @@ const fileInput = document.getElementById('fileInput');
 const urlInput = document.getElementById('urlInput');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
+const exportJsonBtn = document.getElementById('exportJsonBtn');
+const exportBibtexBtn = document.getElementById('exportBibtexBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 
@@ -227,6 +229,74 @@ function hideStatus() {
     status.classList.remove('visible');
 }
 
+// Export papers data as JSON
+function exportJSON() {
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to export');
+        return;
+    }
+
+    const jsonStr = JSON.stringify(papersData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'papers.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showStatus('JSON exported successfully');
+}
+
+// Export papers as BibTeX
+async function exportBibTeX() {
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to export');
+        return;
+    }
+
+    showStatus('Fetching BibTeX entries...');
+
+    const entries = Object.entries(papersData);
+    let bibtexContent = '';
+
+    for (let i = 0; i < entries.length; i++) {
+        const [key, paper] = entries[i];
+        status.textContent = `Fetching BibTeX ${i + 1} of ${entries.length}: ${key}`;
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        if (paper._doi) {
+            const bibtex = await fetchBibTeX(paper._doi);
+            if (bibtex) {
+                bibtexContent += bibtex + '\n\n';
+            } else {
+                // Fallback entry if BibTeX fetch fails
+                bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}},\n  doi = {${paper._doi}}\n}\n\n`;
+            }
+        } else {
+            // Fallback entry for papers without DOI
+            bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}}\n}\n\n`;
+        }
+
+        // Rate limiting
+        if (i < entries.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+
+    const blob = new Blob([bibtexContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'papers.bib';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showStatus(`BibTeX exported successfully (${entries.length} entries)`);
+}
+
 // Load JSON from file
 function loadFromFile(file) {
     return new Promise((resolve, reject) => {
@@ -415,8 +485,14 @@ loadNewBtn.addEventListener('click', () => {
     inputSection.style.display = 'block';
     papersList.innerHTML = '';
     fileInput.value = '';
-    urlInput.value = '';
+    urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/papers.json';
 });
+
+// Export JSON button
+exportJsonBtn.addEventListener('click', exportJSON);
+
+// Export BibTeX button
+exportBibtexBtn.addEventListener('click', exportBibTeX);
 
 // Dark mode toggle functionality
 const themeToggle = document.getElementById('themeToggle');
