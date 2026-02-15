@@ -702,13 +702,32 @@ fileInput.addEventListener('change', () => {
 // URL load button handler
 loadUrlBtn.addEventListener('click', () => loadPapers('url'));
 
-// Load new papers button
+// Reset All button
 loadNewBtn.addEventListener('click', () => {
-    papersSection.style.display = 'none';
-    inputSection.style.display = 'block';
-    papersList.innerHTML = '';
-    fileInput.value = '';
-    urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json';
+    // Show confirmation dialog
+    const confirmed = confirm(
+        'Are you sure you want to reset all papers?\n\n' +
+        'This will clear:\n' +
+        '• All papers\n' +
+        '• All comments\n' +
+        '• All tags\n' +
+        '• Any unsaved changes\n\n' +
+        'This action cannot be undone.'
+    );
+
+    if (confirmed) {
+        // Clear all data
+        selectedTags.clear();
+        papersData = {};
+        processedPapersData = [];
+
+        papersSection.style.display = 'none';
+        inputSection.style.display = 'block';
+        papersList.innerHTML = '';
+        fileInput.value = '';
+        urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json';
+        hideStatus();
+    }
 });
 
 // Export JSON button
