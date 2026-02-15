@@ -498,13 +498,6 @@ fileInput.addEventListener('change', () => {
 // URL load button handler
 loadUrlBtn.addEventListener('click', () => loadPapers('url'));
 
-// Default option handler
-document.querySelector('input[name="inputMethod"][value="default"]').addEventListener('change', (e) => {
-    if (e.target.checked) {
-        loadPapers('default');
-    }
-});
-
 // Load new papers button
 console.log('Setting up loadNewBtn:', loadNewBtn);
 loadNewBtn.addEventListener('click', (e) => {
