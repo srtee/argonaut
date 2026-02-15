@@ -916,6 +916,40 @@ document.querySelectorAll('input[name="inputMethod"]').forEach(radio => {
     });
 });
 
+// Initialize input option state on page load (fix browser remembering radio selection)
+function initInputOptions() {
+    const selectedRadio = document.querySelector('input[name="inputMethod"]:checked');
+    if (selectedRadio) {
+        // Trigger change event to update UI state
+        selectedRadio.dispatchEvent(new Event('change'));
+    } else {
+        // Default to "file" if nothing is selected
+        const fileRadio = document.getElementById('inputMethodFile');
+        if (fileRadio) {
+            fileRadio.checked = true;
+            fileRadio.dispatchEvent(new Event('change'));
+        }
+    }
+}
+initInputOptions();
+
+// Initialize input option UI state on page load
+const initializeInputOptions = () => {
+    const selectedRadio = document.querySelector('input[name="inputMethod"]:checked');
+    if (selectedRadio) {
+        document.querySelectorAll('.input-option').forEach(option => {
+            option.classList.remove('active');
+            option.querySelector('.input-option-content').style.display = 'none';
+        });
+        const selectedOption = document.querySelector(`.input-option[data-input="${selectedRadio.value}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('active');
+            selectedOption.querySelector('.input-option-content').style.display = 'block';
+        }
+    }
+};
+initializeInputOptions();
+
 // File input handler
 fileInput.addEventListener('change', () => {
     if (fileInput.files[0]) {
