@@ -497,7 +497,7 @@ loadNewBtn.addEventListener('click', () => {
     inputSection.style.display = 'block';
     papersList.innerHTML = '';
     fileInput.value = '';
-    urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/papers.json';
+    urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json';
 });
 
 // Export JSON button
