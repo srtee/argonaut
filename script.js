@@ -231,6 +231,7 @@ function hideStatus() {
 
 // Export papers data as JSON
 function exportJSON() {
+    console.log('exportJSON called, papersData:', papersData);
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
@@ -242,6 +243,7 @@ function exportJSON() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'papers.json';
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -251,6 +253,7 @@ function exportJSON() {
 
 // Export papers as BibTeX
 async function exportBibTeX() {
+    console.log('exportBibTeX called, papersData:', papersData);
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
@@ -290,6 +293,7 @@ async function exportBibTeX() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'papers.bib';
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -489,10 +493,21 @@ loadNewBtn.addEventListener('click', () => {
 });
 
 // Export JSON button
-exportJsonBtn.addEventListener('click', exportJSON);
+console.log('Setting up exportJsonBtn:', exportJsonBtn);
+if (exportJsonBtn) {
+    exportJsonBtn.addEventListener('click', exportJSON);
+    console.log('Export JSON button listener attached');
+} else {
+    console.error('Export JSON button not found!');
+}
 
 // Export BibTeX button
-exportBibtexBtn.addEventListener('click', exportBibTeX);
+if (exportBibtexBtn) {
+    exportBibtexBtn.addEventListener('click', exportBibTeX);
+    console.log('Export BibTeX button listener attached');
+} else {
+    console.error('Export BibTeX button not found!');
+}
 
 // Dark mode toggle functionality
 const themeToggle = document.getElementById('themeToggle');
