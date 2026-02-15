@@ -11,6 +11,20 @@ const exportBibtexBtn = document.getElementById('exportBibtexBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 
+// Debug: Check if buttons are found
+console.log('DOM Elements found:');
+console.log('  inputSection:', !!inputSection);
+console.log('  papersSection:', !!papersSection);
+console.log('  papersList:', !!papersList);
+console.log('  fileInput:', !!fileInput);
+console.log('  urlInput:', !!urlInput);
+console.log('  loadUrlBtn:', !!loadUrlBtn);
+console.log('  loadNewBtn:', !!loadNewBtn);
+console.log('  exportJsonBtn:', !!exportJsonBtn);
+console.log('  exportBibtexBtn:', !!exportBibtexBtn);
+console.log('  error:', !!error);
+console.log('  status:', !!status);
+
 // State
 let papersData = {};
 
@@ -492,7 +506,9 @@ document.querySelector('input[name="inputMethod"][value="default"]').addEventLis
 });
 
 // Load new papers button
-loadNewBtn.addEventListener('click', () => {
+console.log('Setting up loadNewBtn:', loadNewBtn);
+loadNewBtn.addEventListener('click', (e) => {
+    console.log('loadNewBtn clicked!', e);
     papersSection.style.display = 'none';
     inputSection.style.display = 'block';
     papersList.innerHTML = '';
@@ -501,13 +517,25 @@ loadNewBtn.addEventListener('click', () => {
 });
 
 // Export JSON button
+console.log('Setting up exportJsonBtn:', exportJsonBtn);
 if (exportJsonBtn) {
-    exportJsonBtn.addEventListener('click', exportJSON);
+    exportJsonBtn.addEventListener('click', (e) => {
+        console.log('exportJsonBtn clicked!', e);
+        exportJSON();
+    });
+} else {
+    console.error('Export JSON button not found!');
 }
 
 // Export BibTeX button
+console.log('Setting up exportBibtexBtn:', exportBibtexBtn);
 if (exportBibtexBtn) {
-    exportBibtexBtn.addEventListener('click', exportBibTeX);
+    exportBibtexBtn.addEventListener('click', (e) => {
+        console.log('exportBibtexBtn clicked!', e);
+        exportBibTeX();
+    });
+} else {
+    console.error('Export BibTeX button not found!');
 }
 
 // Dark mode toggle functionality
