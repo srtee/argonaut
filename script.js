@@ -10,13 +10,15 @@ const urlInput = document.getElementById('urlInput');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
+const exportBibtexAllBtn = document.getElementById('exportBibtexAllBtn');
+const exportBibtexTaggedBtn = document.getElementById('exportBibtexTaggedBtn');
 const doiInput = document.getElementById('doiInput');
 const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 console.log('DOM elements loaded:', {
-    inputSection, papersSection, exportSection, addDoiBtn, themeToggle: document.getElementById('themeToggle')
+    inputSection, papersSection, exportSection, addDoiBtn, exportBibtexTaggedBtn, themeToggle: document.getElementById('themeToggle')
 });
 
 // State
@@ -601,6 +603,91 @@ async function exportBibTeX() {
     }
 }
 
+// Export papers with selected tags as BibTeX
+async function exportBibTeXTagged() {
+    console.log('exportBibTeXTagged called');
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to export');
+        return;
+    }
+
+    if (selectedTags.size === 0) {
+        showError('Please select at least one tag first');
+        return;
+    }
+
+    try {
+        showStatus('Fetching BibTeX entries for tagged papers...');
+
+        // Filter entries to only include papers with selected tags
+        const entries = Object.entries(papersData).filter(([key, paper]) => {
+            const paperTags = paper._tags || [];
+            return paperTags.some(tag => selectedTags.has(tag));
+        });
+
+        if (entries.length === 0) {
+            showError('No papers found with the selected tags');
+            return;
+        }
+
+        console.log('Exporting tagged papers:', entries.length);
+
+        let bibtexContent = '';
+
+        for (let i = 0; i < entries.length; i++) {
+            const [key, paper] = entries[i];
+            status.textContent = `Fetching BibTeX ${i + 1} of ${entries.length}: ${key}`;
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            if (paper._doi) {
+                let bibtex = await fetchBibTeX(paper._doi);
+                if (bibtex) {
+                    // Check if BibTeX has page numbers
+                    const parsed = parseBibTeX(bibtex);
+                    let pages = parsed.pages;
+
+                    if (!pages) {
+                        // Try Crossref API for page numbers
+                        pages = await fetchPagesFromCrossref(paper._doi);
+                    }
+
+                    if (pages) {
+                        bibtex = addPagesToBibTeX(bibtex, pages);
+                    }
+
+                    bibtexContent += bibtex + '\n\n';
+                } else {
+                    // Fallback entry if BibTeX fetch fails
+                    bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}},\n  doi = {${paper._doi}}\n}\n\n`;
+                }
+            } else {
+                // Fallback entry for papers without DOI
+                bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}}\n}\n\n`;
+            }
+
+            // Rate limiting
+            if (i < entries.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        const blob = new Blob([bibtexContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'papers-tagged.bib';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showStatus(`BibTeX exported successfully (${entries.length} entries with selected tags)`);
+    } catch (err) {
+        console.error('Error exporting BibTeX:', err);
+        showError('Error exporting BibTeX: ' + err.message);
+    }
+}
+
 // Load JSON from file
 function loadFromFile(file) {
     return new Promise((resolve, reject) => {
@@ -879,9 +966,10 @@ if (exportBibtexAllBtn) {
 }
 
 // Export BibTeX (only tagged) button
-const exportBibtexTaggedBtn = document.getElementById('exportBibtexTaggedBtn');
+console.log('exportBibtexTaggedBtn:', exportBibtexTaggedBtn);
 if (exportBibtexTaggedBtn) {
     exportBibtexTaggedBtn.addEventListener('click', exportBibTeXTagged);
+    console.log('Added exportBibtexTaggedBtn event listener');
 }
 
 // Add DOI button
