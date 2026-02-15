@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View and manage research papers with filtering, abstracts, and export options.">
     <title>Paper Viewer</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.2">
+    <link rel="stylesheet" href="styles.css?v=1.0.3">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -25,21 +26,21 @@
         </button>
 
         <!-- JSON Input Section -->
-        <section class="input-section" id="inputSection">
-            <h2>Load Papers</h2>
+        <section class="input-section" id="inputSection" aria-labelledby="loadPapersHeading">
+            <h2 id="loadPapersHeading">Load Papers</h2>
             <div class="input-options">
                 <div class="input-option active" data-input="file">
                     <label class="input-option-label">
-                        <input type="radio" name="inputMethod" value="file" checked>
+                        <input type="radio" name="inputMethod" value="file" checked id="inputMethodFile">
                         Upload JSON File
                     </label>
-                    <div class="input-option-content">
-                        <input type="file" id="fileInput" accept=".json" class="file-input" aria-label="Select JSON file to upload">
+                    <div class="input-option-content" id="fileInputContent">
+                        <input type="file" id="fileInput" accept=".json" class="file-input" aria-labelledby="inputMethodFile">
                     </div>
                 </div>
                 <div class="input-option" data-input="url">
                     <label class="input-option-label">
-                        <input type="radio" name="inputMethod" value="url">
+                        <input type="radio" name="inputMethod" value="url" id="inputMethodUrl">
                         Load from URL
                     </label>
                     <div class="input-option-content" style="display: none;">
@@ -51,21 +52,21 @@
         </section>
 
         <!-- Papers List Section -->
-        <section class="papers-section" id="papersSection" style="display: none;">
-            <div class="papers-header">
-                <h2>Papers</h2>
+        <section class="papers-section" id="papersSection" style="display: none;" aria-labelledby="papersHeading" aria-live="polite">
+            <header class="papers-header">
+                <h2 id="papersHeading">Papers</h2>
                 <div class="header-buttons">
-                    <button id="exportJsonBtn" type="button" class="secondary-btn">Export JSON</button>
-                    <button id="exportBibtexBtn" type="button" class="secondary-btn">Export BibTeX</button>
-                    <button id="loadNewBtn" type="button" class="secondary-btn">Load New Papers</button>
+                    <button id="exportJsonBtn" type="button" class="secondary-btn" aria-label="Export all papers as JSON file">Export JSON</button>
+                    <button id="exportBibtexBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX</button>
+                    <button id="loadNewBtn" type="button" class="secondary-btn" aria-label="Load a new set of papers">Load New Papers</button>
                 </div>
-            </div>
-            <div id="papersList" class="papers-list">
+            </header>
+            <div id="papersList" class="papers-list" role="list" aria-label="List of papers">
                 <!-- Papers will be rendered here -->
             </div>
         </section>
 
-        <div id="error" class="error" role="alert" aria-live="polite" aria-atomic="true"></div>
+        <div id="error" class="error" role="alert" aria-live="assertive" aria-atomic="true"></div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
 
         <footer class="attribution">
@@ -87,6 +88,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.0.2"></script>
+    <script src="script.js?v=1.0.3"></script>
 </body>
 </html>

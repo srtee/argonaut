@@ -239,11 +239,11 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
     card.dataset.key = key;
 
     const tags = (paperData._tags || []).map(tag =>
-        `<span class="tag" data-tag="${tag}">${tag}</span>`
+        `<button type="button" class="tag" data-tag="${tag}" aria-pressed="false" tabindex="0">${tag}</button>`
     ).join('');
 
     const alsoread = (paperData._alsoread || []).map(ref =>
-        `<span class="alsoread-link" data-ref="${ref}">${ref}</span>`
+        `<button type="button" class="alsoread-link" data-ref="${ref}" tabindex="0" aria-label="View paper: ${ref}">${ref}</button>`
     ).join('');
 
     const comments = paperData._comments ? `<p class="comments">${escapeHtml(paperData._comments)}</p>` : '';
@@ -281,13 +281,13 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
         ${comments}
         ${tags ? `<div class="tags-container">${tags}</div>` : ''}
         ${alsoread ? `<div class="alsoread-container"><span class="alsoread-label">Also read:</span> ${alsoread}</div>` : ''}
-        <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M6 9l6 6 6-6"/>
             </svg>
             Abstract
         </button>
-        <div class="abstract-container">
+        <div class="abstract-container" aria-hidden="true">
             ${abstractContent}
         </div>
     `;
@@ -300,28 +300,44 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
         const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
         toggleBtn.setAttribute('aria-expanded', !isExpanded);
         abstractContainer.classList.toggle('expanded');
+        abstractContainer.setAttribute('aria-hidden', isExpanded);
         toggleBtn.querySelector('svg').style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
     });
 
     // Also read link click handler
     card.querySelectorAll('.alsoread-link').forEach(link => {
-        link.addEventListener('click', () => {
+        const handleClick = () => {
             const refKey = link.dataset.ref;
             const refCard = document.querySelector(`.paper-card[data-key="${refKey}"]`);
             if (refCard) {
                 refCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 refCard.classList.add('highlight');
+                refCard.focus();
                 setTimeout(() => refCard.classList.remove('highlight'), 2000);
             } else {
                 showError(`Paper "${refKey}" not found in current view`);
+            }
+        };
+        link.addEventListener('click', handleClick);
+        link.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleClick();
             }
         });
     });
 
     // Tag click handler
     card.querySelectorAll('.tag').forEach(tag => {
-        tag.addEventListener('click', () => {
+        const handleClick = () => {
             toggleTag(tag.dataset.tag);
+        };
+        tag.addEventListener('click', handleClick);
+        tag.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleClick();
+            }
         });
     });
 
@@ -596,24 +612,22 @@ function hasSelectedTag(paper) {
 
 // Update visual state of all tags (selected/deselected)
 function updateTagVisuals() {
-    if (selectedTags.size === 0) {
-        // No tags selected - remove all classes
-        document.querySelectorAll('.tag').forEach(tagElement => {
+    document.querySelectorAll('.tag').forEach(tagElement => {
+        const tag = tagElement.dataset.tag;
+        if (selectedTags.size === 0) {
+            // No tags selected - remove all classes
             tagElement.classList.remove('selected', 'deselected');
-        });
-    } else {
-        // Tags are active - apply selected/deselected classes
-        document.querySelectorAll('.tag').forEach(tagElement => {
-            const tag = tagElement.dataset.tag;
-            if (selectedTags.has(tag)) {
-                tagElement.classList.add('selected');
-                tagElement.classList.remove('deselected');
-            } else {
-                tagElement.classList.add('deselected');
-                tagElement.classList.remove('selected');
-            }
-        });
-    }
+            tagElement.setAttribute('aria-pressed', 'false');
+        } else if (selectedTags.has(tag)) {
+            tagElement.classList.add('selected');
+            tagElement.classList.remove('deselected');
+            tagElement.setAttribute('aria-pressed', 'true');
+        } else {
+            tagElement.classList.add('deselected');
+            tagElement.classList.remove('selected');
+            tagElement.setAttribute('aria-pressed', 'false');
+        }
+    });
 }
 
 // Main load function
@@ -714,13 +728,8 @@ const moonIcon = document.querySelector('.moon-icon');
 const THEME_KEY = 'theme';
 
 function updateThemeIcons(isDark) {
-    if (isDark) {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-    } else {
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-    }
+    if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
+    if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
 }
 
 function getSystemPreference() {
@@ -761,11 +770,13 @@ function initTheme() {
     }
 }
 
-themeToggle.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-});
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+}
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     if (!localStorage.getItem(THEME_KEY)) {
