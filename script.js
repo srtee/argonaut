@@ -14,32 +14,22 @@ const status = document.getElementById('status');
 // State
 let papersData = {};
 let selectedTags = new Set();
-let selectedTagsCount = 0; // Number of currently selected tags
 let processedPapersData = []; // Store processed papers for filtering
 
 // Toggle tag selection and filter papers
 function toggleTag(tag) {
-    if (selectedTagsCount === 0) {
+    if (selectedTags.size === 0) {
         // Tags inactive - select this tag, clear any others, activate tags
         selectedTags.clear();
         selectedTags.add(tag);
-        selectedTagsCount = 1;
     } else {
         // Tags active
         if (selectedTags.has(tag)) {
-            if (selectedTagsCount === 1) {
-                // Deselecting the only selected tag - go back to inactive
-                selectedTags.delete(tag);
-                selectedTagsCount = 0;
-            } else {
-                // Deselect this tag
-                selectedTags.delete(tag);
-                selectedTagsCount--;
-            }
+            // Deselect this tag (even if it's the only one)
+            selectedTags.delete(tag);
         } else {
             // Select this tag
             selectedTags.add(tag);
-            selectedTagsCount++;
         }
     }
     filterPapersByTags();
@@ -49,19 +39,24 @@ function toggleTag(tag) {
 function filterPapersByTags() {
     const cards = Array.from(papersList.querySelectorAll('.paper-card'));
 
-    if (selectedTagsCount === 0) {
+    if (selectedTags.size === 0) {
         // No tags selected - reset all cards and tags
         cards.forEach(card => {
             card.style.order = '';
             card.classList.remove('dimmed');
-            const tags = card.querySelectorAll('.tag');
-            tags.forEach(tag => {
-                tag.classList.remove('selected');
-                tag.classList.remove('deselected');
+            card.querySelectorAll('.tag').forEach(tag => {
+                tag.classList.remove('selected', 'deselected');
             });
         });
         return;
     }
+
+    // First pass: clear all tag styles
+    cards.forEach(card => {
+        card.querySelectorAll('.tag').forEach(tag => {
+            tag.classList.remove('selected', 'deselected');
+        });
+    });
 
     // Split papers into matching and non-matching
     const matching = [];
@@ -73,16 +68,9 @@ function filterPapersByTags() {
 
         const hasSelectedTag = Array.from(selectedTags).some(tag => cardTags.includes(tag));
 
-        // Update tag styling based on selectedTagsCount
-        const tags = card.querySelectorAll('.tag');
-        tags.forEach(tag => {
-            if (selectedTags.has(tag.dataset.tag)) {
-                tag.classList.add('selected');
-                tag.classList.remove('deselected');
-            } else {
-                tag.classList.remove('selected');
-                tag.classList.add('deselected');
-            }
+        // Second pass: apply tag styling
+        card.querySelectorAll('.tag').forEach(tag => {
+            tag.classList.add(selectedTags.has(tag.dataset.tag) ? 'selected' : 'deselected');
         });
 
         if (hasSelectedTag) {
