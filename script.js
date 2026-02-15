@@ -231,74 +231,82 @@ function hideStatus() {
 
 // Export papers data as JSON
 function exportJSON() {
-    console.log('exportJSON called, papersData:', papersData);
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
     }
 
-    const jsonStr = JSON.stringify(papersData, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'papers.json';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showStatus('JSON exported successfully');
+    try {
+        const jsonStr = JSON.stringify(papersData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'papers.json';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showStatus('JSON exported successfully');
+    } catch (err) {
+        console.error('Error exporting JSON:', err);
+        showError('Error exporting JSON: ' + err.message);
+    }
 }
 
 // Export papers as BibTeX
 async function exportBibTeX() {
-    console.log('exportBibTeX called, papersData:', papersData);
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
     }
 
-    showStatus('Fetching BibTeX entries...');
+    try {
+        showStatus('Fetching BibTeX entries...');
 
-    const entries = Object.entries(papersData);
-    let bibtexContent = '';
+        const entries = Object.entries(papersData);
+        let bibtexContent = '';
 
-    for (let i = 0; i < entries.length; i++) {
-        const [key, paper] = entries[i];
-        status.textContent = `Fetching BibTeX ${i + 1} of ${entries.length}: ${key}`;
-        await new Promise(resolve => setTimeout(resolve, 0));
+        for (let i = 0; i < entries.length; i++) {
+            const [key, paper] = entries[i];
+            status.textContent = `Fetching BibTeX ${i + 1} of ${entries.length}: ${key}`;
+            await new Promise(resolve => setTimeout(resolve, 0));
 
-        if (paper._doi) {
-            const bibtex = await fetchBibTeX(paper._doi);
-            if (bibtex) {
-                bibtexContent += bibtex + '\n\n';
+            if (paper._doi) {
+                const bibtex = await fetchBibTeX(paper._doi);
+                if (bibtex) {
+                    bibtexContent += bibtex + '\n\n';
+                } else {
+                    // Fallback entry if BibTeX fetch fails
+                    bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}},\n  doi = {${paper._doi}}\n}\n\n`;
+                }
             } else {
-                // Fallback entry if BibTeX fetch fails
-                bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}},\n  doi = {${paper._doi}}\n}\n\n`;
+                // Fallback entry for papers without DOI
+                bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}}\n}\n\n`;
             }
-        } else {
-            // Fallback entry for papers without DOI
-            bibtexContent += `@misc{${key.replace(/\s+/g, '')},\n  title = {${key}}\n}\n\n`;
+
+            // Rate limiting
+            if (i < entries.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
         }
 
-        // Rate limiting
-        if (i < entries.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        const blob = new Blob([bibtexContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'papers.bib';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showStatus(`BibTeX exported successfully (${entries.length} entries)`);
+    } catch (err) {
+        console.error('Error exporting BibTeX:', err);
+        showError('Error exporting BibTeX: ' + err.message);
     }
-
-    const blob = new Blob([bibtexContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'papers.bib';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showStatus(`BibTeX exported successfully (${entries.length} entries)`);
 }
 
 // Load JSON from file
@@ -493,20 +501,13 @@ loadNewBtn.addEventListener('click', () => {
 });
 
 // Export JSON button
-console.log('Setting up exportJsonBtn:', exportJsonBtn);
 if (exportJsonBtn) {
     exportJsonBtn.addEventListener('click', exportJSON);
-    console.log('Export JSON button listener attached');
-} else {
-    console.error('Export JSON button not found!');
 }
 
 // Export BibTeX button
 if (exportBibtexBtn) {
     exportBibtexBtn.addEventListener('click', exportBibTeX);
-    console.log('Export BibTeX button listener attached');
-} else {
-    console.error('Export BibTeX button not found!');
 }
 
 // Dark mode toggle functionality
