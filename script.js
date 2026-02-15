@@ -18,19 +18,12 @@ let processedPapersData = []; // Store processed papers for filtering
 
 // Toggle tag selection and filter papers
 function toggleTag(tag) {
-    if (selectedTags.size === 0) {
-        // Tags inactive - select this tag, clear any others, activate tags
-        selectedTags.clear();
-        selectedTags.add(tag);
+    if (selectedTags.has(tag)) {
+        // Deselect this tag (even if it's the only one)
+        selectedTags.delete(tag);
     } else {
-        // Tags active
-        if (selectedTags.has(tag)) {
-            // Deselect this tag (even if it's the only one)
-            selectedTags.delete(tag);
-        } else {
-            // Select this tag
-            selectedTags.add(tag);
-        }
+        // Select this tag
+        selectedTags.add(tag);
     }
     filterPapersByTags();
 }
