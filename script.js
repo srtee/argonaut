@@ -128,34 +128,43 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
 
     const abstractContent = abstract ? `<div class="abstract-content">${escapeHtml(abstract)}</div>` : '<p class="no-abstract">No abstract available</p>';
 
+    // Build compact citation line
+    const citationParts = [];
+    if (formatAuthors(bibInfo.author)) {
+        citationParts.push(`<span class="authors">${formatAuthors(bibInfo.author)}</span>`);
+    }
+    if (escapeHtml(bibInfo.journal)) {
+        citationParts.push(`<span class="journal">${escapeHtml(bibInfo.journal)}</span>`);
+    }
+    if (bibInfo.year) {
+        citationParts.push(`<span class="year">${bibInfo.year}</span>`);
+    }
+    if (bibInfo.volume) {
+        citationParts.push(`<span class="volume">Vol. ${bibInfo.volume}</span>`);
+    }
+    if (bibInfo.number) {
+        citationParts.push(`<span class="number">No. ${bibInfo.number}</span>`);
+    }
+    if (bibInfo.pages) {
+        citationParts.push(`<span class="pages">pp. ${bibInfo.pages}</span>`);
+    }
+    if (paperData._doi) {
+        citationParts.push(`<a href="https://doi.org/${paperData._doi}" target="_blank" rel="noopener noreferrer" class="doi-link">DOI: ${paperData._doi}</a>`);
+    }
+    const citationLine = citationParts.join(' ');
+
     card.innerHTML = `
-        <div class="paper-header">
-            <h3 class="paper-title">${escapeHtml(bibInfo.title || key)}</h3>
-            <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6 6-6"/>
-                </svg>
-                Abstract
-            </button>
-        </div>
-        <div class="paper-meta">
-            <p class="authors">${formatAuthors(bibInfo.author)}</p>
-            <p class="citation">
-                <span class="journal">${escapeHtml(bibInfo.journal)}</span>
-                ${bibInfo.year ? `<span class="year">${bibInfo.year}</span>` : ''}
-                ${bibInfo.volume ? `<span class="volume">Vol. ${bibInfo.volume}</span>` : ''}
-                ${bibInfo.number ? `<span class="number">No. ${bibInfo.number}</span>` : ''}
-                ${bibInfo.pages ? `<span class="pages">pp. ${bibInfo.pages}</span>` : ''}
-            </p>
-            <p class="doi-link">
-                <a href="https://doi.org/${paperData._doi}" target="_blank" rel="noopener noreferrer">
-                    DOI: ${paperData._doi}
-                </a>
-            </p>
-        </div>
+        <h3 class="paper-title">${escapeHtml(bibInfo.title || key)}</h3>
+        <p class="citation-line">${citationLine}</p>
         ${comments}
         ${tags ? `<div class="tags-container">${tags}</div>` : ''}
         ${alsoread ? `<div class="alsoread-container"><span class="alsoread-label">Also read:</span> ${alsoread}</div>` : ''}
+        <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+            Abstract
+        </button>
         <div class="abstract-container">
             ${abstractContent}
         </div>
