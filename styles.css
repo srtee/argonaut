@@ -92,6 +92,12 @@
     transition: top 0.2s;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .skip-link {
+        transition: none;
+    }
+}
+
 .skip-link:focus-visible {
     top: 20px;
     outline: 3px solid #1d4ed8;
@@ -198,8 +204,19 @@ h3 {
     margin-bottom: 12px;
 }
 
+.input-option-label:focus-within {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
 .input-option-label input[type="radio"] {
     margin-right: 8px;
+}
+
+.input-option-label input[type="radio"]:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
 }
 
 .input-option-content {
@@ -217,11 +234,10 @@ h3 {
     color: var(--text-color);
 }
 
-.file-input:focus,
-.url-input:focus {
+.file-input:focus-visible,
+.url-input:focus-visible {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-    outline: none;
 }
 
 .url-input {
@@ -233,9 +249,26 @@ h3 {
     animation: fadeIn 0.3s ease-in;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .papers-section {
+        animation: none;
+    }
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 .papers-header {
@@ -266,6 +299,13 @@ h3 {
 
 .paper-card.highlight {
     animation: highlight 2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .paper-card.highlight {
+        animation: none;
+        box-shadow: 0 0 0 4px #2563eb;
+    }
 }
 
 @keyframes highlight {
@@ -332,6 +372,12 @@ h3 {
 }
 
 .citation-line a.doi-link:hover {
+    text-decoration: underline;
+}
+
+.citation-line a.doi-link:focus-visible {
+    outline: 2px solid var(--doi-link-color);
+    outline-offset: 2px;
     text-decoration: underline;
 }
 
@@ -409,6 +455,23 @@ h3 {
     opacity: 0.8;
 }
 
+.alsoread-link:focus-visible {
+    outline: 2px solid var(--alsoread-color);
+    outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* Abstract */
 .abstract-container {
     margin-top: 16px;
@@ -422,6 +485,12 @@ h3 {
 .abstract-container.expanded {
     display: block;
     animation: slideDown 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .abstract-container.expanded {
+        animation: none;
+    }
 }
 
 @keyframes slideDown {
@@ -550,6 +619,12 @@ button:disabled {
 }
 
 .social-links a:hover {
+    opacity: 1;
+}
+
+.social-links a:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 2px;
     opacity: 1;
 }
 

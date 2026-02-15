@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
     <main class="container" id="mainContent" tabindex="-1">
         <h1>Paper Viewer</h1>
         <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
@@ -34,7 +34,7 @@
                         Upload JSON File
                     </label>
                     <div class="input-option-content">
-                        <input type="file" id="fileInput" accept=".json" class="file-input">
+                        <input type="file" id="fileInput" accept=".json" class="file-input" aria-label="Select JSON file to upload">
                     </div>
                 </div>
                 <div class="input-option" data-input="url">
@@ -43,8 +43,8 @@
                         Load from URL
                     </label>
                     <div class="input-option-content" style="display: none;">
-                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/papers.json" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input">
-                        <button id="loadUrlBtn" type="button" class="secondary-btn">Load</button>
+                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/papers.json" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input" aria-label="Enter JSON file URL">
+                        <button id="loadUrlBtn" type="button" class="secondary-btn" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
 
         <footer class="attribution">
             <small>Vibe-coded by Shern Ren Tee with Claude Code + Ollama Cloud GLM 4.7</small>
-            <div class="social-links">
+            <nav class="social-links" aria-label="Social media links">
                 <a href="https://github.com/srtee/bibmydoi" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub (opens in new tab)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
