@@ -437,48 +437,48 @@ h3 {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    border: 1px solid transparent;
 }
 
-/* Default state (tags inactive) */
+/* Default state (no tags selected) */
 .tag:hover {
     opacity: 0.8;
 }
 
 /* Selected state (when tags are active and this tag is selected) */
 .tag.selected {
-    background: var(--text-color);
-    color: var(--bg-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.tag.deselected {
-    opacity: 0.5;
-    filter: grayscale(30%);
+    background: #2563eb;
+    color: white;
+    border: 2px solid #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    transform: scale(1.05);
 }
 
 .tag.selected:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+    transform: scale(1.08);
 }
 
 /* Deselected state (when tags are active but this tag is not selected) */
 .tag.deselected {
-    opacity: 0.4;
+    opacity: 0.3;
+    filter: grayscale(60%);
+    cursor: not-allowed;
 }
 
 .tag.deselected:hover {
-    opacity: 0.6;
+    opacity: 0.4;
 }
 
 /* Dimmed state for papers without selected tags */
 .paper-card.dimmed {
-    opacity: 0.4;
-    filter: grayscale(50%);
+    opacity: 0.3;
+    filter: grayscale(60%);
+    pointer-events: none;
 }
 
 .paper-card.dimmed:hover {
-    opacity: 0.6;
-    filter: grayscale(30%);
+    opacity: 0.4;
 }
 
 /* Also Read */

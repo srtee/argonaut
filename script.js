@@ -19,69 +19,11 @@ let processedPapersData = []; // Store processed papers for filtering
 // Toggle tag selection and filter papers
 function toggleTag(tag) {
     if (selectedTags.has(tag)) {
-        // Deselect this tag (even if it's the only one)
         selectedTags.delete(tag);
     } else {
-        // Select this tag
         selectedTags.add(tag);
     }
-    filterPapersByTags();
-}
-
-// Filter papers by selected tags
-function filterPapersByTags() {
-    const cards = Array.from(papersList.querySelectorAll('.paper-card'));
-
-    if (selectedTags.size === 0) {
-        // No tags selected - reset all cards and tags
-        cards.forEach(card => {
-            card.style.order = '';
-            card.classList.remove('dimmed');
-            card.querySelectorAll('.tag').forEach(tag => {
-                tag.classList.remove('selected', 'deselected');
-            });
-        });
-        return;
-    }
-
-    // First pass: clear all tag styles
-    cards.forEach(card => {
-        card.querySelectorAll('.tag').forEach(tag => {
-            tag.classList.remove('selected', 'deselected');
-        });
-    });
-
-    // Split papers into matching and non-matching
-    const matching = [];
-    const nonMatching = [];
-
-    cards.forEach((card, index) => {
-        const cardTags = Array.from(card.querySelectorAll('.tag'))
-            .map(tag => tag.dataset.tag);
-
-        const hasSelectedTag = Array.from(selectedTags).some(tag => cardTags.includes(tag));
-
-        // Second pass: apply tag styling
-        card.querySelectorAll('.tag').forEach(tag => {
-            tag.classList.add(selectedTags.has(tag.dataset.tag) ? 'selected' : 'deselected');
-        });
-
-        if (hasSelectedTag) {
-            card.classList.remove('dimmed');
-            matching.push(card);
-        } else {
-            card.classList.add('dimmed');
-            nonMatching.push(card);
-        }
-    });
-
-    // Reorder: matching papers first, then non-matching
-    matching.forEach((card, index) => {
-        card.style.order = index;
-    });
-    nonMatching.forEach((card, index) => {
-        card.style.order = matching.length + index;
-    });
+    applyTagFilter();
 }
 
 // DOI extraction regex
@@ -633,13 +575,16 @@ function applyTagFilter() {
     sortedPapers.forEach(({ key, paper, bibInfo, abstract }) => {
         const card = createPaperCard(key, paper, bibInfo, abstract);
 
-        // Add faded class if no selected tags
+        // Add dimmed class if no selected tags
         if (selectedTags.size > 0 && !hasSelectedTag(paper)) {
-            card.classList.add('paper-card-faded');
+            card.classList.add('dimmed');
         }
 
         papersList.appendChild(card);
     });
+
+    // Update tag visual states after rendering
+    updateTagVisuals();
 }
 
 // Check if a paper has any selected tag
@@ -649,27 +594,26 @@ function hasSelectedTag(paper) {
     return paperTags.some(tag => selectedTags.has(tag));
 }
 
-// Toggle tag selection
-function toggleTag(tag) {
-    if (selectedTags.has(tag)) {
-        selectedTags.delete(tag);
-    } else {
-        selectedTags.add(tag);
-    }
-    applyTagFilter();
-    updateTagVisuals();
-}
-
-// Update visual state of tags (selected/unselected)
+// Update visual state of all tags (selected/deselected)
 function updateTagVisuals() {
-    document.querySelectorAll('.tag').forEach(tagElement => {
-        const tag = tagElement.dataset.tag;
-        if (selectedTags.has(tag)) {
-            tagElement.classList.add('tag-selected');
-        } else {
-            tagElement.classList.remove('tag-selected');
-        }
-    });
+    if (selectedTags.size === 0) {
+        // No tags selected - remove all classes
+        document.querySelectorAll('.tag').forEach(tagElement => {
+            tagElement.classList.remove('selected', 'deselected');
+        });
+    } else {
+        // Tags are active - apply selected/deselected classes
+        document.querySelectorAll('.tag').forEach(tagElement => {
+            const tag = tagElement.dataset.tag;
+            if (selectedTags.has(tag)) {
+                tagElement.classList.add('selected');
+                tagElement.classList.remove('deselected');
+            } else {
+                tagElement.classList.add('deselected');
+                tagElement.classList.remove('selected');
+            }
+        });
+    }
 }
 
 // Main load function
