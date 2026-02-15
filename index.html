@@ -57,11 +57,22 @@
                 <h2 id="papersHeading">Papers</h2>
                 <div class="header-buttons">
                     <button id="exportJsonBtn" type="button" class="secondary-btn" aria-label="Export all papers as JSON file">Export JSON</button>
-                    <button id="exportBibtexBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
+                    <button id="exportBibtexAllBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                     <button id="exportBibtexTaggedBtn" type="button" class="secondary-btn" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
                     <button id="loadNewBtn" type="button" class="secondary-btn" aria-label="Reset all papers, comments, and tags">Reset All</button>
                 </div>
             </header>
+
+            <!-- Add DOI Section -->
+            <div class="add-doi-section">
+                <h3>Add Paper by DOI</h3>
+                <div class="add-doi-inputs">
+                    <input type="text" id="doiInput" placeholder="DOI or URL (e.g., 10.1038/nature12373)" class="doi-input" aria-label="Enter DOI or URL containing DOI">
+                    <input type="text" id="doiKeyInput" placeholder="Key (optional, defaults to Author+Year)" class="doi-key-input" aria-label="Optional key for the paper">
+                    <button id="addDoiBtn" type="button" aria-label="Add paper with specified DOI">Add DOI</button>
+                </div>
+            </div>
+
             <div id="papersList" class="papers-list" role="list" aria-label="List of papers">
                 <!-- Papers will be rendered here -->
             </div>

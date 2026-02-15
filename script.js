@@ -7,6 +7,9 @@ const urlInput = document.getElementById('urlInput');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
+const doiInput = document.getElementById('doiInput');
+const doiKeyInput = document.getElementById('doiKeyInput');
+const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 
@@ -229,6 +232,126 @@ function formatAuthors(authorString) {
         }
         return author.trim();
     }).join(', ');
+}
+
+// Generate a default key from BibTeX info (first author + year, with duplicate numbering)
+function generateDefaultKey(bibInfo) {
+    const author = bibInfo.author || '';
+    const year = bibInfo.year || '';
+
+    // Get first author's last name
+    const firstAuthor = author.split(/\s+and\s+/i)[0] || '';
+    const lastName = firstAuthor.split(',')[0]?.trim() || 'Unknown';
+
+    // Remove non-alphabetic characters from last name and capitalize first letter
+    const cleanLastName = lastName.replace(/[^a-zA-Z]/g, '');
+    const keyBase = cleanLastName.charAt(0).toUpperCase() + cleanLastName.slice(1).toLowerCase() + year;
+
+    // Check for duplicates and add suffix if needed
+    let key = keyBase;
+    let suffix = 1;
+    const existingKeys = Object.keys(papersData);
+
+    while (existingKeys.includes(key)) {
+        key = keyBase + String.fromCharCode(96 + suffix);
+        suffix++;
+    }
+
+    return key;
+}
+
+// Add a paper by DOI
+async function addPaperByDoi() {
+    const input = doiInput.value.trim();
+    const customKey = doiKeyInput.value.trim();
+
+    if (!input) {
+        showError('Please enter a DOI or URL');
+        return;
+    }
+
+    // Extract DOI from input
+    const doi = extractDOI(input);
+    if (!doi) {
+        showError('Could not extract a valid DOI from the input. Please enter a valid DOI (e.g., 10.xxxx/xxxx) or a URL containing a DOI.');
+        return;
+    }
+
+    try {
+        showStatus(`Fetching paper: ${doi}...`);
+
+        // Fetch BibTeX
+        const bibtex = await fetchBibTeX(doi);
+        if (!bibtex) {
+            showError('Failed to fetch BibTeX for this DOI');
+            return;
+        }
+
+        // Parse BibTeX
+        const bibInfo = parseBibTeX(bibtex);
+
+        // Generate or use custom key
+        const key = customKey || generateDefaultKey(bibInfo);
+
+        // Check if key already exists
+        if (papersData[key] && !customKey) {
+            showError(`Paper "${key}" already exists. Please provide a custom key or use a different DOI.`);
+            return;
+        } else if (papersData[key] && customKey) {
+            // User provided a custom key that already exists - warn and overwrite
+            if (!confirm(`The key "${key}" already exists. Do you want to overwrite the existing entry?`)) {
+                hideStatus();
+                return;
+            }
+        }
+
+        // Fetch abstract
+        const abstract = await fetchAbstract(doi);
+
+        // Add to papersData
+        papersData[key] = {
+            _doi: doi,
+            ...(bibInfo.title && { title: bibInfo.title }),
+            ...(bibInfo.author && { author: bibInfo.author }),
+            ...(bibInfo.journal && { journal: bibInfo.journal }),
+            ...(bibInfo.year && { year: bibInfo.year }),
+            ...(bibInfo.volume && { volume: bibInfo.volume }),
+            ...(bibInfo.number && { number: bibInfo.number }),
+            ...(bibInfo.pages && { pages: bibInfo.pages }),
+        };
+
+        // Add to processedPapersData
+        const processedEntry = {
+            key,
+            paper: papersData[key],
+            bibInfo: { title: bibInfo.title || key, ...bibInfo },
+            abstract
+        };
+        processedPapersData.push(processedEntry);
+
+        // Re-render papers
+        applyTagFilter();
+
+        // Clear inputs
+        doiInput.value = '';
+        doiKeyInput.value = '';
+
+        showStatus(`Paper "${key}" added successfully`);
+
+        // Scroll to the new paper
+        setTimeout(() => {
+            const newCard = document.querySelector(`.paper-card[data-key="${key}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                newCard.classList.add('highlight');
+                setTimeout(() => newCard.classList.remove('highlight'), 2000);
+            }
+        }, 100);
+
+    } catch (err) {
+        console.error('Error adding paper:', err);
+        showError('Error adding paper: ' + err.message);
+    }
 }
 
 // Create paper card element
@@ -909,6 +1032,21 @@ if (exportBibtexAllBtn) {
 const exportBibtexTaggedBtn = document.getElementById('exportBibtexTaggedBtn');
 if (exportBibtexTaggedBtn) {
     exportBibtexTaggedBtn.addEventListener('click', exportBibTeXTagged);
+}
+
+// Add DOI button
+if (addDoiBtn) {
+    addDoiBtn.addEventListener('click', addPaperByDoi);
+}
+
+// Allow Enter key to submit DOI
+if (doiInput) {
+    doiInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addPaperByDoi();
+        }
+    });
 }
 
 // Dark mode toggle functionality
