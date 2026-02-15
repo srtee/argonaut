@@ -41,8 +41,36 @@ async function fetchBibTeX(doi) {
     }
 }
 
+// Fetch abstract from Semantic Scholar API
+async function fetchAbstractFromSemanticScholar(doi) {
+    try {
+        const response = await fetch(
+            `https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(doi)}?fields=abstract`,
+            {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const data = await response.json();
+        if (data.abstract) {
+            return data.abstract;
+        }
+
+        return null;
+    } catch (err) {
+        console.error('Error fetching abstract from Semantic Scholar:', err);
+        return null;
+    }
+}
+
 // Fetch abstract from Crossref API
-async function fetchAbstract(doi) {
+async function fetchAbstractFromCrossref(doi) {
     try {
         const response = await fetch(
             `https://api.crossref.org/works/${encodeURIComponent(doi)}`,
@@ -64,9 +92,22 @@ async function fetchAbstract(doi) {
 
         return null;
     } catch (err) {
-        console.error('Error fetching abstract:', err);
+        console.error('Error fetching abstract from Crossref:', err);
         return null;
     }
+}
+
+// Fetch abstract - tries Semantic Scholar first, then Crossref
+async function fetchAbstract(doi) {
+    // Try Semantic Scholar first
+    let abstract = await fetchAbstractFromSemanticScholar(doi);
+    if (abstract) {
+        return abstract;
+    }
+
+    // Fallback to Crossref
+    abstract = await fetchAbstractFromCrossref(doi);
+    return abstract;
 }
 
 // Fetch page numbers from Crossref API
