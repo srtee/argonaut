@@ -1,4 +1,6 @@
+console.log('=== Paper Viewer Script Loading ===');
 // DOM Elements
+console.log('Loading DOM elements...');
 const inputSection = document.getElementById('inputSection');
 const papersSection = document.getElementById('papersSection');
 const exportSection = document.getElementById('exportSection');
@@ -13,6 +15,9 @@ const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
+console.log('DOM elements loaded:', {
+    inputSection, papersSection, exportSection, addDoiBtn, themeToggle: document.getElementById('themeToggle')
+});
 
 // State
 let papersData = {};
@@ -263,6 +268,7 @@ function generateDefaultKey(bibInfo) {
 
 // Add a paper by DOI
 async function addPaperByDoi() {
+    console.log('addPaperByDoi called');
     const input = doiInput.value.trim();
     const customKey = doiKeyInput.value.trim();
 
@@ -273,6 +279,7 @@ async function addPaperByDoi() {
 
     // Extract DOI from input
     const doi = extractDOI(input);
+    console.log('DOI extracted:', doi);
     if (!doi) {
         showError('Could not extract a valid DOI from the input. Please enter a valid DOI (e.g., 10.xxxx/xxxx) or a URL containing a DOI.');
         return;
@@ -878,8 +885,15 @@ if (exportBibtexTaggedBtn) {
 }
 
 // Add DOI button
+console.log('Setting up addDoiBtn event listener, addDoiBtn:', addDoiBtn);
 if (addDoiBtn) {
-    addDoiBtn.addEventListener('click', addPaperByDoi);
+    console.log('Adding click listener to addDoiBtn');
+    addDoiBtn.addEventListener('click', () => {
+        console.log('addDoiBtn clicked!');
+        addPaperByDoi();
+    });
+} else {
+    console.error('addDoiBtn not found!');
 }
 
 // Allow Enter key to submit DOI
@@ -893,10 +907,12 @@ if (doiInput) {
 }
 
 // Dark mode toggle functionality
+console.log('Setting up theme toggle...');
 const themeToggle = document.getElementById('themeToggle');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
 const THEME_KEY = 'theme';
+console.log('Theme elements:', { themeToggle, sunIcon, moonIcon });
 
 function updateThemeIcons(isDark) {
     if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
@@ -926,11 +942,14 @@ function setTheme(theme) {
 }
 
 function initTheme() {
+    console.log('initTheme called');
     const storedTheme = getStoredTheme();
     if (storedTheme) {
+        console.log('Using stored theme:', storedTheme);
         setTheme(storedTheme);
     } else {
         const isDark = getSystemPreference();
+        console.log('Using system preference, isDark:', isDark);
         // Set initial theme without saving to localStorage
         if (isDark) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -942,11 +961,16 @@ function initTheme() {
 }
 
 if (themeToggle) {
+    console.log('Adding themeToggle event listener');
     themeToggle.addEventListener('click', () => {
+        console.log('themeToggle clicked');
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        console.log('Switching theme from', currentTheme, 'to', newTheme);
         setTheme(newTheme);
     });
+} else {
+    console.error('themeToggle not found!');
 }
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -956,4 +980,6 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e)
 });
 
 // Initialize theme on page load
+console.log('Script fully loaded, initializing theme...');
 initTheme();
+console.log('Script initialization complete');
