@@ -13,6 +13,71 @@ const status = document.getElementById('status');
 
 // State
 let papersData = {};
+let selectedTags = new Set();
+let processedPapersData = []; // Store processed papers for filtering
+
+// Toggle tag selection and filter papers
+function toggleTag(tag) {
+    if (selectedTags.has(tag)) {
+        selectedTags.delete(tag);
+    } else {
+        selectedTags.add(tag);
+    }
+    filterPapersByTags();
+}
+
+// Filter papers by selected tags
+function filterPapersByTags() {
+    const cards = Array.from(papersList.querySelectorAll('.paper-card'));
+
+    if (selectedTags.size === 0) {
+        // No tags selected - reset all cards
+        cards.forEach(card => {
+            card.style.order = '';
+            card.classList.remove('dimmed');
+            const tags = card.querySelectorAll('.tag');
+            tags.forEach(tag => tag.classList.remove('selected'));
+        });
+        return;
+    }
+
+    // Split papers into matching and non-matching
+    const matching = [];
+    const nonMatching = [];
+
+    cards.forEach((card, index) => {
+        const cardTags = Array.from(card.querySelectorAll('.tag'))
+            .map(tag => tag.dataset.tag);
+
+        const hasSelectedTag = Array.from(selectedTags).some(tag => cardTags.includes(tag));
+
+        // Update tag styling
+        const tags = card.querySelectorAll('.tag');
+        tags.forEach(tag => {
+            if (selectedTags.has(tag.dataset.tag)) {
+                tag.classList.add('selected');
+            } else {
+                tag.classList.remove('selected');
+            }
+        });
+
+        if (hasSelectedTag) {
+            card.classList.remove('dimmed');
+            matching.push(card);
+        } else {
+            card.classList.add('dimmed');
+            nonMatching.push(card);
+        }
+    });
+
+    // Reorder: matching papers first, then non-matching
+    matching.forEach((card, index) => {
+        card.style.order = index;
+    });
+    nonMatching.forEach((card, index) => {
+        card.style.order = matching.length + index;
+    });
+}
 
 // DOI extraction regex
 function extractDOI(input) {
@@ -306,6 +371,13 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
         });
     });
 
+    // Tag click handler
+    card.querySelectorAll('.tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+            toggleTag(tag.dataset.tag);
+        });
+    });
+
     return card;
 }
 
@@ -529,16 +601,69 @@ async function processPapers(data) {
 
 // Render papers
 function renderPapers(processedPapers) {
+    // Store processed papers for filtering
+    processedPapersData = processedPapers;
+    applyTagFilter();
+}
+
+// Filter and reorder papers based on selected tags
+function applyTagFilter() {
     papersList.innerHTML = '';
 
-    if (processedPapers.length === 0) {
+    if (processedPapersData.length === 0) {
         papersList.innerHTML = '<p class="no-papers">No papers found in the loaded data.</p>';
         return;
     }
 
-    processedPapers.forEach(({ key, paper, bibInfo, abstract }) => {
+    // Sort papers: matching papers first, non-matching last
+    const sortedPapers = [...processedPapersData].sort((a, b) => {
+        const aHasSelectedTag = hasSelectedTag(a.paper);
+        const bHasSelectedTag = hasSelectedTag(b.paper);
+
+        if (aHasSelectedTag && !bHasSelectedTag) return -1;
+        if (!aHasSelectedTag && bHasSelectedTag) return 1;
+        return 0;
+    });
+
+    sortedPapers.forEach(({ key, paper, bibInfo, abstract }) => {
         const card = createPaperCard(key, paper, bibInfo, abstract);
+
+        // Add faded class if no selected tags
+        if (selectedTags.size > 0 && !hasSelectedTag(paper)) {
+            card.classList.add('paper-card-faded');
+        }
+
         papersList.appendChild(card);
+    });
+}
+
+// Check if a paper has any selected tag
+function hasSelectedTag(paper) {
+    const paperTags = paper._tags || [];
+    if (selectedTags.size === 0) return true; // No tags selected, all papers are "matching"
+    return paperTags.some(tag => selectedTags.has(tag));
+}
+
+// Toggle tag selection
+function toggleTag(tag) {
+    if (selectedTags.has(tag)) {
+        selectedTags.delete(tag);
+    } else {
+        selectedTags.add(tag);
+    }
+    applyTagFilter();
+    updateTagVisuals();
+}
+
+// Update visual state of tags (selected/unselected)
+function updateTagVisuals() {
+    document.querySelectorAll('.tag').forEach(tagElement => {
+        const tag = tagElement.dataset.tag;
+        if (selectedTags.has(tag)) {
+            tagElement.classList.add('tag-selected');
+        } else {
+            tagElement.classList.remove('tag-selected');
+        }
     });
 }
 

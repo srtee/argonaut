@@ -435,6 +435,29 @@ h3 {
     border-radius: 16px;
     font-size: 12px;
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag:hover {
+    opacity: 0.8;
+}
+
+.tag.selected {
+    background: var(--text-color);
+    color: var(--bg-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Dimmed state for papers without selected tags */
+.paper-card.dimmed {
+    opacity: 0.4;
+    filter: grayscale(50%);
+}
+
+.paper-card.dimmed:hover {
+    opacity: 0.6;
+    filter: grayscale(30%);
 }
 
 /* Also Read */
