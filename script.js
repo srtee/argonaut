@@ -960,7 +960,7 @@ if (exportJsonBtn) {
 }
 
 // Export BibTeX (all) button
-const exportBibtexAllBtn = document.getElementById('exportBibtexAllBtn');
+console.log('exportBibtexAllBtn:', exportBibtexAllBtn);
 if (exportBibtexAllBtn) {
     exportBibtexAllBtn.addEventListener('click', exportBibTeX);
 }
