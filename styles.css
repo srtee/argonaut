@@ -1,10 +1,17 @@
 :root {
     /* Light theme colors */
     --bg-color: #f5f5f5;
+    --bg-secondary: #e5e7eb;
+    --hover-bg: #f3f4f6;
     --container-bg: #ffffff;
     --text-color: #333333;
+    --text-secondary: #6b7280;
+    --muted-text: #9ca3af;
     --input-border: #dddddd;
+    --border-color: #e5e7eb;
     --input-bg: #ffffff;
+    --accent-color: #2563eb;
+    --accent-hover: #1d4ed8;
     --paper-card-bg: #f8fafc;
     --paper-card-border: #e2e8f0;
     --paper-card-hover: #f1f5f9;
@@ -25,10 +32,17 @@
 [data-theme="dark"] {
     /* Dark theme colors */
     --bg-color: #1f2937;
+    --bg-secondary: #374151;
+    --hover-bg: #4b5563;
     --container-bg: #374151;
     --text-color: #f9fafb;
+    --text-secondary: #d1d5db;
+    --muted-text: #9ca3af;
     --input-border: #4b5563;
+    --border-color: #4b5563;
     --input-bg: #1f2937;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
     --paper-card-bg: #1e3a8a;
     --paper-card-border: #1e40af;
     --paper-card-hover: #2563eb;
