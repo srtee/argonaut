@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View and manage research papers with filtering, abstracts, and export options.">
     <title>Argonaut</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.8">
+    <link rel="stylesheet" href="styles.css?v=1.0.9">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
     <main class="container" id="mainContent" tabindex="-1">
         <h1>Argonaut</h1>
         <p class="subtitle">browser-based, JSON-stored bibliographies</p>
-        <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
+        <button id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false" type="button">
             <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
                 <!-- Sun icon (shown in dark mode) -->
                 <g class="sun-icon" style="display: none;">
@@ -21,7 +21,7 @@
                 </g>
                 <!-- Moon icon (shown in light mode) -->
                 <g class="moon-icon">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" fill="none"/>
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="#4b5563" stroke-width="2" fill="none"/>
                 </g>
             </svg>
         </button>
@@ -58,11 +58,11 @@
             <div class="add-doi-inputs">
                 <div class="input-group">
                     <label for="doiInput" class="input-label">DOI or URL</label>
-                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx" aria-label="Enter DOI or URL containing DOI">
+                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx">
                 </div>
                 <div class="input-group">
                     <label for="doiKeyInput" class="input-label">Key (optional)</label>
-                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024" aria-label="Enter optional citation key">
+                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024">
                 </div>
                 <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
             </div>
@@ -108,6 +108,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.0.9"></script>
+    <script src="script.js?v=1.1.0"></script>
 </body>
 </html>

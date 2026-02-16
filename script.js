@@ -29,6 +29,14 @@ function toggleTag(tag) {
         selectedTags.add(tag);
     }
     applyTagFilter();
+    updateExportButtonStates();
+}
+
+// Update disabled state of export buttons based on tag selection
+function updateExportButtonStates() {
+    if (exportBibtexTaggedBtn) {
+        exportBibtexTaggedBtn.disabled = selectedTags.size === 0;
+    }
 }
 
 // DOI extraction regex
@@ -420,7 +428,7 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
             </button>
             ${tags}
         </div>
-        ${alsoread ? `<div class="alsoread-container"><span class="alsoread-label">Also read:</span> ${alsoread}</div>` : ''}
+        ${alsoread ? `<div class="alsoread-container" role="group" aria-label="Also read papers" role="group" aria-label="Also read papers" role="group" aria-label="Also read papers"><span class="alsoread-label">Also read:</span> ${alsoread}</div>` : ''}
         <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract" type="button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M6 9l6 6 6-6"/>
@@ -824,6 +832,9 @@ function applyTagFilter() {
 
     // Update tag visual states after rendering
     updateTagVisuals();
+
+    // Update export button states
+    updateExportButtonStates();
 }
 
 // Check if a paper has any selected tag
@@ -851,6 +862,13 @@ function updateTagVisuals() {
             tagElement.setAttribute('aria-pressed', 'false');
         }
     });
+}
+
+// Update export button states based on tag selection
+function updateExportButtonStates() {
+    if (exportBibtexTaggedBtn) {
+        exportBibtexTaggedBtn.disabled = selectedTags.size === 0;
+    }
 }
 
 // Main load function
