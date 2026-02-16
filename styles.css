@@ -562,6 +562,176 @@ h3 {
     opacity: 0.4;
 }
 
+/* ========== Inline Tag Editing Styles ========== */
+
+.tags-container.editing {
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edit-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tag-add-container {
+    display: flex;
+    gap: 8px;
+}
+
+.tag-edit-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.tag-edit-input:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: -1px;
+}
+
+.add-edit-tag-btn {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.add-edit-tag-btn:hover {
+    background: var(--accent-hover);
+}
+
+.edit-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+}
+
+.edit-tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.edit-tag-item:hover {
+    border-color: var(--accent-color);
+}
+
+.edit-tag-item.tentatively-removed {
+    background: rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+    border: 1px dashed #dc2626;
+    text-decoration: line-through;
+}
+
+.edit-tag-item.tentatively-removed:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+.tag-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    line-height: 1;
+}
+
+.tag-remove:hover {
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+}
+
+.tag-restore {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    color: #16a34a;
+}
+
+.tag-restore:hover {
+    background: #16a34a;
+    color: white;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.cancel-edit-tags-btn {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.cancel-edit-tags-btn:hover {
+    background: var(--bg-secondary);
+}
+
+.save-edit-tags-btn {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.save-edit-tags-btn:hover {
+    background: var(--accent-hover);
+}
+
+.no-tags-message {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-style: italic;
+}
+
 /* Dimmed state for papers without selected tags */
 .paper-card.dimmed {
     opacity: 0.3;
@@ -571,6 +741,169 @@ h3 {
 
 .paper-card.dimmed:hover {
     opacity: 0.4;
+}
+
+/* Inline Tag Editing */
+.tags-container.editing {
+    background: var(--input-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 12px;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edit-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.tag-add-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag-edit-input {
+    flex: 1;
+    min-width: 150px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+.tag-edit-input:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: -1px;
+}
+
+.add-edit-tag-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-edit-tag-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.edit-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 30px;
+}
+
+.edit-tag-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.edit-tag-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-tag-item:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.edit-tag-item.tentatively-removed {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.edit-tag-item.tentatively-removed:hover {
+    background: rgba(239, 68, 68, 0.2);
+    opacity: 0.9;
+}
+
+.tag-remove,
+.tag-restore {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.tag-restore {
+    color: #22c55e;
+}
+
+.no-tags-message {
+    color: var(--muted-text);
+    font-size: 12px;
+    font-style: italic;
+    margin: 0;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.cancel-edit-tags-btn,
+.save-edit-tags-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-edit-tags-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.cancel-edit-tags-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-color);
+}
+
+.save-edit-tags-btn {
+    background: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    color: white;
+}
+
+.save-edit-tags-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
 /* Also Read */

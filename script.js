@@ -1115,23 +1115,13 @@ console.log('Script fully loaded, initializing theme...');
 initTheme();
 console.log('Script initialization complete');
 
-// ========== Tag Management Dialog ==========
+// ========== Inline Tag Management ==========
 
 // State for tag editing
 let currentEditingKey = null;
+let currentTagsContainer = null;
 let tentativeTags = []; // Array of tag strings (active tags)
 let tentativeTagsRemoved = []; // Array of tag strings (tentatively removed tags)
-
-// DOM Elements for tag dialog
-const tagDialog = document.getElementById('tagDialog');
-const tagDialogTitle = document.getElementById('tagDialogTitle');
-const tagDialogPaperTitle = document.getElementById('tagDialogPaperTitle');
-const tagList = document.getElementById('tagList');
-const tagInput = document.getElementById('tagInput');
-const addTagBtn = document.getElementById('addTagBtn');
-const cancelTagChanges = document.getElementById('cancelTagChanges');
-const saveTagChangesBtn = document.getElementById('saveTagChanges');
-const tagDialogClose = document.querySelector('.tag-dialog-close');
 
 console.log('Tag dialog elements found:', {
     tagDialog,
@@ -1145,9 +1135,32 @@ console.log('Tag dialog elements found:', {
     tagDialogClose
 });
 
-// Open tag dialog
+// Check if there are unsaved changes
+function hasUnsavedChanges() {
+    const paper = papersData[currentEditingKey];
+    if (!paper) return false;
+    const originalTags = paper._tags || [];
+    const finalTags = [...tentativeTags];
+    // Check if tags have changed
+    if (originalTags.length !== finalTags.length) return true;
+    for (let i = 0; i < originalTags.length; i++) {
+        if (originalTags[i] !== finalTags[i]) return true;
+    }
+    return false;
+}
+
+// Open inline tag editing
 function openTagDialog(key) {
-    console.log('Opening tag dialog for key:', key);
+    console.log('Opening inline tag editing for key:', key);
+
+    // Prevent editing multiple papers at once
+    if (currentEditingKey !== null && currentEditingKey !== key) {
+        if (hasUnsavedChanges() && !confirm('You have unsaved changes. Discard them?')) {
+            return;
+        }
+        closeTagDialog();
+    }
+
     currentEditingKey = key;
     const paper = papersData[key];
     if (!paper) {
@@ -1172,149 +1185,186 @@ function openTagDialog(key) {
 
     console.log('Tentative tags after initialization:', tentativeTags);
 
-    // Set dialog title
-    if (tagDialogPaperTitle) {
-        tagDialogPaperTitle.textContent = paper.title || key;
-    } else {
-        console.error('tagDialogPaperTitle element not found!');
-    }
-
-    // Render tags
-    renderTagList();
-
-    // Show dialog
-    if (tagDialog) {
-        tagDialog.style.display = 'flex';
-    } else {
-        console.error('tagDialog element not found!');
-    }
-    if (tagInput) {
-        tagInput.value = '';
-        tagInput.focus();
-    } else {
-        console.error('tagInput element not found!');
-    }
-
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
-}
-
-// Close tag dialog
-function closeTagDialog() {
-    tagDialog.style.display = 'none';
-    currentEditingKey = null;
-    tentativeTags = [];
-    tentativeTagsRemoved = [];
-    document.body.style.overflow = '';
-}
-
-// Render tag list in dialog
-function renderTagList() {
-    console.log('Rendering tag list, tentativeTags.length:', tentativeTags.length, 'tentativeTagsRemoved.length:', tentativeTagsRemoved.length);
-    console.log('tagList element:', tagList);
-
-    if (!tagList) {
-        console.error('tagList element not found!');
+    // Find the card and tags container
+    const card = document.querySelector(`.paper-card[data-key="${key}"]`);
+    if (!card) {
+        console.error('Card not found for key:', key);
         return;
     }
 
-    tagList.innerHTML = '';
+    const tagsContainer = card.querySelector('.tags-container');
+    if (!tagsContainer) {
+        console.error('tags-container not found for key:', key);
+        return;
+    }
 
+    // Add editing class for visual distinction
+    tagsContainer.classList.add('editing');
+
+    // Store original content
+    tagsContainer.dataset.originalContent = tagsContainer.innerHTML;
+
+    // Render inline editing interface
+    renderInlineTagEditor(tagsContainer);
+}
+
+// Render inline tag editor
+function renderInlineTagEditor(tagsContainer) {
+    // Build tags HTML
+    let tagsHtml = '';
     if (tentativeTags.length === 0 && tentativeTagsRemoved.length === 0) {
-        tagList.innerHTML = '<p class="no-tags-message">No tags yet. Add your first tag above!</p>';
-        console.log('No tags to render');
-        return;
+        tagsHtml = '<p class="no-tags-message">No tags yet. Add your first tag above!</p>';
+    } else {
+        // Render active tags
+        tentativeTags.forEach(tag => {
+            tagsHtml += `<button type="button" class="edit-tag-item" data-tag="${tag}" aria-label="Remove tag: ${tag}">${tag} <span class="tag-remove">×</span></button>`;
+        });
+        // Render tentatively removed tags
+        tentativeTagsRemoved.forEach(tag => {
+            tagsHtml += `<button type="button" class="edit-tag-item tentatively-removed" data-tag="${tag}" aria-label="Restore tag: ${tag}">${tag} <span class="tag-restore">+</span></button>`;
+        });
     }
 
-    console.log('Rendering tentative tags:', tentativeTags);
-    console.log('Rendering tentative tags removed:', tentativeTagsRemoved);
+    tagsContainer.innerHTML = `
+        <div class="edit-controls">
+            <div class="tag-add-container">
+                <input type="text" class="tag-edit-input" placeholder="Add new tag..." aria-label="New tag name">
+                <button type="button" class="add-edit-tag-btn">Add</button>
+            </div>
+            <div class="edit-tags-list" role="list" aria-label="Tags for this paper">
+                ${tagsHtml}
+            </div>
+            <div class="edit-buttons">
+                <button type="button" class="cancel-edit-tags-btn secondary-btn">Cancel</button>
+                <button type="button" class="save-edit-tags-btn">Save Tag Changes</button>
+            </div>
+        </div>
+    `;
 
-    // Render active tags (tentativeTags)
-    tentativeTags.forEach(tag => {
-        const tagItem = createTagItem(tag, false);
-        console.log('Created tag item:', tagItem, 'textContent:', tagItem.textContent);
-        console.log('Tag item styles:', window.getComputedStyle(tagItem));
-        tagList.appendChild(tagItem);
-    });
-
-    // Render tentatively removed tags (tentativeTagsRemoved)
-    tentativeTagsRemoved.forEach(tag => {
-        const tagItem = createTagItem(tag, true);
-        console.log('Created removed tag item:', tagItem, 'textContent:', tagItem.textContent);
-        tagList.appendChild(tagItem);
-    });
-
-    console.log('Tag list HTML after render:', tagList.innerHTML);
-    console.log('Tag list dimensions:', tagList.getBoundingClientRect());
-    console.log('Tag list children:', tagList.children.length);
-}
-
-// Create a tag item element
-function createTagItem(tag, isTentativelyRemoved) {
-    const item = document.createElement('div');
-    item.className = 'tag-item';
-    if (isTentativelyRemoved) {
-        item.classList.add('tentatively-removed');
+    // Focus the input
+    const input = tagsContainer.querySelector('.tag-edit-input');
+    if (input) {
+        input.focus();
     }
-    item.textContent = tag;
 
-    // Make the tag clickable to toggle removal
-    item.addEventListener('click', () => {
-        if (isTentativelyRemoved) {
-            // Restore: move from removed back to active
-            const index = tentativeTagsRemoved.indexOf(tag);
-            if (index > -1) {
-                tentativeTagsRemoved.splice(index, 1);
-                tentativeTags.push(tag);
-            }
-        } else {
-            // Remove: move from active to removed
-            const index = tentativeTags.indexOf(tag);
-            if (index > -1) {
-                tentativeTags.splice(index, 1);
-                tentativeTagsRemoved.push(tag);
-            }
-        }
-        renderTagList();
-    });
-
-    item.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            item.click();
-        }
-    });
-
-    item.setAttribute('tabindex', '0');
-    item.setAttribute('role', 'button');
-    item.setAttribute('aria-label', isTentativelyRemoved ? `Restore tag ${tag}` : `Remove tag ${tag}`);
-
-    return item;
+    // Add event listeners for the inline editor
+    setupInlineEditorListeners(tagsContainer);
 }
 
-// Add a new tag
-function addNewTag() {
-    const tagName = tagInput.value.trim();
+// Setup event listeners for inline editor
+function setupInlineEditorListeners(tagsContainer) {
+    const input = tagsContainer.querySelector('.tag-edit-input');
+    const addBtn = tagsContainer.querySelector('.add-edit-tag-btn');
+    const cancelBtn = tagsContainer.querySelector('.cancel-edit-tags-btn');
+    const saveBtn = tagsContainer.querySelector('.save-edit-tags-btn');
+
+    // Add tag button
+    if (addBtn) {
+        addBtn.addEventListener('click', () => addInlineTag(tagsContainer));
+    }
+
+    // Enter key in input
+    if (input) {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addInlineTag(tagsContainer);
+            }
+        });
+    }
+
+    // Cancel button
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            // Check for unsaved changes before canceling
+            if (hasUnsavedChanges()) {
+                if (confirm('You have unsaved changes. Discard them?')) {
+                    closeTagDialog();
+                }
+            } else {
+                closeTagDialog();
+            }
+        });
+    }
+
+    // Save button
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveTagChanges);
+    }
+
+    // Tag item clicks (to toggle removal)
+    tagsContainer.querySelectorAll('.edit-tag-item').forEach(tagItem => {
+        tagItem.addEventListener('click', () => {
+            const tag = tagItem.dataset.tag;
+            const isRemoved = tagItem.classList.contains('tentatively-removed');
+
+            if (isRemoved) {
+                // Restore: move from removed back to active
+                const index = tentativeTagsRemoved.indexOf(tag);
+                if (index > -1) {
+                    tentativeTagsRemoved.splice(index, 1);
+                    tentativeTags.push(tag);
+                }
+            } else {
+                // Remove: move from active to removed
+                const index = tentativeTags.indexOf(tag);
+                if (index > -1) {
+                    tentativeTags.splice(index, 1);
+                    tentativeTagsRemoved.push(tag);
+                }
+            }
+            renderInlineTagEditor(tagsContainer);
+        });
+    });
+}
+
+// Add a tag in inline editor
+function addInlineTag(tagsContainer) {
+    const input = tagsContainer.querySelector('.tag-edit-input');
+    if (!input) return;
+
+    const tagName = input.value.trim();
     if (!tagName) return;
 
-    // Check if tag already exists in tentativeTags or tentativeTagsRemoved
+    // Check if tag already exists
     if (tentativeTags.includes(tagName) || tentativeTagsRemoved.includes(tagName)) {
         showError('Tag already exists');
         return;
     }
 
-    // Add to tentativeTags (active tags)
+    // Add to tentativeTags
     tentativeTags.push(tagName);
 
-    // Clear input
-    tagInput.value = '';
+    // Clear input and re-render
+    input.value = '';
+    renderInlineTagEditor(tagsContainer);
 
-    // Re-render
-    renderTagList();
-    tagInput.focus();
+    // Focus the input again
+    const newInput = tagsContainer.querySelector('.tag-edit-input');
+    if (newInput) newInput.focus();
 }
 
-// Save tag changes
+// Close tag dialog (inline version)
+function closeTagDialog() {
+    if (currentEditingKey === null) return;
+
+    const card = document.querySelector(`.paper-card[data-key="${currentEditingKey}"]`);
+    if (card) {
+        const tagsContainer = card.querySelector('.tags-container');
+        if (tagsContainer && tagsContainer.dataset.originalContent) {
+            // Restore original content
+            tagsContainer.innerHTML = tagsContainer.dataset.originalContent;
+            tagsContainer.classList.remove('editing');
+            delete tagsContainer.dataset.originalContent;
+        }
+    }
+
+    currentEditingKey = null;
+    tentativeTags = [];
+    tentativeTagsRemoved = [];
+}
+
+// Save tag changes (inline version)
 function saveTagChanges() {
     if (!currentEditingKey) return;
 
@@ -1356,7 +1406,7 @@ function saveTagChanges() {
     closeTagDialog();
 }
 
-// Event listeners for tag dialog
+// Event listeners for inline tag editing
 
 // Pencil icon clicks (using event delegation)
 papersList.addEventListener('click', (e) => {
@@ -1367,63 +1417,40 @@ papersList.addEventListener('click', (e) => {
     }
 });
 
-// Close button
-if (tagDialogClose) {
-    tagDialogClose.addEventListener('click', closeTagDialog);
-} else {
-    console.error('tagDialogClose element not found!');
-}
-
-// Cancel button - query at event listener setup time
-const cancelButton = document.getElementById('cancelTagChanges');
-if (cancelButton) {
-    cancelButton.addEventListener('click', closeTagDialog);
-} else {
-    console.error('cancelTagChanges element not found at event listener setup!');
-}
-
-// Add tag button
-if (addTagBtn) {
-    addTagBtn.addEventListener('click', addNewTag);
-} else {
-    console.error('addTagBtn element not found!');
-}
-
-// Save button - query at event listener setup time
-const saveButton = document.getElementById('saveTagChanges');
-if (saveButton) {
-    saveButton.addEventListener('click', saveTagChanges);
-} else {
-    console.error('saveTagChanges element not found at event listener setup!');
-}
-
-// Enter key in tag input
-if (tagInput) {
-    tagInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addNewTag();
-        }
-    });
-} else {
-    console.error('tagInput element not found!');
-}
-
-// Escape key to close dialog
+// Escape key to close inline editor
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && tagDialog && tagDialog.style.display === 'flex') {
-        closeTagDialog();
+    if (e.key === 'Escape' && currentEditingKey !== null) {
+        if (hasUnsavedChanges()) {
+            if (confirm('You have unsaved changes. Discard them?')) {
+                closeTagDialog();
+            }
+        } else {
+            closeTagDialog();
+        }
     }
 });
 
-// Click on backdrop to close
-if (tagDialog) {
-    const backdrop = tagDialog.querySelector('.tag-dialog-backdrop');
-    if (backdrop) {
-        backdrop.addEventListener('click', closeTagDialog);
-    } else {
-        console.error('tag-dialog-backdrop element not found!');
+// Click outside to close inline editor
+document.addEventListener('click', (e) => {
+    if (currentEditingKey !== null) {
+        const card = document.querySelector(`.paper-card[data-key="${currentEditingKey}"]`);
+        if (card) {
+            const tagsContainer = card.querySelector('.tags-container');
+            if (tagsContainer && !tagsContainer.contains(e.target)) {
+                // Check if clicking inside the same card (but outside tags container)
+                if (card.contains(e.target)) {
+                    // Clicking inside the same card is okay, don't close
+                    return;
+                }
+                // Clicking outside the card - close with confirmation
+                if (hasUnsavedChanges()) {
+                    if (confirm('You have unsaved changes. Discard them?')) {
+                        closeTagDialog();
+                    }
+                } else {
+                    closeTagDialog();
+                }
+            }
+        }
     }
-} else {
-    console.error('tagDialog element not found!');
-}
+});
