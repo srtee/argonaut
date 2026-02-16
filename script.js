@@ -15,8 +15,6 @@ const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
-    inputSection, papersSection, exportSection, addDoiBtn, exportBibtexTaggedBtn, themeToggle: document.getElementById('themeToggle')
-});
 
 // State
 let papersData = {};
