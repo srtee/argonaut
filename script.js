@@ -1212,7 +1212,10 @@ function setupInlineEditorListeners(tagsContainer) {
 
     // Add tag button
     if (addBtn) {
-        addBtn.addEventListener('click', () => addInlineTag(tagsContainer));
+        addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            addInlineTag(tagsContainer);
+        });
     } else {
         console.error('add-edit-tag-btn not found!');
     }
@@ -1248,7 +1251,8 @@ function setupInlineEditorListeners(tagsContainer) {
 
     // Tag item clicks (to toggle removal)
     tagsContainer.querySelectorAll('.edit-tag-item').forEach(tagItem => {
-        tagItem.addEventListener('click', () => {
+        tagItem.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent bubbling to document click handler
             const tag = tagItem.dataset.tag;
             const isRemoved = tagItem.classList.contains('tentatively-removed');
 
