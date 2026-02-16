@@ -923,29 +923,51 @@ function hideError() {
 // Input option switching
 document.querySelectorAll('input[name="inputMethod"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
-        document.querySelectorAll('.input-option').forEach(option => {
-            option.classList.remove('active');
-            option.querySelector('.input-option-content').style.display = 'none';
-        });
-
-        const selectedOption = document.querySelector(`.input-option[data-input="${e.target.value}"]`);
-        selectedOption.classList.add('active');
-        selectedOption.querySelector('.input-option-content').style.display = 'block';
+        updateInputOptionUI(e.target.value);
     });
 });
 
 // Initialize input option state on page load (fix browser remembering radio selection)
 function initInputOptions() {
     const selectedRadio = document.querySelector('input[name="inputMethod"]:checked');
+    console.log('initInputOptions: selectedRadio =', selectedRadio?.id);
+
     if (selectedRadio) {
-        // Trigger change event to update UI state
-        selectedRadio.dispatchEvent(new Event('change'));
+        // Update UI state directly to ensure proper display
+        updateInputOptionUI(selectedRadio.value);
     } else {
         // Default to "file" if nothing is selected
         const fileRadio = document.getElementById('inputMethodFile');
         if (fileRadio) {
             fileRadio.checked = true;
-            fileRadio.dispatchEvent(new Event('change'));
+            updateInputOptionUI('file');
+        }
+    }
+}
+
+// Update input option UI state
+function updateInputOptionUI(selectedValue) {
+    console.log('updateInputOptionUI: selectedValue =', selectedValue);
+
+    // Hide all option contents and remove active class
+    document.querySelectorAll('.input-option').forEach(option => {
+        option.classList.remove('active');
+        const content = option.querySelector('.input-option-content');
+        if (content) {
+            content.style.display = 'none';
+        }
+    });
+
+    // Show the selected option
+    const selectedOption = document.querySelector(`.input-option[data-input="${selectedValue}"]`);
+    console.log('updateInputOptionUI: selectedOption =', selectedOption);
+
+    if (selectedOption) {
+        selectedOption.classList.add('active');
+        const selectedContent = selectedOption.querySelector('.input-option-content');
+        console.log('updateInputOptionUI: selectedContent =', selectedContent);
+        if (selectedContent) {
+            selectedContent.style.display = 'block';
         }
     }
 }
