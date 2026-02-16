@@ -1401,6 +1401,9 @@ function saveTagChanges() {
             processedEntry.paper = papersData[currentEditingKey];
         }
 
+        // Clear editing key before closeTagDialog to prevent restoring old HTML
+        currentEditingKey = null;
+
         // Re-render paper cards
         applyTagFilter();
 
