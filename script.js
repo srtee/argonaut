@@ -1198,6 +1198,8 @@ function openTagDialog(key) {
 
 // Render inline tag editor
 function renderInlineTagEditor(tagsContainer) {
+    console.log('renderInlineTagEditor called, tagsContainer:', tagsContainer);
+
     // Build tags HTML
     let tagsHtml = '';
     if (tentativeTags.length === 0 && tentativeTagsRemoved.length === 0) {
@@ -1213,7 +1215,7 @@ function renderInlineTagEditor(tagsContainer) {
         });
     }
 
-    tagsContainer.innerHTML = `
+    const html = `
         <div class="edit-controls">
             <div class="tag-add-container">
                 <input type="text" class="tag-edit-input" placeholder="Add new tag..." aria-label="New tag name">
@@ -1229,6 +1231,15 @@ function renderInlineTagEditor(tagsContainer) {
         </div>
     `;
 
+    console.log('Generated HTML length:', html.length);
+    tagsContainer.innerHTML = html;
+
+    // Verify elements were created
+    console.log('edit-controls element:', tagsContainer.querySelector('.edit-controls'));
+    console.log('edit-buttons element:', tagsContainer.querySelector('.edit-buttons'));
+    console.log('cancel-edit-tags-btn:', tagsContainer.querySelector('.cancel-edit-tags-btn'));
+    console.log('save-edit-tags-btn:', tagsContainer.querySelector('.save-edit-tags-btn'));
+
     // Focus the input
     const input = tagsContainer.querySelector('.tag-edit-input');
     if (input) {
@@ -1241,14 +1252,20 @@ function renderInlineTagEditor(tagsContainer) {
 
 // Setup event listeners for inline editor
 function setupInlineEditorListeners(tagsContainer) {
+    console.log('setupInlineEditorListeners called');
+
     const input = tagsContainer.querySelector('.tag-edit-input');
     const addBtn = tagsContainer.querySelector('.add-edit-tag-btn');
     const cancelBtn = tagsContainer.querySelector('.cancel-edit-tags-btn');
     const saveBtn = tagsContainer.querySelector('.save-edit-tags-btn');
 
+    console.log('Elements found - input:', !!input, 'addBtn:', !!addBtn, 'cancelBtn:', !!cancelBtn, 'saveBtn:', !!saveBtn);
+
     // Add tag button
     if (addBtn) {
         addBtn.addEventListener('click', () => addInlineTag(tagsContainer));
+    } else {
+        console.error('add-edit-tag-btn not found!');
     }
 
     // Enter key in input
