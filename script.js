@@ -1276,14 +1276,10 @@ function setupInlineEditorListeners(tagsContainer) {
             // Check for unsaved changes before canceling
             if (hasUnsavedChanges()) {
                 if (confirm('You have unsaved changes. Discard them?')) {
-                    // Clear editing key before closeTagDialog to prevent restoring old HTML
-                    currentEditingKey = null;
-                    closeTagDialog();
+                    closeTagDialog();  // Restore original content by default
                 }
             } else {
-                // Clear editing key before closeTagDialog to prevent restoring old HTML
-                currentEditingKey = null;
-                closeTagDialog();
+                closeTagDialog();  // Restore original content by default
             }
         });
     }
@@ -1347,7 +1343,15 @@ function addInlineTag(tagsContainer) {
 }
 
 // Close tag dialog (inline version)
-function closeTagDialog() {
+function closeTagDialog({ restoreContent = true } = {}) {
+    if (!restoreContent) {
+        // Skip restoring content - just clear state
+        currentEditingKey = null;
+        tentativeTags = [];
+        tentativeTagsRemoved = [];
+        return;
+    }
+
     if (currentEditingKey === null) return;
 
     const card = document.querySelector(`.paper-card[data-key="${currentEditingKey}"]`);
@@ -1405,16 +1409,13 @@ function saveTagChanges() {
             processedEntry.paper = papersData[currentEditingKey];
         }
 
-        // Clear editing key before closeTagDialog to prevent restoring old HTML
-        currentEditingKey = null;
-
         // Re-render paper cards
         applyTagFilter();
 
         showStatus('Tags updated successfully');
     }
 
-    closeTagDialog();
+    closeTagDialog({ restoreContent: false });
 }
 
 // Event listeners for inline tag editing
