@@ -1392,9 +1392,12 @@ document.addEventListener('click', (e) => {
         const card = document.querySelector(`.paper-card[data-key="${currentEditingKey}"]`);
         if (card) {
             const tagsContainer = card.querySelector('.tags-container');
-            console.log('click-outside check - card:', !!card, 'tagsContainer:', !!tagsContainer, 'insideTagsContainer:', tagsContainer?.contains(e.target));
+            console.log('click-outside check - card:', !!card, 'tagsContainer:', !!tagsContainer, 'insideTagsContainer:', tagsContainer?.contains(e.target), 'e.target:', e.target, 'isConnected:', e.target.isConnected);
             if (tagsContainer && !tagsContainer.contains(e.target)) {
                 // Check if clicking inside the same card (but outside tags container)
+                // Also check if the target is still in the DOM (DOM modification may have removed it)
+                if (card.contains(e.target) && e.target.isConnected) {
+                    // Clicking inside the same card is okay, don't close
                 if (card.contains(e.target)) {
                     // Clicking inside the same card is okay, don't close
                     console.log('click inside same card, not closing');
