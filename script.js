@@ -1276,9 +1276,13 @@ function setupInlineEditorListeners(tagsContainer) {
             // Check for unsaved changes before canceling
             if (hasUnsavedChanges()) {
                 if (confirm('You have unsaved changes. Discard them?')) {
+                    // Clear editing key before closeTagDialog to prevent restoring old HTML
+                    currentEditingKey = null;
                     closeTagDialog();
                 }
             } else {
+                // Clear editing key before closeTagDialog to prevent restoring old HTML
+                currentEditingKey = null;
                 closeTagDialog();
             }
         });
