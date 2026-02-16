@@ -75,6 +75,8 @@
                 <button id="exportJsonBtn" type="button" class="secondary-btn" aria-label="Export all papers as JSON file">Export JSON</button>
                 <button id="exportBibtexAllBtn" type="button" class="secondary-btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                 <button id="exportBibtexTaggedBtn" type="button" class="secondary-btn" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
+                <button id="manageTagsBtn" type="button" class="secondary-btn" aria-label="Manage all tags globally">Manage Tags</button>
+                <button id="editTagsModeBtn" type="button" class="secondary-btn" aria-label="Toggle edit mode for global tag changes">Edit Tags Mode: Off</button>
                 <button id="loadNewBtn" type="button" class="secondary-btn" aria-label="Reset all papers, comments, and tags">Reset All</button>
             </div>
         </section>
@@ -86,8 +88,155 @@
             </div>
         </section>
 
+        <!-- Edit Tags Modal -->
+        <div id="editTagsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editTagsModalTitle" style="display: none;">
+            <div class="modal-container" role="document">
+                <div class="modal-header">
+                    <h2 id="editTagsModalTitle">Edit Tags</h2>
+                    <button id="closeEditTagsModal" class="modal-close-btn" aria-label="Close modal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="paper-title-preview" id="editTagsPaperTitle"></p>
+                    <div class="global-edit-warning" id="globalEditWarning" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span>Global Edit Mode Active - Renaming tags here affects ALL papers</span>
+                    </div>
+                    <div class="tags-edit-section">
+                        <label>Current Tags:</label>
+                        <div id="editTagsList" class="edit-tags-list">
+                            <!-- Tags will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="tag-input-section">
+                        <label for="newTagInput">Add new tag:</label>
+                        <div class="tag-input-wrapper">
+                            <input type="text" id="newTagInput" class="tag-input" placeholder="Enter tag name" aria-label="Enter new tag name">
+                            <button id="addTagBtn" type="button" class="add-tag-btn">+</button>
+                        </div>
+                        <div id="tagSuggestions" class="tag-suggestions">
+                            <span>Suggested: </span>
+                            <!-- Suggestions will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Tags Modal -->
+        <div id="manageTagsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="manageTagsModalTitle" style="display: none;">
+            <div class="modal-container modal-container-large">
+                <div class="modal-header">
+                    <h2 id="manageTagsModalTitle">Manage Tags</h2>
+                    <button id="closeManageTagsModal" class="modal-close-btn" aria-label="Close modal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="manage-tags-actions">
+                        <button id="mergeDuplicateTagsBtn" type="button" class="secondary-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+                            </svg>
+                            Merge Duplicate Tags
+                        </button>
+                    </div>
+                    <div id="manageTagsList" class="manage-tags-list">
+                        <!-- Tags will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true">
+            <!-- Toasts will be rendered here -->
+        </div>
+
         <div id="error" class="error" role="alert" aria-live="assertive" aria-atomic="true"></div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
+
+        <!-- Edit Tags Modal -->
+        <div id="editTagsModal" class="modal-overlay" role="dialog" aria-labelledby="editTagsModalTitle" aria-modal="true" style="display: none;">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2 id="editTagsModalTitle">Edit Tags</h2>
+                    <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="paper-title-display" id="editTagsPaperTitle"></p>
+                    <div id="globalEditWarning" class="edit-warning" style="display: none;">
+                        <span class="warning-icon">⚠️</span>
+                        Global Edit Mode Active - Renaming tags affects ALL papers
+                    </div>
+                    <div class="tags-edit-section">
+                        <h3>Current Tags</h3>
+                        <div id="currentTagsList" class="current-tags-list"></div>
+                    </div>
+                    <div class="add-tag-section">
+                        <h3>Add New Tag</h3>
+                        <div class="tag-input-wrapper">
+                            <input type="text" id="newTagInput" class="tag-input" placeholder="Enter tag name" aria-label="Enter new tag name">
+                            <button type="button" id="addTagBtn" class="add-tag-btn">Add</button>
+                        </div>
+                        <div id="tagSuggestions" class="tag-suggestions"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="secondary-btn modal-cancel-btn">Cancel</button>
+                    <button type="button" class="modal-save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Tags Modal -->
+        <div id="manageTagsModal" class="modal-overlay" role="dialog" aria-labelledby="manageTagsModalTitle" aria-modal="true" style="display: none;">
+            <div class="modal-container modal-large">
+                <div class="modal-header">
+                    <h2 id="manageTagsModalTitle">Manage All Tags</h2>
+                    <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="tags-manage-header">
+                        <button type="button" id="mergeTagsBtn" class="secondary-btn merge-tags-btn">Merge Duplicate Tags</button>
+                    </div>
+                    <div id="allTagsList" class="all-tags-list"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-close-btn-footer">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rename Tag Modal -->
+        <div id="renameTagModal" class="modal-overlay" role="dialog" aria-labelledby="renameTagModalTitle" aria-modal="true" style="display: none;">
+            <div class="modal-container modal-small">
+                <div class="modal-header">
+                    <h2 id="renameTagModalTitle">Rename Tag</h2>
+                    <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Renaming this tag will affect <strong id="renameTagCount">0</strong> paper(s).</p>
+                    <div class="tag-input-wrapper">
+                        <input type="text" id="renameTagInput" class="tag-input" aria-label="Enter new tag name">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="secondary-btn modal-cancel-btn">Cancel</button>
+                    <button type="button" class="modal-save-btn">Rename</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications Container -->
+        <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
         <footer class="attribution">
             <small>Vibe-coded by Shern Ren Tee with Claude Code + Ollama Cloud GLM 4.7</small>
