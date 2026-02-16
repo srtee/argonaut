@@ -26,6 +26,22 @@
             </svg>
         </button>
 
+        <!-- Add A Paper By DOI Section (always visible) -->
+        <section class="add-doi-section add-doi-input-section" id="addDoiSection" aria-labelledby="addDoiHeading">
+            <h2 id="addDoiHeading">Add A Paper By DOI:</h2>
+            <div class="add-doi-inputs">
+                <div class="input-group">
+                    <label for="doiInput" class="input-label">DOI or URL</label>
+                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx">
+                </div>
+                <div class="input-group">
+                    <label for="doiKeyInput" class="input-label">Key (optional)</label>
+                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024">
+                </div>
+                <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
+            </div>
+        </section>
+
         <!-- Load JSON Collection Section -->
         <section class="input-section load-json-section" id="loadJsonSection" aria-labelledby="loadJsonHeading">
             <h2 id="loadJsonHeading">Load JSON Collection:</h2>
@@ -49,22 +65,6 @@
                         <button id="loadUrlBtn" type="button" class="secondary-btn" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Add A Paper By DOI Section (always visible) -->
-        <section class="add-doi-section add-doi-input-section" id="addDoiSection" aria-labelledby="addDoiHeading">
-            <h2 id="addDoiHeading">Add A Paper By DOI:</h2>
-            <div class="add-doi-inputs">
-                <div class="input-group">
-                    <label for="doiInput" class="input-label">DOI or URL</label>
-                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx">
-                </div>
-                <div class="input-group">
-                    <label for="doiKeyInput" class="input-label">Key (optional)</label>
-                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024">
-                </div>
-                <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
             </div>
         </section>
 
