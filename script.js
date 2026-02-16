@@ -1,5 +1,5 @@
 // DOM Elements
-const inputSection = document.getElementById('inputSection');
+const loadJsonSection = document.getElementById('loadJsonSection');
 const papersSection = document.getElementById('papersSection');
 const exportSection = document.getElementById('exportSection');
 const papersList = document.getElementById('papersList');
@@ -905,7 +905,7 @@ async function loadPapers(method) {
         renderPapers(processedPapers);
 
         // Switch to papers view
-        inputSection.style.display = 'none';
+        loadJsonSection.style.display = 'none';
         exportSection.style.display = 'block';
         papersSection.style.display = 'block';
         showStatus(`Loaded ${processedPapers.length} papers successfully`);
@@ -1003,7 +1003,7 @@ loadNewBtn.addEventListener('click', () => {
         processedPapersData = [];
 
         papersSection.style.display = 'none';
-        inputSection.style.display = 'block';
+        loadJsonSection.style.display = 'block';
         papersList.innerHTML = '';
         fileInput.value = '';
         urlInput.value = 'https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json';
