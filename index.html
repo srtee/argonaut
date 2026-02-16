@@ -89,6 +89,37 @@
         <div id="error" class="error" role="alert" aria-live="assertive" aria-atomic="true"></div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
 
+        <!-- Tag Management Dialog -->
+        <div id="tagDialog" class="tag-dialog" role="dialog" aria-modal="true" aria-labelledby="tagDialogTitle" style="display: none;">
+            <div class="tag-dialog-backdrop"></div>
+            <div class="tag-dialog-content">
+                <div class="tag-dialog-header">
+                    <h2 id="tagDialogTitle" class="tag-dialog-title">Edit Tags</h2>
+                    <button class="tag-dialog-close" aria-label="Close dialog" type="button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="tag-dialog-body">
+                    <p class="tag-dialog-paper-title"></p>
+                    <div class="tag-editor">
+                        <div class="tag-input-container">
+                            <input type="text" id="tagInput" class="tag-input" placeholder="Add a new tag..." aria-label="Add new tag">
+                            <button type="button" id="addTagBtn" class="add-tag-btn">Add</button>
+                        </div>
+                        <div class="tags-list" id="tagsList">
+                            <!-- Tags will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="tag-dialog-footer">
+                    <button type="button" class="tag-dialog-cancel secondary-btn">Cancel</button>
+                    <button type="button" class="tag-dialog-save">Save tag changes</button>
+                </div>
+            </div>
+        </div>
+
         <footer class="attribution">
             <small>Vibe-coded by Shern Ren Tee with Claude Code + Ollama Cloud GLM 4.7</small>
             <nav class="social-links" aria-label="Social media links">
@@ -107,6 +138,35 @@
             </div>
         </footer>
     </main>
+
+    <!-- Tag Management Dialog -->
+    <div id="tagDialog" class="tag-dialog" role="dialog" aria-modal="true" aria-labelledby="tagDialogTitle" style="display: none;">
+        <div class="tag-dialog-backdrop"></div>
+        <div class="tag-dialog-content">
+            <div class="tag-dialog-header">
+                <h2 id="tagDialogTitle" class="tag-dialog-title">Edit Tags</h2>
+                <button class="tag-dialog-close" aria-label="Close dialog" type="button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="tag-dialog-body">
+                <p class="tag-dialog-paper-title" id="tagDialogPaperTitle"></p>
+                <div class="tag-add-container">
+                    <input type="text" id="tagInput" class="tag-input" placeholder="Add new tag..." aria-label="New tag name">
+                    <button id="addTagBtn" type="button" class="secondary-btn add-tag-btn">Add</button>
+                </div>
+                <div id="tagList" class="tag-list" role="list" aria-label="Tags for this paper">
+                    <!-- Tags will be rendered here -->
+                </div>
+            </div>
+            <div class="tag-dialog-footer">
+                <button id="cancelTagChanges" type="button" class="secondary-btn">Cancel</button>
+                <button id="saveTagChanges" type="button" class="save-tag-btn">Save Tag Changes</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js?v=1.0.4"></script>
 </body>
