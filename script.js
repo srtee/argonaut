@@ -1096,6 +1096,7 @@ function hasUnsavedChanges() {
 
 // Open inline tag editing
 function openTagDialog(key) {
+    console.log('openTagDialog called with key:', key);
 
     // Prevent editing multiple papers at once
     if (currentEditingKey !== null && currentEditingKey !== key) {
@@ -1151,6 +1152,7 @@ function openTagDialog(key) {
 
 // Render inline tag editor
 function renderInlineTagEditor(tagsContainer) {
+    console.log('renderInlineTagEditor called');
 
     // Build tags HTML
     let tagsHtml = '';
@@ -1199,12 +1201,14 @@ function renderInlineTagEditor(tagsContainer) {
 
 // Setup event listeners for inline editor
 function setupInlineEditorListeners(tagsContainer) {
+    console.log('setupInlineEditorListeners called');
 
     const input = tagsContainer.querySelector('.tag-edit-input');
     const addBtn = tagsContainer.querySelector('.add-edit-tag-btn');
     const cancelBtn = tagsContainer.querySelector('.cancel-edit-tags-btn');
     const saveBtn = tagsContainer.querySelector('.save-edit-tags-btn');
 
+    console.log('Elements found:', { input, addBtn, cancelBtn, saveBtn });
 
     // Add tag button
     if (addBtn) {
@@ -1363,6 +1367,7 @@ papersList.addEventListener('click', (e) => {
     const editBtn = e.target.closest('.edit-tags-btn');
     if (editBtn) {
         const key = editBtn.dataset.key;
+        console.log('Edit button clicked, key:', key);
         openTagDialog(key);
     }
 });
