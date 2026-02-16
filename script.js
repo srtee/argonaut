@@ -1398,8 +1398,6 @@ document.addEventListener('click', (e) => {
                 // Also check if the target is still in the DOM (DOM modification may have removed it)
                 if (card.contains(e.target) && e.target.isConnected) {
                     // Clicking inside the same card is okay, don't close
-                if (card.contains(e.target)) {
-                    // Clicking inside the same card is okay, don't close
                     console.log('click inside same card, not closing');
                     return;
                 }
