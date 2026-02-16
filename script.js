@@ -1,6 +1,4 @@
-console.log('=== Paper Viewer Script Loading ===');
 // DOM Elements
-console.log('Loading DOM elements...');
 const inputSection = document.getElementById('inputSection');
 const papersSection = document.getElementById('papersSection');
 const exportSection = document.getElementById('exportSection');
@@ -17,7 +15,6 @@ const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
-console.log('DOM elements loaded:', {
     inputSection, papersSection, exportSection, addDoiBtn, exportBibtexTaggedBtn, themeToggle: document.getElementById('themeToggle')
 });
 
@@ -270,7 +267,6 @@ function generateDefaultKey(bibInfo) {
 
 // Add a paper by DOI
 async function addPaperByDoi() {
-    console.log('addPaperByDoi called');
     const input = doiInput.value.trim();
     const customKey = doiKeyInput.value.trim();
 
@@ -281,7 +277,6 @@ async function addPaperByDoi() {
 
     // Extract DOI from input
     const doi = extractDOI(input);
-    console.log('DOI extracted:', doi);
     if (!doi) {
         showError('Could not extract a valid DOI from the input. Please enter a valid DOI (e.g., 10.xxxx/xxxx) or a URL containing a DOI.');
         return;
@@ -614,7 +609,6 @@ async function exportBibTeX() {
 
 // Export papers with selected tags as BibTeX
 async function exportBibTeXTagged() {
-    console.log('exportBibTeXTagged called');
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
@@ -639,7 +633,6 @@ async function exportBibTeXTagged() {
             return;
         }
 
-        console.log('Exporting tagged papers:', entries.length);
 
         let bibtexContent = '';
 
@@ -942,23 +935,6 @@ function initInputOptions() {
 }
 initInputOptions();
 
-// Initialize input option UI state on page load
-const initializeInputOptions = () => {
-    const selectedRadio = document.querySelector('input[name="inputMethod"]:checked');
-    if (selectedRadio) {
-        document.querySelectorAll('.input-option').forEach(option => {
-            option.classList.remove('active');
-            option.querySelector('.input-option-content').style.display = 'none';
-        });
-        const selectedOption = document.querySelector(`.input-option[data-input="${selectedRadio.value}"]`);
-        if (selectedOption) {
-            selectedOption.classList.add('active');
-            selectedOption.querySelector('.input-option-content').style.display = 'block';
-        }
-    }
-};
-initializeInputOptions();
-
 // File input handler
 fileInput.addEventListener('change', () => {
     if (fileInput.files[0]) {
@@ -1003,24 +979,18 @@ if (exportJsonBtn) {
 }
 
 // Export BibTeX (all) button
-console.log('exportBibtexAllBtn:', exportBibtexAllBtn);
 if (exportBibtexAllBtn) {
     exportBibtexAllBtn.addEventListener('click', exportBibTeX);
 }
 
 // Export BibTeX (only tagged) button
-console.log('exportBibtexTaggedBtn:', exportBibtexTaggedBtn);
 if (exportBibtexTaggedBtn) {
     exportBibtexTaggedBtn.addEventListener('click', exportBibTeXTagged);
-    console.log('Added exportBibtexTaggedBtn event listener');
 }
 
 // Add DOI button
-console.log('Setting up addDoiBtn event listener, addDoiBtn:', addDoiBtn);
 if (addDoiBtn) {
-    console.log('Adding click listener to addDoiBtn');
     addDoiBtn.addEventListener('click', () => {
-        console.log('addDoiBtn clicked!');
         addPaperByDoi();
     });
 } else {
@@ -1038,12 +1008,10 @@ if (doiInput) {
 }
 
 // Dark mode toggle functionality
-console.log('Setting up theme toggle...');
 const themeToggle = document.getElementById('themeToggle');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
 const THEME_KEY = 'theme';
-console.log('Theme elements:', { themeToggle, sunIcon, moonIcon });
 
 function updateThemeIcons(isDark) {
     if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
@@ -1073,14 +1041,11 @@ function setTheme(theme) {
 }
 
 function initTheme() {
-    console.log('initTheme called');
     const storedTheme = getStoredTheme();
     if (storedTheme) {
-        console.log('Using stored theme:', storedTheme);
         setTheme(storedTheme);
     } else {
         const isDark = getSystemPreference();
-        console.log('Using system preference, isDark:', isDark);
         // Set initial theme without saving to localStorage
         if (isDark) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -1092,12 +1057,9 @@ function initTheme() {
 }
 
 if (themeToggle) {
-    console.log('Adding themeToggle event listener');
     themeToggle.addEventListener('click', () => {
-        console.log('themeToggle clicked');
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        console.log('Switching theme from', currentTheme, 'to', newTheme);
         setTheme(newTheme);
     });
 } else {
@@ -1111,17 +1073,14 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e)
 });
 
 // Initialize theme on page load
-console.log('Script fully loaded, initializing theme...');
 initTheme();
-console.log('Script initialization complete');
 
 // ========== Inline Tag Management ==========
 
 // State for tag editing
 let currentEditingKey = null;
-let currentTagsContainer = null;
-let tentativeTags = []; // Array of tag strings (active tags)
-let tentativeTagsRemoved = []; // Array of tag strings (tentatively removed tags)
+let tentativeTags = [];
+let tentativeTagsRemoved = [];
 
 // Check if there are unsaved changes
 function hasUnsavedChanges() {
@@ -1139,7 +1098,6 @@ function hasUnsavedChanges() {
 
 // Open inline tag editing
 function openTagDialog(key) {
-    console.log('Opening inline tag editing for key:', key);
 
     // Prevent editing multiple papers at once
     if (currentEditingKey !== null && currentEditingKey !== key) {
@@ -1156,8 +1114,6 @@ function openTagDialog(key) {
         return;
     }
 
-    console.log('Paper data:', paper);
-    console.log('Existing tags:', paper._tags);
 
     // Reset state
     tentativeTags = [];
@@ -1171,7 +1127,6 @@ function openTagDialog(key) {
         tentativeTags.push(tagString);
     });
 
-    console.log('Tentative tags after initialization:', tentativeTags);
 
     // Find the card and tags container
     const card = document.querySelector(`.paper-card[data-key="${key}"]`);
@@ -1198,7 +1153,6 @@ function openTagDialog(key) {
 
 // Render inline tag editor
 function renderInlineTagEditor(tagsContainer) {
-    console.log('renderInlineTagEditor called, tagsContainer:', tagsContainer);
 
     // Build tags HTML
     let tagsHtml = '';
@@ -1231,14 +1185,9 @@ function renderInlineTagEditor(tagsContainer) {
         </div>
     `;
 
-    console.log('Generated HTML length:', html.length);
     tagsContainer.innerHTML = html;
 
     // Verify elements were created
-    console.log('edit-controls element:', tagsContainer.querySelector('.edit-controls'));
-    console.log('edit-buttons element:', tagsContainer.querySelector('.edit-buttons'));
-    console.log('cancel-edit-tags-btn:', tagsContainer.querySelector('.cancel-edit-tags-btn'));
-    console.log('save-edit-tags-btn:', tagsContainer.querySelector('.save-edit-tags-btn'));
 
     // Focus the input
     const input = tagsContainer.querySelector('.tag-edit-input');
@@ -1252,14 +1201,12 @@ function renderInlineTagEditor(tagsContainer) {
 
 // Setup event listeners for inline editor
 function setupInlineEditorListeners(tagsContainer) {
-    console.log('setupInlineEditorListeners called');
 
     const input = tagsContainer.querySelector('.tag-edit-input');
     const addBtn = tagsContainer.querySelector('.add-edit-tag-btn');
     const cancelBtn = tagsContainer.querySelector('.cancel-edit-tags-btn');
     const saveBtn = tagsContainer.querySelector('.save-edit-tags-btn');
 
-    console.log('Elements found - input:', !!input, 'addBtn:', !!addBtn, 'cancelBtn:', !!cancelBtn, 'saveBtn:', !!saveBtn);
 
     // Add tag button
     if (addBtn) {
