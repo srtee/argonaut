@@ -1123,18 +1123,6 @@ let currentTagsContainer = null;
 let tentativeTags = []; // Array of tag strings (active tags)
 let tentativeTagsRemoved = []; // Array of tag strings (tentatively removed tags)
 
-console.log('Tag dialog elements found:', {
-    tagDialog,
-    tagDialogTitle,
-    tagDialogPaperTitle,
-    tagList,
-    tagInput,
-    addTagBtn,
-    cancelTagChanges,
-    saveTagChangesBtn,
-    tagDialogClose
-});
-
 // Check if there are unsaved changes
 function hasUnsavedChanges() {
     const paper = papersData[currentEditingKey];
