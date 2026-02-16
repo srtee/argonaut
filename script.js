@@ -1387,17 +1387,21 @@ document.addEventListener('keydown', (e) => {
 
 // Click outside to close inline editor
 document.addEventListener('click', (e) => {
+    console.log('document click handler, currentEditingKey:', currentEditingKey);
     if (currentEditingKey !== null) {
         const card = document.querySelector(`.paper-card[data-key="${currentEditingKey}"]`);
         if (card) {
             const tagsContainer = card.querySelector('.tags-container');
+            console.log('click-outside check - card:', !!card, 'tagsContainer:', !!tagsContainer, 'insideTagsContainer:', tagsContainer?.contains(e.target));
             if (tagsContainer && !tagsContainer.contains(e.target)) {
                 // Check if clicking inside the same card (but outside tags container)
                 if (card.contains(e.target)) {
                     // Clicking inside the same card is okay, don't close
+                    console.log('click inside same card, not closing');
                     return;
                 }
                 // Clicking outside the card - close with confirmation
+                console.log('click outside card, closing');
                 if (hasUnsavedChanges()) {
                     if (confirm('You have unsaved changes. Discard them?')) {
                         closeTagDialog();
