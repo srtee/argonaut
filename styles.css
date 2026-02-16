@@ -415,6 +415,7 @@ h3 {
     border-radius: 8px;
     padding: 20px;
     transition: all 0.2s;
+    position: relative;
 }
 
 .paper-card:hover {
@@ -711,8 +712,6 @@ h3 {
     justify-content: flex-end;
     margin-top: 8px;
     min-height: 40px;
-    /* Debug: bright background to verify rendering */
-    background: #ff0000 !important;
 }
 
 .cancel-edit-tags-btn {
@@ -720,7 +719,7 @@ h3 {
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
-    background: #00ff00 !important;
+    background: transparent;
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -731,7 +730,8 @@ h3 {
 }
 
 .cancel-edit-tags-btn:hover {
-    background: var(--bg-secondary);
+    background: var(--bg-secondary) !important;
+    color: var(--text-color) !important;
 }
 
 .save-edit-tags-btn {
@@ -739,9 +739,9 @@ h3 {
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
-    background: #ff00ff !important; /* Debug: bright magenta to verify rendering */
-    color: #ffffff !important; /* Debug: white text for contrast */
-    border: 2px solid #000000 !important; /* Debug: black border */
+    background: var(--accent-color);
+    color: white;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
@@ -751,7 +751,8 @@ h3 {
 }
 
 .save-edit-tags-btn:hover {
-    background: var(--accent-hover);
+    background: var(--accent-hover) !important;
+    color: white !important;
 }
 
 .no-tags-message {
