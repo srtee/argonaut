@@ -1370,8 +1370,14 @@ function saveTagChanges() {
 
     // Show confirmation
     if (confirm(confirmMessage)) {
-        // Apply changes
+        // Apply changes to papersData
         paper._tags = finalTags;
+
+        // Update the paper reference in processedPapersData to ensure filtering works correctly
+        const processedEntry = processedPapersData.find(entry => entry.key === currentEditingKey);
+        if (processedEntry) {
+            processedEntry.paper = papersData[currentEditingKey];
+        }
 
         // Re-render paper cards
         applyTagFilter();
