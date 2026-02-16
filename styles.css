@@ -587,6 +587,7 @@ h3 {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-height: 150px;
 }
 
 .edit-controls {
@@ -709,9 +710,13 @@ h3 {
     gap: 8px;
     justify-content: flex-end;
     margin-top: 8px;
+    min-height: 40px;
 }
 
 .cancel-edit-tags-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 16px;
     background: transparent;
     color: var(--text-color);
@@ -720,6 +725,7 @@ h3 {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
+    min-height: 36px;
 }
 
 .cancel-edit-tags-btn:hover {
@@ -727,6 +733,9 @@ h3 {
 }
 
 .save-edit-tags-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 16px;
     background: var(--accent-color);
     color: white;
@@ -736,6 +745,7 @@ h3 {
     font-size: 14px;
     font-weight: 500;
     transition: background 0.2s;
+    min-height: 36px;
 }
 
 .save-edit-tags-btn:hover {

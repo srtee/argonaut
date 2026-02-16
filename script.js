@@ -1225,7 +1225,7 @@ function renderInlineTagEditor(tagsContainer) {
                 ${tagsHtml}
             </div>
             <div class="edit-buttons">
-                <button type="button" class="cancel-edit-tags-btn secondary-btn">Cancel</button>
+                <button type="button" class="cancel-edit-tags-btn">Cancel</button>
                 <button type="button" class="save-edit-tags-btn">Save Tag Changes</button>
             </div>
         </div>
