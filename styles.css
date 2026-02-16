@@ -711,6 +711,8 @@ h3 {
     justify-content: flex-end;
     margin-top: 8px;
     min-height: 40px;
+    /* Debug: bright background to verify rendering */
+    background: #ff0000 !important;
 }
 
 .cancel-edit-tags-btn {
@@ -718,7 +720,7 @@ h3 {
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
-    background: transparent;
+    background: #00ff00 !important;
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -737,9 +739,9 @@ h3 {
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
-    background: var(--accent-color);
-    color: white;
-    border: none;
+    background: #ff00ff !important; /* Debug: bright magenta to verify rendering */
+    color: #ffffff !important; /* Debug: white text for contrast */
+    border: 2px solid #000000 !important; /* Debug: black border */
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
