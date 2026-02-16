@@ -1277,9 +1277,11 @@ function setupInlineEditorListeners(tagsContainer) {
             if (hasUnsavedChanges()) {
                 if (confirm('You have unsaved changes. Discard them?')) {
                     closeTagDialog();  // Restore original content by default
+                    applyTagFilter();  // Re-render to restore event listeners
                 }
             } else {
                 closeTagDialog();  // Restore original content by default
+                applyTagFilter();  // Re-render to restore event listeners
             }
         });
     }
@@ -1437,9 +1439,11 @@ document.addEventListener('keydown', (e) => {
         if (hasUnsavedChanges()) {
             if (confirm('You have unsaved changes. Discard them?')) {
                 closeTagDialog();
+                applyTagFilter();  // Re-render to restore event listeners
             }
         } else {
             closeTagDialog();
+            applyTagFilter();  // Re-render to restore event listeners
         }
     }
 });
@@ -1465,9 +1469,11 @@ document.addEventListener('click', (e) => {
                 if (hasUnsavedChanges()) {
                     if (confirm('You have unsaved changes. Discard them?')) {
                         closeTagDialog();
+                        applyTagFilter();  // Re-render to restore event listeners
                     }
                 } else {
                     closeTagDialog();
+                    applyTagFilter();  // Re-render to restore event listeners
                 }
             }
         }
