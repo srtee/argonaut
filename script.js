@@ -1366,6 +1366,7 @@ function saveTagChanges() {
 papersList.addEventListener('click', (e) => {
     const editBtn = e.target.closest('.edit-tags-btn');
     if (editBtn) {
+        e.stopPropagation(); // Prevent bubbling to document click handler
         const key = editBtn.dataset.key;
         console.log('Edit button clicked, key:', key);
         openTagDialog(key);
