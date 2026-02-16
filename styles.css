@@ -920,6 +920,7 @@ button:disabled {
     padding: 20px;
     overflow-y: auto;
     flex: 1;
+    /* Remove min-height: 0 to allow content to expand */
 }
 
 .tag-dialog-paper-title {
@@ -963,6 +964,10 @@ button:disabled {
     flex-wrap: wrap;
     gap: 8px;
     min-height: 40px;
+    margin-top: 10px;
+    /* Ensure tag list takes up space */
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .tag-item {

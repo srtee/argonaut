@@ -1220,6 +1220,7 @@ function renderTagList() {
 
     if (tentativeTags.length === 0 && tentativeTagsRemoved.length === 0) {
         tagList.innerHTML = '<p class="no-tags-message">No tags yet. Add your first tag above!</p>';
+        console.log('No tags to render');
         return;
     }
 
@@ -1229,16 +1230,21 @@ function renderTagList() {
     // Render active tags (tentativeTags)
     tentativeTags.forEach(tag => {
         const tagItem = createTagItem(tag, false);
+        console.log('Created tag item:', tagItem, 'textContent:', tagItem.textContent);
+        console.log('Tag item styles:', window.getComputedStyle(tagItem));
         tagList.appendChild(tagItem);
     });
 
     // Render tentatively removed tags (tentativeTagsRemoved)
     tentativeTagsRemoved.forEach(tag => {
         const tagItem = createTagItem(tag, true);
+        console.log('Created removed tag item:', tagItem, 'textContent:', tagItem.textContent);
         tagList.appendChild(tagItem);
     });
 
     console.log('Tag list HTML after render:', tagList.innerHTML);
+    console.log('Tag list dimensions:', tagList.getBoundingClientRect());
+    console.log('Tag list children:', tagList.children.length);
 }
 
 // Create a tag item element
