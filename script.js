@@ -416,15 +416,17 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
     card.innerHTML = `
         <div class="paper-header">
             <h3 class="paper-title">${escapeHtml(bibInfo.title || key)}</h3>
+        </div>
+        <p class="citation-line">${citationLine}</p>
+        ${comments}
+        <div class="tags-container">
             <button class="edit-tags-btn" aria-label="Edit tags" type="button" data-key="${key}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
                 </svg>
             </button>
+            ${tags}
         </div>
-        <p class="citation-line">${citationLine}</p>
-        ${comments}
-        ${tags ? `<div class="tags-container">${tags}</div>` : ''}
         ${alsoread ? `<div class="alsoread-container"><span class="alsoread-label">Also read:</span> ${alsoread}</div>` : ''}
         <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract" type="button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
