@@ -1131,11 +1131,30 @@ const cancelTagChanges = document.getElementById('cancelTagChanges');
 const saveTagChangesBtn = document.getElementById('saveTagChanges');
 const tagDialogClose = document.querySelector('.tag-dialog-close');
 
+console.log('Tag dialog elements found:', {
+    tagDialog,
+    tagDialogTitle,
+    tagDialogPaperTitle,
+    tagList,
+    tagInput,
+    addTagBtn,
+    cancelTagChanges,
+    saveTagChangesBtn,
+    tagDialogClose
+});
+
 // Open tag dialog
 function openTagDialog(key) {
+    console.log('Opening tag dialog for key:', key);
     currentEditingKey = key;
     const paper = papersData[key];
-    if (!paper) return;
+    if (!paper) {
+        console.error('Paper not found for key:', key);
+        return;
+    }
+
+    console.log('Paper data:', paper);
+    console.log('Existing tags:', paper._tags);
 
     // Reset state
     tentativeTags.clear();
@@ -1147,16 +1166,30 @@ function openTagDialog(key) {
         tentativeTags.set(tag, { removed: false, added: false });
     });
 
+    console.log('Tentative tags after initialization:', Array.from(tentativeTags.entries()));
+
     // Set dialog title
-    tagDialogPaperTitle.textContent = paper.title || key;
+    if (tagDialogPaperTitle) {
+        tagDialogPaperTitle.textContent = paper.title || key;
+    } else {
+        console.error('tagDialogPaperTitle element not found!');
+    }
 
     // Render tags
     renderTagList();
 
     // Show dialog
-    tagDialog.style.display = 'flex';
-    tagInput.value = '';
-    tagInput.focus();
+    if (tagDialog) {
+        tagDialog.style.display = 'flex';
+    } else {
+        console.error('tagDialog element not found!');
+    }
+    if (tagInput) {
+        tagInput.value = '';
+        tagInput.focus();
+    } else {
+        console.error('tagInput element not found!');
+    }
 
     // Prevent body scroll
     document.body.style.overflow = 'hidden';
@@ -1173,6 +1206,14 @@ function closeTagDialog() {
 
 // Render tag list in dialog
 function renderTagList() {
+    console.log('Rendering tag list, tentativeTags.size:', tentativeTags.size, 'newTags.length:', newTags.length);
+    console.log('tagList element:', tagList);
+
+    if (!tagList) {
+        console.error('tagList element not found!');
+        return;
+    }
+
     tagList.innerHTML = '';
 
     if (tentativeTags.size === 0 && newTags.length === 0) {
@@ -1193,6 +1234,8 @@ function renderTagList() {
         const tagItem = createTagItem(tag, false);
         tagList.appendChild(tagItem);
     });
+
+    console.log('Tag list HTML after render:', tagList.innerHTML);
 }
 
 // Create a tag item element
@@ -1323,31 +1366,60 @@ papersList.addEventListener('click', (e) => {
 });
 
 // Close button
-tagDialogClose.addEventListener('click', closeTagDialog);
+if (tagDialogClose) {
+    tagDialogClose.addEventListener('click', closeTagDialog);
+} else {
+    console.error('tagDialogClose element not found!');
+}
 
 // Cancel button
-cancelTagChanges.addEventListener('click', closeTagDialog);
+if (cancelTagChanges) {
+    cancelTagChanges.addEventListener('click', closeTagDialog);
+} else {
+    console.error('cancelTagChanges element not found!');
+}
 
 // Add tag button
-addTagBtn.addEventListener('click', addNewTag);
+if (addTagBtn) {
+    addTagBtn.addEventListener('click', addNewTag);
+} else {
+    console.error('addTagBtn element not found!');
+}
 
 // Save button
-saveTagChangesBtn.addEventListener('click', saveTagChanges);
+if (saveTagChangesBtn) {
+    saveTagChangesBtn.addEventListener('click', saveTagChanges);
+} else {
+    console.error('saveTagChangesBtn element not found!');
+}
 
 // Enter key in tag input
-tagInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        addNewTag();
-    }
-});
+if (tagInput) {
+    tagInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addNewTag();
+        }
+    });
+} else {
+    console.error('tagInput element not found!');
+}
 
 // Escape key to close dialog
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && tagDialog.style.display === 'flex') {
+    if (e.key === 'Escape' && tagDialog && tagDialog.style.display === 'flex') {
         closeTagDialog();
     }
 });
 
 // Click on backdrop to close
-tagDialog.querySelector('.tag-dialog-backdrop').addEventListener('click', closeTagDialog);
+if (tagDialog) {
+    const backdrop = tagDialog.querySelector('.tag-dialog-backdrop');
+    if (backdrop) {
+        backdrop.addEventListener('click', closeTagDialog);
+    } else {
+        console.error('tag-dialog-backdrop element not found!');
+    }
+} else {
+    console.error('tagDialog element not found!');
+}
