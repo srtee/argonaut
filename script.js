@@ -1372,11 +1372,12 @@ if (tagDialogClose) {
     console.error('tagDialogClose element not found!');
 }
 
-// Cancel button
-if (cancelTagChanges) {
-    cancelTagChanges.addEventListener('click', closeTagDialog);
+// Cancel button - query at event listener setup time
+const cancelButton = document.getElementById('cancelTagChanges');
+if (cancelButton) {
+    cancelButton.addEventListener('click', closeTagDialog);
 } else {
-    console.error('cancelTagChanges element not found!');
+    console.error('cancelTagChanges element not found at event listener setup!');
 }
 
 // Add tag button
@@ -1386,11 +1387,12 @@ if (addTagBtn) {
     console.error('addTagBtn element not found!');
 }
 
-// Save button
-if (saveTagChangesBtn) {
-    saveTagChangesBtn.addEventListener('click', saveTagChanges);
+// Save button - query at event listener setup time
+const saveButton = document.getElementById('saveTagChanges');
+if (saveButton) {
+    saveButton.addEventListener('click', saveTagChanges);
 } else {
-    console.error('saveTagChangesBtn element not found!');
+    console.error('saveTagChanges element not found at event listener setup!');
 }
 
 // Enter key in tag input
