@@ -1117,8 +1117,8 @@ console.log('Script initialization complete');
 
 // State for tag editing
 let currentEditingKey = null;
-let tentativeTags = new Map(); // key: tag, value: { removed: boolean, added: boolean }
-let newTags = []; // Tags added during editing
+let tentativeTags = []; // Array of tag strings (active tags)
+let tentativeTagsRemoved = []; // Array of tag strings (tentatively removed tags)
 
 // DOM Elements for tag dialog
 const tagDialog = document.getElementById('tagDialog');
@@ -1157,18 +1157,18 @@ function openTagDialog(key) {
     console.log('Existing tags:', paper._tags);
 
     // Reset state
-    tentativeTags.clear();
-    newTags = [];
+    tentativeTags = [];
+    tentativeTagsRemoved = [];
 
     // Initialize tags from paper
     const existingTags = paper._tags || [];
     existingTags.forEach(tag => {
         // Ensure tag is a string (not an object)
         const tagString = typeof tag === 'object' ? JSON.stringify(tag) : String(tag);
-        tentativeTags.set(tagString, { removed: false, added: false });
+        tentativeTags.push(tagString);
     });
 
-    console.log('Tentative tags after initialization:', Array.from(tentativeTags.entries()).map(([t, s]) => [t, s]));
+    console.log('Tentative tags after initialization:', tentativeTags);
 
     // Set dialog title
     if (tagDialogPaperTitle) {
@@ -1201,14 +1201,14 @@ function openTagDialog(key) {
 function closeTagDialog() {
     tagDialog.style.display = 'none';
     currentEditingKey = null;
-    tentativeTags.clear();
-    newTags = [];
+    tentativeTags = [];
+    tentativeTagsRemoved = [];
     document.body.style.overflow = '';
 }
 
 // Render tag list in dialog
 function renderTagList() {
-    console.log('Rendering tag list, tentativeTags.size:', tentativeTags.size, 'newTags.length:', newTags.length);
+    console.log('Rendering tag list, tentativeTags.length:', tentativeTags.length, 'tentativeTagsRemoved.length:', tentativeTagsRemoved.length);
     console.log('tagList element:', tagList);
 
     if (!tagList) {
@@ -1218,26 +1218,23 @@ function renderTagList() {
 
     tagList.innerHTML = '';
 
-    if (tentativeTags.size === 0 && newTags.length === 0) {
+    if (tentativeTags.length === 0 && tentativeTagsRemoved.length === 0) {
         tagList.innerHTML = '<p class="no-tags-message">No tags yet. Add your first tag above!</p>';
         return;
     }
 
-    console.log('Rendering tentative tags:', Array.from(tentativeTags.entries()));
+    console.log('Rendering tentative tags:', tentativeTags);
+    console.log('Rendering tentative tags removed:', tentativeTagsRemoved);
 
-    // Render existing tags (including those that might be tentatively removed)
-    tentativeTags.forEach((state, tag) => {
-        console.log('Processing tag:', tag, 'type:', typeof tag, 'state:', state);
-        if (!state.added) { // Only show original tags (not newly added ones)
-            const tagItem = createTagItem(tag, state.removed);
-            tagList.appendChild(tagItem);
-        }
+    // Render active tags (tentativeTags)
+    tentativeTags.forEach(tag => {
+        const tagItem = createTagItem(tag, false);
+        tagList.appendChild(tagItem);
     });
 
-    // Render newly added tags
-    newTags.forEach(tag => {
-        console.log('Processing new tag:', tag, 'type:', typeof tag);
-        const tagItem = createTagItem(tag, false);
+    // Render tentatively removed tags (tentativeTagsRemoved)
+    tentativeTagsRemoved.forEach(tag => {
+        const tagItem = createTagItem(tag, true);
         tagList.appendChild(tagItem);
     });
 
@@ -1256,16 +1253,18 @@ function createTagItem(tag, isTentativelyRemoved) {
     // Make the tag clickable to toggle removal
     item.addEventListener('click', () => {
         if (isTentativelyRemoved) {
-            // Undo removal
-            tentativeTags.get(tag).removed = false;
-        } else if (tentativeTags.has(tag)) {
-            // Mark for removal
-            tentativeTags.get(tag).removed = true;
-        } else {
-            // This is a newly added tag - remove from newTags array
-            const index = newTags.indexOf(tag);
+            // Restore: move from removed back to active
+            const index = tentativeTagsRemoved.indexOf(tag);
             if (index > -1) {
-                newTags.splice(index, 1);
+                tentativeTagsRemoved.splice(index, 1);
+                tentativeTags.push(tag);
+            }
+        } else {
+            // Remove: move from active to removed
+            const index = tentativeTags.indexOf(tag);
+            if (index > -1) {
+                tentativeTags.splice(index, 1);
+                tentativeTagsRemoved.push(tag);
             }
         }
         renderTagList();
@@ -1290,14 +1289,14 @@ function addNewTag() {
     const tagName = tagInput.value.trim();
     if (!tagName) return;
 
-    // Check if tag already exists or is in tentativeTags
-    if (tentativeTags.has(tagName) || newTags.includes(tagName)) {
+    // Check if tag already exists in tentativeTags or tentativeTagsRemoved
+    if (tentativeTags.includes(tagName) || tentativeTagsRemoved.includes(tagName)) {
         showError('Tag already exists');
         return;
     }
 
-    // Add to new tags
-    newTags.push(tagName);
+    // Add to tentativeTags (active tags)
+    tentativeTags.push(tagName);
 
     // Clear input
     tagInput.value = '';
@@ -1313,20 +1312,9 @@ function saveTagChanges() {
 
     const paper = papersData[currentEditingKey];
 
-    // Build final tag list
-    const finalTags = [];
-
-    // Add existing tags that weren't removed
-    tentativeTags.forEach((state, tag) => {
-        if (!state.added && !state.removed) {
-            finalTags.push(tag);
-        }
-    });
-
-    // Add newly added tags
-    newTags.forEach(tag => {
-        finalTags.push(tag);
-    });
+    // Final tags are just the active tags (tentativeTags)
+    // Tags in tentativeTagsRemoved are not saved
+    const finalTags = [...tentativeTags];
 
     // Calculate changes
     const originalTags = paper._tags || [];
