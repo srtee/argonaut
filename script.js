@@ -1128,7 +1128,7 @@ const tagList = document.getElementById('tagList');
 const tagInput = document.getElementById('tagInput');
 const addTagBtn = document.getElementById('addTagBtn');
 const cancelTagChanges = document.getElementById('cancelTagChanges');
-const saveTagChanges = document.getElementById('saveTagChanges');
+const saveTagChangesBtn = document.getElementById('saveTagChanges');
 const tagDialogClose = document.querySelector('.tag-dialog-close');
 
 // Open tag dialog
@@ -1332,7 +1332,7 @@ cancelTagChanges.addEventListener('click', closeTagDialog);
 addTagBtn.addEventListener('click', addNewTag);
 
 // Save button
-saveTagChanges.addEventListener('click', saveTagChanges);
+saveTagChangesBtn.addEventListener('click', saveTagChanges);
 
 // Enter key in tag input
 tagInput.addEventListener('keydown', (e) => {
