@@ -1007,6 +1007,8 @@ button:disabled {
     color: var(--text-color);
     transition: all 0.2s;
     flex-shrink: 0;
+    position: relative;
+    z-index: 10;
 }
 
 .edit-tags-btn:hover {
