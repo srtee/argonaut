@@ -1163,10 +1163,12 @@ function openTagDialog(key) {
     // Initialize tags from paper
     const existingTags = paper._tags || [];
     existingTags.forEach(tag => {
-        tentativeTags.set(tag, { removed: false, added: false });
+        // Ensure tag is a string (not an object)
+        const tagString = typeof tag === 'object' ? JSON.stringify(tag) : String(tag);
+        tentativeTags.set(tagString, { removed: false, added: false });
     });
 
-    console.log('Tentative tags after initialization:', Array.from(tentativeTags.entries()));
+    console.log('Tentative tags after initialization:', Array.from(tentativeTags.entries()).map(([t, s]) => [t, s]));
 
     // Set dialog title
     if (tagDialogPaperTitle) {
@@ -1221,8 +1223,11 @@ function renderTagList() {
         return;
     }
 
+    console.log('Rendering tentative tags:', Array.from(tentativeTags.entries()));
+
     // Render existing tags (including those that might be tentatively removed)
     tentativeTags.forEach((state, tag) => {
+        console.log('Processing tag:', tag, 'type:', typeof tag, 'state:', state);
         if (!state.added) { // Only show original tags (not newly added ones)
             const tagItem = createTagItem(tag, state.removed);
             tagList.appendChild(tagItem);
@@ -1231,6 +1236,7 @@ function renderTagList() {
 
     // Render newly added tags
     newTags.forEach(tag => {
+        console.log('Processing new tag:', tag, 'type:', typeof tag);
         const tagItem = createTagItem(tag, false);
         tagList.appendChild(tagItem);
     });
