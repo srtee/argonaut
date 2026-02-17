@@ -605,6 +605,14 @@ function getMimeTypeExtensions(mimeType) {
     }
 }
 
+// Clear current papers data
+function clearCurrentData() {
+    papersData = {};
+    selectedTags.clear();
+    processedPapersData = [];
+    papersList.innerHTML = '';
+}
+
 // Save papers data to browser storage
 function saveToStorage() {
     if (!papersData || Object.keys(papersData).length === 0) {
