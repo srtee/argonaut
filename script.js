@@ -1317,6 +1317,16 @@ async function processPapers(data) {
     return processed;
 }
 
+// Display papers (process and render)
+async function displayPapers() {
+    const processedPapers = await processPapers(papersData);
+    renderPapers(processedPapers);
+
+    // Show sections
+    papersSection.style.display = 'block';
+    exportSection.style.display = 'block';
+}
+
 // Render papers
 function renderPapers(processedPapers) {
     // Store processed papers for filtering
