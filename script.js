@@ -6,7 +6,9 @@ const papersList = document.getElementById('papersList');
 const fileInput = document.getElementById('fileInput');
 const urlInput = document.getElementById('urlInput');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
+const loadFromStorageBtn = document.getElementById('loadFromStorageBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
+const saveToStorageBtn = document.getElementById('saveToStorageBtn');
 const exportJsonLightBtn = document.getElementById('exportJsonLightBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
 const exportBibtexAllBtn = document.getElementById('exportBibtexAllBtn');
@@ -586,6 +588,49 @@ function getMimeTypeExtensions(mimeType) {
     }
 }
 
+// Save papers data to browser storage
+function saveToStorage() {
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to save');
+        return;
+    }
+
+    try {
+        const jsonStr = JSON.stringify(papersData);
+        localStorage.setItem('argonautPapers', jsonStr);
+        showStatus('Papers saved to browser storage');
+    } catch (err) {
+        console.error('Error saving to storage:', err);
+        showError('Error saving to storage: ' + err.message);
+    }
+}
+
+// Load papers data from browser storage
+function loadFromStorage() {
+    try {
+        const jsonStr = localStorage.getItem('argonautPapers');
+        if (!jsonStr) {
+            showError('No papers found in browser storage');
+            return;
+        }
+
+        const data = JSON.parse(jsonStr);
+        if (!data || Object.keys(data).length === 0) {
+            showError('No papers found in browser storage');
+            return;
+        }
+
+        // Clear current data and load new data
+        clearCurrentData();
+        papersData = data;
+        displayPapers();
+        showStatus(`Loaded ${Object.keys(data).length} papers from browser storage`);
+    } catch (err) {
+        console.error('Error loading from storage:', err);
+        showError('Error loading from storage: ' + err.message);
+    }
+}
+
 // Export papers data as JSON
 async function exportJSON() {
     if (!papersData || Object.keys(papersData).length === 0) {
@@ -1060,6 +1105,11 @@ fileInput.addEventListener('change', () => {
 // URL load button handler
 loadUrlBtn.addEventListener('click', () => loadPapers('url'));
 
+// Load from browser storage button handler
+if (loadFromStorageBtn) {
+    loadFromStorageBtn.addEventListener('click', loadFromStorage);
+}
+
 // Reset All button
 loadNewBtn.addEventListener('click', () => {
     // Show confirmation dialog
@@ -1087,6 +1137,11 @@ loadNewBtn.addEventListener('click', () => {
         hideStatus();
     }
 });
+
+// Save to browser storage button
+if (saveToStorageBtn) {
+    saveToStorageBtn.addEventListener('click', saveToStorage);
+}
 
 // Export JSON button
 if (exportJsonLightBtn) {

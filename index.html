@@ -71,6 +71,15 @@
                         <button id="loadUrlBtn" type="button" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
+                <div class="input-option" data-input="storage">
+                    <label class="input-option-label">
+                        <input type="radio" name="inputMethod" value="storage" id="inputMethodStorage">
+                        Load from Browser Storage
+                    </label>
+                    <div class="input-option-content" style="display: none;">
+                        <button id="loadFromStorageBtn" type="button" aria-label="Load papers from browser storage">Load from Storage</button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -78,6 +87,7 @@
         <section class="export-section" id="exportSection" style="display: none;" aria-labelledby="exportHeading">
             <h2 id="exportHeading" class="visually-hidden">Export Options</h2>
             <div class="export-buttons">
+                <button id="saveToStorageBtn" type="button" aria-label="Save papers to browser storage">Save to Storage</button>
                 <button id="exportJsonLightBtn" type="button" aria-label="Export papers with only DOI, comments, tags, and alsoreads as JSON">Export JSON (light)</button>
                 <button id="exportJsonBtn" type="button" aria-label="Export all papers as JSON file">Export JSON (full)</button>
                 <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
@@ -114,6 +124,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.1.7"></script>
+    <script src="script.js?v=1.1.8"></script>
 </body>
 </html>
