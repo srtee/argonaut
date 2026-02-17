@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.1.5">
+    <link rel="stylesheet" href="styles.css?v=1.1.6">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -78,7 +78,8 @@
         <section class="export-section" id="exportSection" style="display: none;" aria-labelledby="exportHeading">
             <h2 id="exportHeading" class="visually-hidden">Export Options</h2>
             <div class="export-buttons">
-                <button id="exportJsonBtn" type="button" aria-label="Export all papers as JSON file">Export JSON</button>
+                <button id="exportJsonLightBtn" type="button" aria-label="Export papers with only DOI, comments, tags, and alsoreads as JSON">Export JSON (light)</button>
+                <button id="exportJsonBtn" type="button" aria-label="Export all papers as JSON file">Export JSON (full)</button>
                 <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                 <button id="exportBibtexTaggedBtn" type="button" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
                 <button id="loadNewBtn" type="button" aria-label="Reset all papers, comments, and tags">Reset All</button>
@@ -113,6 +114,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.1.4"></script>
+    <script src="script.js?v=1.1.6"></script>
 </body>
 </html>

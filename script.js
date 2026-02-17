@@ -7,6 +7,7 @@ const fileInput = document.getElementById('fileInput');
 const urlInput = document.getElementById('urlInput');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
+const exportJsonLightBtn = document.getElementById('exportJsonLightBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
 const exportBibtexAllBtn = document.getElementById('exportBibtexAllBtn');
 const exportBibtexTaggedBtn = document.getElementById('exportBibtexTaggedBtn');
@@ -546,6 +547,41 @@ function exportJSON() {
     }
 }
 
+// Export papers data as JSON (light version with only DOI, comments, tags, and alsoreads)
+function exportJSONLight() {
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to export');
+        return;
+    }
+
+    try {
+        const lightData = {};
+        for (const [key, paper] of Object.entries(papersData)) {
+            lightData[key] = {
+                _doi: paper._doi,
+                _comments: paper._comments,
+                _tags: paper._tags,
+                _alsoread: paper._alsoread
+            };
+        }
+        const jsonStr = JSON.stringify(lightData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'papers-light.json';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showStatus('JSON (light) exported successfully');
+    } catch (err) {
+        console.error('Error exporting JSON (light):', err);
+        showError('Error exporting JSON (light): ' + err.message);
+    }
+}
+
 // Export papers as BibTeX
 async function exportBibTeX() {
     if (!papersData || Object.keys(papersData).length === 0) {
@@ -1016,6 +1052,9 @@ loadNewBtn.addEventListener('click', () => {
 });
 
 // Export JSON button
+if (exportJsonLightBtn) {
+    exportJsonLightBtn.addEventListener('click', exportJSONLight);
+}
 if (exportJsonBtn) {
     exportJsonBtn.addEventListener('click', exportJSON);
 }
