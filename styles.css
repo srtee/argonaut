@@ -318,8 +318,10 @@ body {
     border: 1px solid var(--abstract-border);
     border-radius: 12px;
     padding: 16px;
+    padding-bottom: 48px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-soft);
+    position: relative;
 }
 
 .add-doi-section h2 {
@@ -1019,7 +1021,10 @@ button:disabled {
 
 .status {
     color: var(--status-color);
-    margin-top: 16px;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
     font-size: 14px;
     display: none;
     font-weight: 500;

@@ -1270,6 +1270,9 @@ async function processPapers(data) {
 
     showStatus(`Processing ${entries.length} papers...`);
 
+    // Force UI update before starting the loop
+    await new Promise(resolve => setTimeout(resolve, 0));
+
     const processed = [];
 
     for (let i = 0; i < entries.length; i++) {
@@ -1322,7 +1325,8 @@ async function displayPapers() {
     const processedPapers = await processPapers(papersData);
     renderPapers(processedPapers);
 
-    // Show sections
+    // Hide load section, show papers and export sections
+    loadJsonSection.style.display = 'none';
     papersSection.style.display = 'block';
     exportSection.style.display = 'block';
 }
@@ -1545,7 +1549,9 @@ loadNewBtn.addEventListener('click', () => {
         papersData = {};
         processedPapersData = [];
 
+        // Hide papers and export sections, show load section
         papersSection.style.display = 'none';
+        exportSection.style.display = 'none';
         loadJsonSection.style.display = 'block';
         papersList.innerHTML = '';
         fileInput.value = '';
