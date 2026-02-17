@@ -121,48 +121,39 @@ body {
 .container {
     position: relative;
     background: var(--container-bg);
-    padding: 28px;
+    padding: 28px 28px 28px 28px;
     border-radius: 16px;
     box-shadow: var(--shadow-soft);
     width: 100%;
     max-width: 900px;
 }
 
-h1 {
-    font-family: 'Merriweather', Georgia, serif;
-    text-align: center;
-    margin-bottom: 6px;
-    color: var(--text-color);
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-
-.subtitle {
-    text-align: center;
-    color: var(--attribution-color);
-    font-size: 14px;
+/* Header with three portions */
+.header-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
     margin-bottom: 20px;
-    font-weight: 400;
 }
 
-h2 {
+.header-title {
     font-family: 'Merriweather', Georgia, serif;
+    font-size: 24px;
+    font-weight: 600;
     color: var(--text-color);
-    margin-bottom: 14px;
-    font-weight: 500;
-    font-size: 16px;
+    letter-spacing: -0.5px;
+    margin: 0;
 }
 
-h3 {
-    color: var(--text-color);
-    margin-bottom: 8px;
-    font-weight: 500;
+.header-subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
 }
 
 .theme-toggle {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    justify-self: end;
     background: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: 999px;
@@ -537,15 +528,87 @@ h3 {
 
 /* Comments */
 .comments {
-    color: var(--comments-color);
-    font-style: italic;
+    color: var(--text-secondary);
     margin-bottom: 10px;
-    padding: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 400;
+    border: 1px solid var(--input-border);
+}
+
+.comments-placeholder {
+    color: var(--muted-text);
+    font-style: italic;
+}
+
+/* DOI Section Status */
+.doi-status {
+    margin-top: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    display: none;
+    font-weight: 500;
+}
+
+.doi-status.visible {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Tooltip for edit button */
+.edit-tags-btn {
     background: var(--input-bg);
-    border-radius: 10px;
-    border-left: 3px solid var(--tag-accent-1);
-    font-size: 14px;
-    line-height: 1.5;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: all 0.3s ease-out;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.edit-tags-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.edit-tags-btn:hover::after {
+    content: 'Edit tags';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    font-weight: 500;
+    box-shadow: var(--shadow-medium);
+    z-index: 20;
+}
+
+.edit-tags-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    background-color: var(--input-bg);
+}
+
+.edit-tags-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.edit-tags-btn:hover svg {
+    stroke: var(--accent-color);
 }
 
 /* Tags */
@@ -1042,41 +1105,6 @@ button:disabled {
     .citation span:not(:last-child)::after {
         content: "";
     }
-}
-
-/* Paper Header Edit Button */
-.edit-tags-btn {
-    background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    cursor: pointer;
-    color: var(--text-color);
-    transition: all 0.3s ease-out;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10;
-}
-
-.edit-tags-btn:hover {
-    background: var(--hover-bg);
-    border-color: var(--accent-color);
-    transform: scale(1.05);
-}
-
-.edit-tags-btn:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-    background-color: var(--input-bg);
-}
-
-.edit-tags-btn svg {
-    width: 14px;
-    height: 14px;
-}
-
-.edit-tags-btn:hover svg {
-    stroke: var(--accent-color);
 }
 
 /* Tag Dialog */

@@ -13,21 +13,23 @@
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
     <main class="container" id="mainContent" tabindex="-1">
-        <h1>Argonaut</h1>
-        <p class="subtitle">browser-based, JSON-stored bibliographies</p>
-        <button id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false" type="button">
-            <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
-                <!-- Sun icon (shown in dark mode) -->
-                <g class="sun-icon" style="display: none;">
-                    <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/>
-                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </g>
-                <!-- Moon icon (shown in light mode) -->
-                <g class="moon-icon">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="#4b5563" stroke-width="2" fill="none"/>
-                </g>
-            </svg>
-        </button>
+        <div class="header-container">
+            <h1 class="header-title">Argonaut</h1>
+            <p class="header-subtitle">browser-based, JSON-stored bibliographies</p>
+            <button id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false" type="button">
+                <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+                    <!-- Sun icon (shown in dark mode) -->
+                    <g class="sun-icon" style="display: none;">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                    <!-- Moon icon (shown in light mode) -->
+                    <g class="moon-icon">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="#4b5563" stroke-width="2" fill="none"/>
+                    </g>
+                </svg>
+            </button>
+        </div>
 
         <!-- Add A Paper By DOI Section (always visible) -->
         <section class="add-doi-section add-doi-input-section" id="addDoiSection" aria-labelledby="addDoiHeading">
@@ -43,6 +45,7 @@
                 </div>
                 <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
             </div>
+            <div id="doiStatus" class="doi-status" role="status" aria-live="polite"></div>
         </section>
 
         <!-- Load JSON Collection Section -->
