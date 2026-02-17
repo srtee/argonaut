@@ -15,7 +15,6 @@ const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
-const doiStatus = document.getElementById('doiStatus');
 
 // State
 let papersData = {};
@@ -290,7 +289,7 @@ async function addPaperByDoi() {
     }
 
     try {
-        showDoiStatus(`Fetching paper: ${doi}...`);
+        showStatus(`Fetching paper: ${doi}...`);
 
         // Fetch BibTeX
         const bibtex = await fetchBibTeX(doi);
@@ -312,7 +311,7 @@ async function addPaperByDoi() {
         } else if (papersData[key] && customKey) {
             // User provided a custom key that already exists - warn and overwrite
             if (!confirm(`The key "${key}" already exists. Do you want to overwrite the existing entry?`)) {
-                hideDoiStatus();
+                hideStatus();
                 return;
             }
         }
@@ -354,7 +353,7 @@ async function addPaperByDoi() {
         doiInput.value = '';
         doiKeyInput.value = '';
 
-        showDoiStatus(`Paper "${key}" added successfully`);
+        showStatus(`Paper "${key}" added successfully`);
 
         // Scroll to the new paper
         setTimeout(() => {
@@ -519,36 +518,6 @@ function showStatus(message) {
 // Hide status message
 function hideStatus() {
     status.classList.remove('visible');
-}
-
-// Show DOI-specific status message
-function showDoiStatus(message) {
-    if (doiStatus) {
-        doiStatus.textContent = message;
-        doiStatus.classList.add('visible');
-    }
-}
-
-// Hide DOI-specific status message
-function hideDoiStatus() {
-    if (doiStatus) {
-        doiStatus.classList.remove('visible');
-    }
-}
-
-// Show DOI section status message
-function showDoiStatus(message) {
-    if (doiStatus) {
-        doiStatus.textContent = message;
-        doiStatus.classList.add('visible');
-    }
-}
-
-// Hide DOI section status message
-function hideDoiStatus() {
-    if (doiStatus) {
-        doiStatus.classList.remove('visible');
-    }
 }
 
 // Export papers data as JSON
@@ -905,7 +874,7 @@ function updateExportButtonStates() {
 // Main load function
 async function loadPapers(method) {
     hideError();
-    hideDoiStatus();
+    hideStatus();
     hideStatus();
     papersList.innerHTML = '<p class="loading">Loading papers...</p>';
 
@@ -917,7 +886,7 @@ async function loadPapers(method) {
                 if (!fileInput.files[0]) {
                     throw new Error('Please select a file');
                 }
-                showDoiStatus('Loading papers from file...');
+                showStatus('Loading papers from file...');
                 data = await loadFromFile(fileInput.files[0]);
                 break;
             case 'url':
@@ -925,7 +894,7 @@ async function loadPapers(method) {
                 if (!url) {
                     throw new Error('Please enter a URL');
                 }
-                showDoiStatus('Loading papers from URL...');
+                showStatus('Loading papers from URL...');
                 data = await loadFromUrl(url);
                 break;
             case 'default':
@@ -942,8 +911,8 @@ async function loadPapers(method) {
         loadJsonSection.style.display = 'none';
         exportSection.style.display = 'block';
         papersSection.style.display = 'block';
-        showDoiStatus(`Loaded ${processedPapers.length} papers successfully`);
-        setTimeout(hideDoiStatus, 3000);
+        showStatus(`Loaded ${processedPapers.length} papers successfully`);
+        setTimeout(hideStatus, 3000);
 
     } catch (err) {
         showError(err.message);
