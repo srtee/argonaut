@@ -530,18 +530,30 @@ body {
 
 /* Comments */
 .comments {
-    color: var(--text-secondary);
+    color: var(--text-color);
     margin-bottom: 10px;
-    padding: 10px 14px;
     background: var(--bg-secondary);
     border-radius: 8px;
     font-size: 13px;
     line-height: 1.6;
     font-weight: 400;
     border: 1px solid var(--input-border);
+    transition: all 0.3s ease-out;
+    padding: 10px 14px;
+    width: 100%;
+    min-height: 60px;
+    max-height: 200px;
+    resize: vertical;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
-.comments-placeholder {
+.comments:focus-visible {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(44, 76, 102, 0.15);
+}
+
+.comments::placeholder {
     color: var(--muted-text);
     font-style: italic;
 }

@@ -385,7 +385,7 @@ function createPaperCard(key, paperData, bibInfo, abstract) {
         `<button type="button" class="alsoread-link" data-ref="${ref}" tabindex="0" aria-label="View paper: ${ref}">${ref}</button>`
     ).join('');
 
-    const comments = `<p class="comments">${paperData._comments ? escapeHtml(paperData._comments) : 'No notes yet.'}</p>`;
+    const comments = `<textarea class="comments" placeholder="Add your notes..." data-key="${key}" aria-label="Notes for this paper">${paperData._comments || ''}</textarea>`;
 
     const abstractContent = abstract ? `<div class="abstract-content">${escapeHtml(abstract)}</div>` : '<p class="no-abstract">No abstract available</p>';
 
@@ -1483,3 +1483,35 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+// ========== Comment Editing with Auto-Save ==========
+
+// Auto-save comment on blur (when clicking away)
+papersList.addEventListener('blur', (e) => {
+    if (e.target.classList.contains('comments')) {
+        const key = e.target.dataset.key;
+        const newComment = e.target.value;
+        saveComment(key, newComment);
+    }
+}, true); // Use capture phase to ensure we catch blur events
+
+// Save comment to papersData
+function saveComment(key, comment) {
+    if (!papersData[key]) return;
+
+    const paper = papersData[key];
+    const oldComment = paper._comments || '';
+
+    // Only save if the comment actually changed
+    if (oldComment !== comment) {
+        paper._comments = comment;
+
+        // Update the paper reference in processedPapersData
+        const processedEntry = processedPapersData.find(entry => entry.key === key);
+        if (processedEntry) {
+            processedEntry.paper = papersData[key];
+        }
+
+        console.log(`Comment saved for "${key}"`);
+    }
+}
