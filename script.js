@@ -521,8 +521,73 @@ function hideStatus() {
     status.classList.remove('visible');
 }
 
+// Helper function to save file using File System Access API with fallback
+async function saveFileWithPicker(content, defaultFilename, mimeType) {
+    // Check if File System Access API is supported
+    if ('showSaveFilePicker' in window) {
+        try {
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: defaultFilename,
+                types: [{
+                    description: getMimeTypeDescription(mimeType),
+                    accept: { [mimeType]: getMimeTypeExtensions(mimeType) }
+                }]
+            });
+            const writable = await fileHandle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            return true;
+        } catch (err) {
+            // User cancelled the dialog - not an error
+            if (err.name === 'AbortError') {
+                return false;
+            }
+            throw err;
+        }
+    } else {
+        // Fallback for browsers without File System Access API
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = defaultFilename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return true;
+    }
+}
+
+// Helper function to get file description based on MIME type
+function getMimeTypeDescription(mimeType) {
+    switch (mimeType) {
+        case 'application/json':
+            return 'JSON File';
+        case 'text/plain':
+        case 'text/x-bibtex':
+            return 'BibTeX File';
+        default:
+            return 'File';
+    }
+}
+
+// Helper function to get file extensions based on MIME type
+function getMimeTypeExtensions(mimeType) {
+    switch (mimeType) {
+        case 'application/json':
+            return ['.json'];
+        case 'text/plain':
+        case 'text/x-bibtex':
+            return ['.bib', '.txt'];
+        default:
+            return ['.*'];
+    }
+}
+
 // Export papers data as JSON
-function exportJSON() {
+async function exportJSON() {
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
@@ -530,17 +595,10 @@ function exportJSON() {
 
     try {
         const jsonStr = JSON.stringify(papersData, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'papers.json';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showStatus('JSON exported successfully');
+        const saved = await saveFileWithPicker(jsonStr, 'papers.json', 'application/json');
+        if (saved) {
+            showStatus('JSON exported successfully');
+        }
     } catch (err) {
         console.error('Error exporting JSON:', err);
         showError('Error exporting JSON: ' + err.message);
@@ -548,7 +606,7 @@ function exportJSON() {
 }
 
 // Export papers data as JSON (light version with only DOI, comments, tags, and alsoreads)
-function exportJSONLight() {
+async function exportJSONLight() {
     if (!papersData || Object.keys(papersData).length === 0) {
         showError('No papers to export');
         return;
@@ -565,17 +623,10 @@ function exportJSONLight() {
             };
         }
         const jsonStr = JSON.stringify(lightData, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'papers-light.json';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showStatus('JSON (light) exported successfully');
+        const saved = await saveFileWithPicker(jsonStr, 'papers-light.json', 'application/json');
+        if (saved) {
+            showStatus('JSON (light) exported successfully');
+        }
     } catch (err) {
         console.error('Error exporting JSON (light):', err);
         showError('Error exporting JSON (light): ' + err.message);
@@ -632,17 +683,10 @@ async function exportBibTeX() {
             }
         }
 
-        const blob = new Blob([bibtexContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'papers.bib';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showStatus(`BibTeX exported successfully (${entries.length} entries)`);
+        const saved = await saveFileWithPicker(bibtexContent, 'papers.bib', 'text/x-bibtex');
+        if (saved) {
+            showStatus(`BibTeX exported successfully (${entries.length} entries)`);
+        }
     } catch (err) {
         console.error('Error exporting BibTeX:', err);
         showError('Error exporting BibTeX: ' + err.message);
@@ -715,17 +759,10 @@ async function exportBibTeXTagged() {
             }
         }
 
-        const blob = new Blob([bibtexContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'papers-tagged.bib';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showStatus(`BibTeX exported successfully (${entries.length} entries with selected tags)`);
+        const saved = await saveFileWithPicker(bibtexContent, 'papers-tagged.bib', 'text/x-bibtex');
+        if (saved) {
+            showStatus(`BibTeX exported successfully (${entries.length} entries with selected tags)`);
+        }
     } catch (err) {
         console.error('Error exporting BibTeX:', err);
         showError('Error exporting BibTeX: ' + err.message);
