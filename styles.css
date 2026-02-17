@@ -1025,12 +1025,12 @@ button:disabled {
     bottom: 8px;
     left: 8px;
     right: 8px;
-    font-size: 14px;
+    font-size: 13px;
     display: none;
     font-weight: 500;
-    padding: 12px;
+    padding: 4px 8px;
     background: rgba(90, 138, 106, 0.1);
-    border-radius: 10px;
+    border-radius: 6px;
     border-left: 3px solid var(--status-color);
 }
 
