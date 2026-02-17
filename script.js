@@ -19,6 +19,23 @@ const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 
+// GitHub OAuth Elements
+const githubAuthStatus = document.getElementById('githubAuthStatus');
+const githubConnectBtn = document.getElementById('githubConnectBtn');
+const githubSyncControls = document.getElementById('githubSyncControls');
+const githubUserInfo = document.getElementById('githubUserInfo');
+const gistSelector = document.getElementById('gistSelector');
+const loadFromGistBtn = document.getElementById('loadFromGistBtn');
+const saveToGistBtn = document.getElementById('saveToGistBtn');
+const githubDisconnectBtn = document.getElementById('githubDisconnectBtn');
+
+// GitHub OAuth Constants
+const GITHUB_CLIENT_ID = 'Iv23liS8pGQh2R8k2Y3N'; // Replace with your actual GitHub OAuth App client ID
+const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize';
+const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
+const GITHUB_API_URL = 'https://api.github.com';
+const GITHUB_SCOPE = 'gist';
+
 // State
 let papersData = {};
 let selectedTags = new Set();
@@ -631,6 +648,387 @@ function loadFromStorage() {
     }
 }
 
+// GitHub OAuth PKCE Helpers
+function generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    let text = '';
+    for (let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+async function generateCodeChallenge(codeVerifier) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+}
+
+// GitHub OAuth Functions
+function initiateGitHubLogin() {
+    const codeVerifier = generateRandomString(128);
+    sessionStorage.setItem('github_code_verifier', codeVerifier);
+    sessionStorage.setItem('github_state', generateRandomString(32));
+
+    const authUrl = new URL(GITHUB_AUTH_URL);
+    authUrl.searchParams.append('client_id', GITHUB_CLIENT_ID);
+    authUrl.searchParams.append('scope', 'gist');
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('state', sessionStorage.getItem('github_state'));
+    authUrl.searchParams.append('code_challenge', codeVerifier);
+    authUrl.searchParams.append('code_challenge_method', 'plain');
+
+    window.location.href = authUrl.toString();
+}
+
+async function exchangeCodeForToken(code) {
+    const codeVerifier = sessionStorage.getItem('github_code_verifier');
+
+    const response = await fetch(GITHUB_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            client_id: GITHUB_CLIENT_ID,
+            code: code,
+            code_verifier: codeVerifier
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to exchange code for token');
+    }
+
+    const data = await response.json();
+    if (data.error) {
+        throw new Error(data.error_description || data.error);
+    }
+
+    return data.access_token;
+}
+
+async function getGitHubUser(token) {
+    const response = await fetch(`${GITHUB_API_URL}/user`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to get user info');
+    }
+
+    return await response.json();
+}
+
+async function listUserGists(token) {
+    const response = await fetch(`${GITHUB_API_URL}/gists`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to list gists');
+    }
+
+    return await response.json();
+}
+
+async function getGist(token, gistId) {
+    const response = await fetch(`${GITHUB_API_URL}/gists/${gistId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to get gist');
+    }
+
+    return await response.json();
+}
+
+async function createGist(token, description, files) {
+    const response = await fetch(`${GITHUB_API_URL}/gists`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            description: description,
+            public: false,
+            files: files
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to create gist');
+    }
+
+    return await response.json();
+}
+
+async function updateGist(token, gistId, description, files) {
+    const response = await fetch(`${GITHUB_API_URL}/gists/${gistId}`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            description: description,
+            files: files
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update gist');
+    }
+
+    return await response.json();
+}
+
+// GitHub UI Functions
+async function connectToGitHub() {
+    try {
+        githubConnectBtn.classList.add('loading');
+        initiateGitHubLogin();
+    } catch (err) {
+        console.error('Error connecting to GitHub:', err);
+        showError('Error connecting to GitHub: ' + err.message);
+        githubConnectBtn.classList.remove('loading');
+    }
+}
+
+async function disconnectFromGitHub() {
+    try {
+        localStorage.removeItem('github_token');
+        localStorage.removeItem('github_user');
+        localStorage.removeItem('github_selected_gist');
+
+        githubAuthStatus.style.display = 'block';
+        githubSyncControls.style.display = 'none';
+        showStatus('Disconnected from GitHub');
+    } catch (err) {
+        console.error('Error disconnecting from GitHub:', err);
+        showError('Error disconnecting from GitHub: ' + err.message);
+    }
+}
+
+async function loadGitHubAuth() {
+    const token = localStorage.getItem('github_token');
+    const userStr = localStorage.getItem('github_user');
+
+    if (token && userStr) {
+        const user = JSON.parse(userStr);
+        updateGitHubUI(user);
+        await loadUserGists(token);
+    }
+}
+
+function updateGitHubUI(user) {
+    githubAuthStatus.style.display = 'none';
+    githubSyncControls.style.display = 'block';
+
+    githubUserInfo.innerHTML = `
+        <img src="${user.avatar_url}" alt="${user.login}" class="github-user-avatar">
+        <span class="github-user-name">${user.login}</span>
+    `;
+}
+
+async function loadUserGists(token) {
+    try {
+        gistSelector.innerHTML = '<option value="">Loading gists...</option>';
+        gistSelector.disabled = true;
+
+        const gists = await listUserGists(token);
+
+        if (gists.length === 0) {
+            gistSelector.innerHTML = '<option value="">No gists found</option>';
+        } else {
+            gistSelector.innerHTML = '<option value="">Select a gist...</option>';
+            gists.forEach(gist => {
+                const option = document.createElement('option');
+                option.value = gist.id;
+                option.textContent = gist.description || gist.files[Object.keys(gist.files)[0]].filename;
+                option.setAttribute('data-description', gist.description || '');
+                option.setAttribute('data-filename', Object.keys(gist.files)[0]);
+                gistSelector.appendChild(option);
+            });
+
+            // Restore selected gist if available
+            const savedGistId = localStorage.getItem('github_selected_gist');
+            if (savedGistId) {
+                gistSelector.value = savedGistId;
+            }
+        }
+
+        gistSelector.disabled = false;
+    } catch (err) {
+        console.error('Error loading gists:', err);
+        showError('Error loading gists: ' + err.message);
+        gistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+    }
+}
+
+async function loadFromGist() {
+    const token = localStorage.getItem('github_token');
+    const gistId = gistSelector.value;
+
+    if (!token) {
+        showError('Not connected to GitHub');
+        return;
+    }
+
+    if (!gistId) {
+        showError('Please select a gist');
+        return;
+    }
+
+    try {
+        loadFromGistBtn.classList.add('loading');
+        showStatus('Loading from Gist...');
+
+        const gist = await getGist(token, gistId);
+        const filename = Object.keys(gist.files)[0];
+        const content = gist.files[filename].content;
+
+        // Check if the content is valid JSON
+        let data;
+        try {
+            data = JSON.parse(content);
+        } catch (err) {
+            throw new Error('Gist does not contain valid papers data');
+        }
+
+        if (!data || Object.keys(data).length === 0) {
+            throw new Error('Gist does not contain any papers');
+        }
+
+        // Load the data
+        clearCurrentData();
+        papersData = data;
+        displayPapers();
+
+        // Save selected gist
+        localStorage.setItem('github_selected_gist', gistId);
+
+        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
+    } catch (err) {
+        console.error('Error loading from Gist:', err);
+        showError('Error loading from Gist: ' + err.message);
+    } finally {
+        loadFromGistBtn.classList.remove('loading');
+    }
+}
+
+async function saveToGist() {
+    const token = localStorage.getItem('github_token');
+    const gistId = gistSelector.value;
+
+    if (!token) {
+        showError('Not connected to GitHub');
+        return;
+    }
+
+    if (!papersData || Object.keys(papersData).length === 0) {
+        showError('No papers to save');
+        return;
+    }
+
+    try {
+        saveToGistBtn.classList.add('loading');
+        showStatus('Saving to Gist...');
+
+        const jsonStr = JSON.stringify(papersData, null, 2);
+        const filename = 'papers.json';
+        const files = {
+            [filename]: {
+                content: jsonStr
+            }
+        };
+
+        if (gistId) {
+            // Update existing gist
+            await updateGist(token, gistId, 'Argonaut Papers', files);
+            showStatus('Updated existing Gist');
+        } else {
+            // Create new gist
+            const gist = await createGist(token, 'Argonaut Papers', files);
+            gistSelector.innerHTML = '<option value="">Loading gists...</option>';
+            await loadUserGists(token);
+            gistSelector.value = gist.id;
+            showStatus('Created new Gist');
+        }
+
+        // Save selected gist
+        const newGistId = gistSelector.value;
+        if (newGistId) {
+            localStorage.setItem('github_selected_gist', newGistId);
+        }
+    } catch (err) {
+        console.error('Error saving to Gist:', err);
+        showError('Error saving to Gist: ' + err.message);
+    } finally {
+        saveToGistBtn.classList.remove('loading');
+    }
+}
+
+// Handle OAuth callback
+async function handleOAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    const savedState = sessionStorage.getItem('github_state');
+
+    if (!code) {
+        return;
+    }
+
+    if (state !== savedState) {
+        showError('OAuth state mismatch. Please try again.');
+        return;
+    }
+
+    try {
+        showStatus('Authenticating with GitHub...');
+
+        const token = await exchangeCodeForToken(code);
+        const user = await getGitHubUser(token);
+
+        localStorage.setItem('github_token', token);
+        localStorage.setItem('github_user', JSON.stringify(user));
+
+        // Clear URL params
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Update UI
+        updateGitHubUI(user);
+        await loadUserGists(token);
+
+        showStatus(`Connected as ${user.login}`);
+    } catch (err) {
+        console.error('Error handling OAuth callback:', err);
+        showError('Error connecting to GitHub: ' + err.message);
+    } finally {
+        sessionStorage.removeItem('github_code_verifier');
+        sessionStorage.removeItem('github_state');
+    }
+}
+
 // Export papers data as JSON
 async function exportJSON() {
     if (!papersData || Object.keys(papersData).length === 0) {
@@ -1142,6 +1540,26 @@ loadNewBtn.addEventListener('click', () => {
 if (saveToStorageBtn) {
     saveToStorageBtn.addEventListener('click', saveToStorage);
 }
+
+// GitHub OAuth event listeners
+if (githubConnectBtn) {
+    githubConnectBtn.addEventListener('click', connectToGitHub);
+}
+if (githubDisconnectBtn) {
+    githubDisconnectBtn.addEventListener('click', disconnectFromGitHub);
+}
+if (loadFromGistBtn) {
+    loadFromGistBtn.addEventListener('click', loadFromGist);
+}
+if (saveToGistBtn) {
+    saveToGistBtn.addEventListener('click', saveToGist);
+}
+
+// Check for OAuth callback on page load
+handleOAuthCallback();
+
+// Load saved GitHub auth on page load
+loadGitHubAuth();
 
 // Export JSON button
 if (exportJsonLightBtn) {
