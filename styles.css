@@ -1275,6 +1275,9 @@ button:disabled {
     background: rgba(90, 138, 106, 0.1);
     border-radius: 6px;
     border-left: 3px solid var(--status-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .status.visible {
