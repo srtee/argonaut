@@ -868,6 +868,8 @@ async function loadGitHubAuth() {
         console.log('[GitHub Auth] User authenticated, updating UI');
         updateGitHubUI(session.user);
         await loadGistOptions();
+        // Initialize UI state - show gist container when "select" is active
+        handleGistActionChange();
     } else {
         console.log('[GitHub Auth] User not authenticated or no user data');
     }
@@ -1056,9 +1058,9 @@ async function saveToGist() {
             gistSelector.value = gist.id;
             localStorage.setItem('github_selected_gist', gist.id);
 
-            // Switch to select mode
+            // Switch to select mode and update UI state
             gistActionSelector.value = 'select';
-            existingGistContainer.style.display = 'block';
+            handleGistActionChange();
         } else {
             const gistId = gistSelector.value;
             if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
