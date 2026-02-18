@@ -38,7 +38,7 @@ console.log('GitHub elements:', {
     gistSelector: !!gistSelector,
     loadFromGistBtn: !!loadFromGistBtn,
     saveToGistBtn: !!saveToGistBtn,
-    githubDisconnectBtn: !!githubDisconnectBtn
+    githubLogoutBtn: !!githubLogoutBtn
 });
 
 // CloudFlare Worker OAuth Constants
