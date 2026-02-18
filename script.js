@@ -29,6 +29,18 @@ const loadFromGistBtn = document.getElementById('loadFromGistBtn');
 const saveToGistBtn = document.getElementById('saveToGistBtn');
 const githubDisconnectBtn = document.getElementById('githubDisconnectBtn');
 
+// Debug: Verify GitHub elements exist
+console.log('GitHub elements:', {
+    githubAuthStatus: !!githubAuthStatus,
+    githubConnectBtn: !!githubConnectBtn,
+    githubSyncControls: !!githubSyncControls,
+    githubUserInfo: !!githubUserInfo,
+    gistSelector: !!gistSelector,
+    loadFromGistBtn: !!loadFromGistBtn,
+    saveToGistBtn: !!saveToGistBtn,
+    githubDisconnectBtn: !!githubDisconnectBtn
+});
+
 // CloudFlare Worker OAuth Constants
 const WORKER_BASE_URL = 'https://argonaut-headless-github-oauth.shernren.workers.dev';
 
@@ -662,10 +674,30 @@ function loginToGitHub() {
 // Check if user is authenticated
 async function checkSession() {
     try {
+        console.log('Checking session at:', `${WORKER_BASE_URL}/session`);
         const res = await fetch(`${WORKER_BASE_URL}/session`, {
             credentials: 'include'  // Required for cookies
         });
-        return await res.json();  // { authenticated: true/false, user: {...}, scopes: [...] }
+        console.log('Session response status:', res.status, res.statusText);
+
+        if (!res.ok) {
+            console.error('Session check failed with status:', res.status);
+            return { authenticated: false };
+        }
+
+        const contentType = res.headers.get('content-type');
+        let data;
+
+        if (contentType && contentType.includes('application/json')) {
+            data = await res.json();
+        } else {
+            const text = await res.text();
+            console.error('Non-JSON response from session endpoint:', text);
+            return { authenticated: false };
+        }
+
+        console.log('Session data:', data);
+        return data;  // { authenticated: true/false, user: {...}, scopes: [...] }
     } catch (err) {
         console.error('Error checking session:', err);
         return { authenticated: false };
@@ -776,10 +808,15 @@ async function disconnectFromGitHub() {
 
 async function loadGitHubAuth() {
     try {
+        console.log('Loading GitHub auth...');
         const session = await checkSession();
+        console.log('Session response:', session);
         if (session.authenticated && session.user) {
+            console.log('User is authenticated:', session.user);
             updateGitHubUI(session.user);
             await loadUserGists();
+        } else {
+            console.log('User is not authenticated');
         }
     } catch (err) {
         console.error('Error loading GitHub auth:', err);
@@ -787,6 +824,11 @@ async function loadGitHubAuth() {
 }
 
 function updateGitHubUI(user) {
+    console.log('Updating GitHub UI for user:', user);
+    console.log('githubAuthStatus element:', githubAuthStatus);
+    console.log('githubSyncControls element:', githubSyncControls);
+    console.log('githubUserInfo element:', githubUserInfo);
+
     githubAuthStatus.style.display = 'none';
     githubSyncControls.style.display = 'block';
 
@@ -794,6 +836,7 @@ function updateGitHubUI(user) {
         <img src="${user.avatar_url}" alt="${user.login}" class="github-user-avatar">
         <span class="github-user-name">${user.login}</span>
     `;
+    console.log('GitHub UI updated');
 }
 
 async function loadUserGists() {
@@ -1465,7 +1508,24 @@ if (saveToGistBtn) {
 }
 
 // Load saved GitHub auth on page load (checks session via worker)
-loadGitHubAuth();
+// Also check for OAuth callback parameters
+async function initGitHubAuth() {
+    // Check if we just returned from OAuth callback
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('code') || urlParams.has('state')) {
+        console.log('OAuth callback detected, checking session...');
+        // Remove OAuth params from URL for cleanliness
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    await loadGitHubAuth();
+}
+
+// Ensure DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGitHubAuth);
+} else {
+    initGitHubAuth();
+}
 
 // Export JSON button
 if (exportJsonLightBtn) {
