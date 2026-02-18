@@ -19,7 +19,23 @@ const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
 
-// GitHub OAuth Elements - REMOVED
+// GitHub OAuth Elements
+const githubSection = document.getElementById('githubSection');
+const githubAuthStatus = document.getElementById('githubAuthStatus');
+const githubConnectBtn = document.getElementById('githubConnectBtn');
+const githubSyncControls = document.getElementById('githubSyncControls');
+const githubUserAvatar = document.getElementById('githubUserAvatar');
+const githubUserName = document.getElementById('githubUserName');
+const githubLogoutBtn = document.getElementById('githubLogoutBtn');
+const gistActionSelector = document.getElementById('gistActionSelector');
+const gistSelector = document.getElementById('gistSelector');
+const existingGistContainer = document.getElementById('existingGistContainer');
+const loadFromGistBtn = document.getElementById('loadFromGistBtn');
+const saveToGistBtn = document.getElementById('saveToGistBtn');
+
+// CloudFlare Worker Configuration
+// Replace with your actual worker URL
+const WORKER_BASE_URL = 'https://argonaut-github-proxy.shernren.workers.dev';
 
 // State
 let papersData = {};
@@ -641,7 +657,289 @@ function loadFromStorage() {
     }
 }
 
-// ========== GitHub OAuth Functions - REMOVED ==========
+// ========== GitHub OAuth Functions ==========
+
+/**
+ * Initiate GitHub OAuth login flow
+ */
+async function initiateLogin() {
+    window.location.href = `${WORKER_BASE_URL}/login`;
+}
+
+/**
+ * Check if user is authenticated
+ */
+async function checkSession() {
+    try {
+        const res = await fetch(`${WORKER_BASE_URL}/session`, {
+            credentials: 'include'
+        });
+        if (!res.ok) {
+            return { authenticated: false };
+        }
+        return await res.json();
+    } catch (err) {
+        console.error('Error checking session:', err);
+        return { authenticated: false };
+    }
+}
+
+/**
+ * Logout from GitHub
+ */
+async function logout() {
+    try {
+        await fetch(`${WORKER_BASE_URL}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        localStorage.removeItem('github_selected_gist');
+    } catch (err) {
+        console.error('Error logging out:', err);
+    }
+    // Update UI
+    githubAuthStatus.style.display = 'block';
+    githubSyncControls.style.display = 'none';
+}
+
+/**
+ * List user's gists
+ */
+async function listGists() {
+    const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
+        credentials: 'include'
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to fetch gists');
+    }
+    return await res.json();
+}
+
+/**
+ * Get specific gist content
+ */
+async function getGist(gistId) {
+    const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
+        credentials: 'include'
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to fetch gist');
+    }
+    return await res.json();
+}
+
+/**
+ * Create new gist
+ */
+async function createGist(files, description = 'Argonaut Papers') {
+    const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ description, public: false, files })
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to create gist');
+    }
+    return await res.json();
+}
+
+/**
+ * Update existing gist
+ */
+async function updateGist(gistId, files, description = 'Argonaut Papers') {
+    const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ description, files })
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to update gist');
+    }
+    return await res.json();
+}
+
+/**
+ * Load GitHub auth status on page load
+ */
+async function loadGitHubAuth() {
+    const session = await checkSession();
+    if (session.authenticated && session.user) {
+        updateGitHubUI(session.user);
+        await loadGistOptions();
+    }
+}
+
+/**
+ * Update GitHub UI with user info
+ */
+function updateGitHubUI(user) {
+    githubAuthStatus.style.display = 'none';
+    githubSyncControls.style.display = 'block';
+    githubUserAvatar.src = user.avatar_url;
+    githubUserAvatar.alt = user.login;
+    githubUserName.textContent = user.login;
+}
+
+/**
+ * Load gist options from GitHub
+ */
+async function loadGistOptions() {
+    try {
+        const gists = await listGists();
+
+        // Clear existing options
+        gistSelector.innerHTML = '';
+
+        if (gists.length === 0) {
+            gistSelector.innerHTML = '<option value="">No gists found</option>';
+            return;
+        }
+
+        // Add options for each gist
+        gists.forEach(gist => {
+            const option = document.createElement('option');
+            option.value = gist.id;
+            // Use description or first filename as label
+            const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
+            option.textContent = label;
+            gistSelector.appendChild(option);
+        });
+
+        // Restore selected gist from localStorage if exists
+        const savedGistId = localStorage.getItem('github_selected_gist');
+        if (savedGistId && gists.find(g => g.id === savedGistId)) {
+            gistSelector.value = savedGistId;
+        }
+    } catch (err) {
+        console.error('Error loading gists:', err);
+        gistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+    }
+}
+
+/**
+ * Load papers from selected gist
+ */
+async function loadFromGist() {
+    const action = gistActionSelector.value;
+
+    if (action === 'create') {
+        showError('Please select an existing gist to load from');
+        return;
+    }
+
+    const gistId = gistSelector.value;
+    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        showError('Please select a gist to load from');
+        return;
+    }
+
+    loadFromGistBtn.classList.add('loading');
+    showStatus('Loading from Gist...');
+
+    try {
+        const gist = await getGist(gistId);
+
+        // Find papers.json file in gist
+        const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
+
+        if (!papersFile) {
+            showError('Selected gist does not contain a papers.json file');
+            hideStatus();
+            loadFromGistBtn.classList.remove('loading');
+            return;
+        }
+
+        // Parse JSON
+        const data = JSON.parse(papersFile.content);
+
+        // Clear current data and load new data
+        clearCurrentData();
+        papersData = data;
+
+        // Process and display papers
+        const processedPapers = await processPapers(data);
+        renderPapers(processedPapers);
+
+        // Switch to papers view
+        loadJsonSection.style.display = 'none';
+        exportSection.style.display = 'block';
+        papersSection.style.display = 'block';
+
+        // Save selected gist
+        localStorage.setItem('github_selected_gist', gistId);
+
+        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
+        setTimeout(hideStatus, 3000);
+    } catch (err) {
+        console.error('Error loading from Gist:', err);
+        showError('Error loading from Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        loadFromGistBtn.classList.remove('loading');
+    }
+}
+
+/**
+ * Save papers to gist
+ */
+async function saveToGist() {
+    const action = gistActionSelector.value;
+
+    saveToGistBtn.classList.add('loading');
+    showStatus('Saving to Gist...');
+
+    try {
+        if (!papersData || Object.keys(papersData).length === 0) {
+            showError('No papers to save');
+            hideStatus();
+            saveToGistBtn.classList.remove('loading');
+            return;
+        }
+
+        const jsonStr = JSON.stringify(papersData, null, 2);
+        const files = { 'papers.json': { content: jsonStr } };
+
+        if (action === 'create') {
+            const gist = await createGist(files);
+            showStatus('Created new Gist successfully');
+
+            // Reload gist options and select the new gist
+            await loadGistOptions();
+            gistSelector.value = gist.id;
+            localStorage.setItem('github_selected_gist', gist.id);
+
+            // Switch to select mode
+            gistActionSelector.value = 'select';
+            existingGistContainer.style.display = 'block';
+        } else {
+            const gistId = gistSelector.value;
+            if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+                showError('Please select a gist to save to');
+                hideStatus();
+                saveToGistBtn.classList.remove('loading');
+                return;
+            }
+
+            await updateGist(gistId, files);
+            localStorage.setItem('github_selected_gist', gistId);
+            showStatus('Saved to Gist successfully');
+        }
+
+        setTimeout(hideStatus, 3000);
+    } catch (err) {
+        console.error('Error saving to Gist:', err);
+        showError('Error saving to Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        saveToGistBtn.classList.remove('loading');
+    }
+}
 
 // Export papers data as JSON
 async function exportJSON() {
@@ -1171,8 +1469,42 @@ if (saveToStorageBtn) {
     saveToStorageBtn.addEventListener('click', saveToStorage);
 }
 
-// GitHub OAuth event listeners - REMOVED
-// Load saved GitHub auth on page load - REMOVED
+// GitHub OAuth event listeners
+if (githubConnectBtn) {
+    githubConnectBtn.addEventListener('click', initiateLogin);
+}
+if (githubLogoutBtn) {
+    githubLogoutBtn.addEventListener('click', logout);
+}
+if (gistActionSelector) {
+    gistActionSelector.addEventListener('change', handleGistActionChange);
+}
+if (gistSelector) {
+    gistSelector.addEventListener('change', handleGistSelectorChange);
+}
+if (loadFromGistBtn) {
+    loadFromGistBtn.addEventListener('click', loadFromGist);
+}
+if (saveToGistBtn) {
+    saveToGistBtn.addEventListener('click', saveToGist);
+}
+
+// Load saved GitHub auth on page load
+async function initGitHubAuth() {
+    // Check for OAuth callback params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('code') || urlParams.has('state')) {
+        // Clean up URL parameters after callback
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    await loadGitHubAuth();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGitHubAuth);
+} else {
+    initGitHubAuth();
+}
 
 // Export JSON button
 if (exportJsonLightBtn) {

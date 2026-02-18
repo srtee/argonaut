@@ -1,0 +1,24 @@
+# CloudFlare Worker configuration for Argonaut GitHub OAuth2 Proxy
+
+name = "argonaut-github-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Route (optional - uncomment and configure when deploying)
+# route = { pattern = "your-worker.your-subdomain.workers.dev/*", zone_name = "your-subdomain.workers.dev" }
+
+# KV namespace binding
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "862ff8c8c49040b4a72b0216989c1eea"
+
+# Environment variables
+[vars]
+# Redirect URI - update with your worker URL
+REDIRECT_URI = "https://argonaut-github-proxy.shernren.workers.dev/callback"
+
+# Secrets (set with: wrangler secret put <name>)
+# Required secrets:
+# - GITHUB_CLIENT_ID: GitHub OAuth App client ID
+# - GITHUB_CLIENT_SECRET: GitHub OAuth App client secret
+# - GITHUB_CLIENT_SECRET: GitHub OAuth App client secret
