@@ -67,7 +67,7 @@
                         Load from URL
                     </label>
                     <div class="input-option-content" style="display: none;">
-                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json" placeholder="Enter JSON URL (e.g., GitHub Gist)" class="url-input" aria-label="Enter JSON file URL">
+                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json" placeholder="Enter JSON URL" class="url-input" aria-label="Enter JSON file URL">
                         <button id="loadUrlBtn" type="button" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
@@ -78,37 +78,6 @@
                     </label>
                     <div class="input-option-content" style="display: none;">
                         <button id="loadFromStorageBtn" type="button" aria-label="Load papers from browser storage">Load from Storage</button>
-                    </div>
-                </div>
-                <div class="input-option" data-input="github">
-                    <label class="input-option-label">
-                        <input type="radio" name="inputMethod" value="github" id="inputMethodGithub">
-                        <span class="github-option-label">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.7 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                            </svg>
-                            GitHub Gist
-                        </span>
-                    </label>
-                    <div class="input-option-content" style="display: none;">
-                        <div class="github-auth-status" id="githubAuthStatus">
-                            <span class="github-status-text">Not connected</span>
-                            <button id="githubConnectBtn" type="button" class="github-connect-btn">Connect to GitHub</button>
-                        </div>
-                        <div class="github-sync-controls" id="githubSyncControls" style="display: none;">
-                            <div class="github-user-info" id="githubUserInfo"></div>
-                            <div class="github-gist-selector">
-                                <label for="gistSelector" class="input-label">Select Gist:</label>
-                                <select id="gistSelector" class="gist-select" aria-label="Select a GitHub Gist">
-                                    <option value="">Loading gists...</option>
-                                </select>
-                            </div>
-                            <div class="github-sync-buttons">
-                                <button id="loadFromGistBtn" type="button" class="load-gist-btn">Load from Gist</button>
-                                <button id="saveToGistBtn" type="button" class="save-gist-btn">Save to Gist</button>
-                                <button id="githubDisconnectBtn" type="button" class="github-disconnect-btn">Disconnect</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -124,27 +93,6 @@
                 <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                 <button id="exportBibtexTaggedBtn" type="button" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
                 <button id="loadNewBtn" type="button" aria-label="Reset all papers, comments, and tags">Reset All</button>
-            </div>
-        </section>
-
-        <!-- GitHub Gist Sync Section (hidden until papers are loaded) -->
-        <section class="github-section" id="githubSection" style="display: none;" aria-labelledby="githubHeading">
-            <h2 id="githubHeading">GitHub Gist Sync:</h2>
-            <div class="github-content">
-                <div id="githubConnectionStatus" class="github-connection-status">
-                    <span class="github-status-indicator disconnected"></span>
-                    <span class="github-status-text">Not connected to GitHub</span>
-                </div>
-                <div class="github-buttons">
-                    <button id="connectGithubBtn" type="button" class="github-btn" aria-label="Connect to GitHub account">Connect GitHub</button>
-                    <button id="disconnectGithubBtn" type="button" class="github-btn" style="display: none;" aria-label="Disconnect from GitHub account">Disconnect</button>
-                    <button id="syncToGistBtn" type="button" class="github-btn" style="display: none;" aria-label="Sync papers to GitHub Gist">Sync to Gist</button>
-                    <button id="loadFromGistBtn" type="button" class="github-btn" style="display: none;" aria-label="Load papers from GitHub Gist">Load from Gist</button>
-                </div>
-                <div id="githubInfo" class="github-info" style="display: none;">
-                    <span class="github-username"></span>
-                    <span class="github-gist-link"></span>
-                </div>
             </div>
         </section>
 
