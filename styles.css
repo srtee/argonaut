@@ -1323,6 +1323,399 @@ button:disabled {
     opacity: 1;
 }
 
+.footer-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease-out;
+    margin-top: 8px;
+}
+
+.footer-link:hover {
+    color: var(--accent-color);
+    background: var(--bg-secondary);
+}
+
+.footer-link:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Onboarding Modal */
+.onboarding-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.onboarding-modal.active {
+    display: flex;
+}
+
+.onboarding-content {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.onboarding-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.3s ease-out;
+    z-index: 10;
+}
+
+.onboarding-close-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-color);
+}
+
+.onboarding-close-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.onboarding-step {
+    display: none;
+    padding: 40px 32px 24px;
+}
+
+.onboarding-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.onboarding-step h2 {
+    color: var(--text-color);
+    font-size: 24px;
+    margin: 0 0 16px 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.onboarding-step p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.onboarding-step strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.onboarding-navigation {
+    padding: 20px 32px 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.onboarding-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.onboarding-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    transition: all 0.3s ease-out;
+    cursor: pointer;
+}
+
+.onboarding-dot.active {
+    background: var(--accent-color);
+    transform: scale(1.25);
+}
+
+.onboarding-dot:hover {
+    background: var(--bg-hover);
+}
+
+.onboarding-dot.active:hover {
+    background: var(--accent-hover);
+}
+
+.onboarding-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.onboarding-nav-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+}
+
+.onboarding-nav-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.onboarding-nav-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.onboarding-nav-btn.primary {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #FFFFFF;
+}
+
+.onboarding-nav-btn.primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.footer-link {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-top: 8px;
+    transition: all 0.3s ease-out;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+.footer-link:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Onboarding Modal */
+.onboarding-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.onboarding-modal[aria-hidden="false"] {
+    display: flex;
+    animation: onboardingFadeIn 0.3s ease-out;
+}
+
+@keyframes onboardingFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.onboarding-content {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+}
+
+.onboarding-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.onboarding-close-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+}
+
+.onboarding-close-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.onboarding-step {
+    display: none;
+    animation: onboardingSlideIn 0.3s ease-out;
+}
+
+.onboarding-step.active {
+    display: block;
+}
+
+@keyframes onboardingSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.onboarding-step h2 {
+    color: var(--text-color);
+    margin-bottom: 12px;
+    font-size: 22px;
+}
+
+.onboarding-step p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.onboarding-step strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.onboarding-navigation {
+    margin-top: 28px;
+}
+
+.onboarding-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.onboarding-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.onboarding-dot:hover {
+    background: var(--accent-color);
+    opacity: 0.7;
+}
+
+.onboarding-dot.active {
+    background: var(--accent-color);
+    transform: scale(1.2);
+}
+
+.onboarding-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.onboarding-nav-btn {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+}
+
+.onboarding-nav-btn:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-color);
+}
+
+.onboarding-nav-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.onboarding-nav-btn.primary {
+    background: var(--accent-color);
+    color: #ffffff;
+    border-color: var(--accent-color);
+}
+
+.onboarding-nav-btn.primary:hover {
+    background: var(--accent-hover);
+}
+
+/* Dark mode specific for onboarding */
+[data-theme="dark"] .onboarding-content {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
 /* GitHub Sync Section */
 .github-sync-section {
     background: linear-gradient(135deg, var(--abstract-bg) 0%, var(--bg-secondary) 100%);

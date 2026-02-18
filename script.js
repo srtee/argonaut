@@ -2355,3 +2355,175 @@ function saveComment(key, comment) {
         console.log(`Comment saved for "${key}"`);
     }
 }
+
+// ========== Onboarding ==========
+
+// Cookie helper functions
+function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+}
+
+function getCookie(name) {
+    const nameEQ = `${name}=`;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) === 0) {
+            return cookie.substring(nameEQ.length, cookie.length);
+        }
+    }
+    return null;
+}
+
+// Onboarding state
+let currentStep = 0;
+const totalSteps = 6;
+
+// DOM Elements
+const onboardingModal = document.getElementById('onboardingModal');
+const closeOnboardingBtn = document.getElementById('closeOnboardingBtn');
+const onboardingBackBtn = document.getElementById('onboardingBackBtn');
+const onboardingNextBtn = document.getElementById('onboardingNextBtn');
+const onboardingCompleteBtn = document.getElementById('onboardingCompleteBtn');
+const showOnboardingBtn = document.getElementById('showOnboardingBtn');
+const onboardingSteps = document.querySelectorAll('.onboarding-step');
+const onboardingDots = document.querySelectorAll('.onboarding-dot');
+
+// Check if user has completed onboarding
+function hasCompletedOnboarding() {
+    return getCookie('argonaut_onboarding_complete') === 'true';
+}
+
+// Mark onboarding as complete
+function markOnboardingComplete() {
+    setCookie('argonaut_onboarding_complete', 'true', 365); // 1 year
+}
+
+// Show onboarding modal
+function showOnboarding() {
+    currentStep = 0;
+    updateOnboardingUI();
+    onboardingModal.classList.add('active');
+    onboardingModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+// Hide onboarding modal
+function hideOnboarding() {
+    onboardingModal.classList.remove('active');
+    onboardingModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
+// Update onboarding UI based on current step
+function updateOnboardingUI() {
+    // Update steps
+    onboardingSteps.forEach((step, index) => {
+        step.classList.toggle('active', index === currentStep);
+    });
+
+    // Update dots
+    onboardingDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentStep);
+    });
+
+    // Update buttons
+    onboardingBackBtn.style.display = currentStep === 0 ? 'none' : 'block';
+    onboardingNextBtn.style.display = currentStep === totalSteps - 1 ? 'none' : 'block';
+    onboardingCompleteBtn.style.display = currentStep === totalSteps - 1 ? 'block' : 'none';
+
+    // Focus the modal for accessibility
+    if (currentStep === 0) {
+        onboardingModal.focus();
+    }
+}
+
+// Go to next step
+function nextStep() {
+    if (currentStep < totalSteps - 1) {
+        currentStep++;
+        updateOnboardingUI();
+    }
+}
+
+// Go to previous step
+function prevStep() {
+    if (currentStep > 0) {
+        currentStep--;
+        updateOnboardingUI();
+    }
+}
+
+// Go to specific step
+function goToStep(step) {
+    currentStep = step;
+    updateOnboardingUI();
+}
+
+// Complete onboarding
+function completeOnboarding() {
+    markOnboardingComplete();
+    hideOnboarding();
+}
+
+// Event listeners
+if (closeOnboardingBtn) {
+    closeOnboardingBtn.addEventListener('click', () => {
+        hideOnboarding();
+    });
+}
+
+if (onboardingNextBtn) {
+    onboardingNextBtn.addEventListener('click', nextStep);
+}
+
+if (onboardingBackBtn) {
+    onboardingBackBtn.addEventListener('click', prevStep);
+}
+
+if (onboardingCompleteBtn) {
+    onboardingCompleteBtn.addEventListener('click', completeOnboarding);
+}
+
+if (showOnboardingBtn) {
+    showOnboardingBtn.addEventListener('click', showOnboarding);
+}
+
+// Click on dots to go to specific step
+onboardingDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+        goToStep(parseInt(dot.dataset.step));
+    });
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && onboardingModal.classList.contains('active')) {
+        hideOnboarding();
+    }
+});
+
+// Close modal on backdrop click
+onboardingModal.addEventListener('click', (e) => {
+    if (e.target === onboardingModal) {
+        hideOnboarding();
+    }
+});
+
+// Initialize onboarding on page load
+function initOnboarding() {
+    if (!hasCompletedOnboarding()) {
+        // Delay showing onboarding to let the page load first
+        setTimeout(() => {
+            showOnboarding();
+        }, 500);
+    }
+}
+
+// Initialize onboarding
+initOnboarding();

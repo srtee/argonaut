@@ -8,10 +8,62 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.6.5">
+    <link rel="stylesheet" href="styles.css?v=1.6.6">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
+
+    <!-- Onboarding Modal -->
+    <div id="onboardingModal" class="onboarding-modal" role="dialog" aria-labelledby="onboardingHeading" aria-hidden="true">
+        <div class="onboarding-content">
+            <button id="closeOnboardingBtn" class="onboarding-close-btn" aria-label="Close onboarding">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="onboarding-step" data-step="0">
+                <h2 id="onboardingHeading">Welcome to Argonaut!</h2>
+                <p>A browser-based bibliography manager that stores your papers as JSON.</p>
+            </div>
+            <div class="onboarding-step" data-step="1">
+                <h2>Load Your Papers</h2>
+                <p>Import your collection from a JSON file, URL, browser storage, or GitHub Gist using the <strong>Load JSON Collection</strong> section.</p>
+            </div>
+            <div class="onboarding-step" data-step="2">
+                <h2>Add Papers by DOI</h2>
+                <p>Quickly add papers by entering a DOI or URL in the <strong>Add A Paper By DOI</strong> section. We'll fetch the BibTeX and abstract automatically.</p>
+            </div>
+            <div class="onboarding-step" data-step="3">
+                <h2>Save & Export</h2>
+                <p>Save your collection to a file, browser storage, or GitHub Gist. Export as BibTeX for use in LaTeX or other citation managers.</p>
+            </div>
+            <div class="onboarding-step" data-step="4">
+                <h2>Organize Your Papers</h2>
+                <p>Add tags to filter and group your papers. Use the comment box on each paper to add your notes and thoughts.</p>
+            </div>
+            <div class="onboarding-step" data-step="5">
+                <h2>You're Ready!</h2>
+                <p>Click "Get Started" to begin using Argonaut. You can view this guide again from the help link in the footer.</p>
+            </div>
+            <div class="onboarding-navigation">
+                <div class="onboarding-dots">
+                    <span class="onboarding-dot active" data-step="0"></span>
+                    <span class="onboarding-dot" data-step="1"></span>
+                    <span class="onboarding-dot" data-step="2"></span>
+                    <span class="onboarding-dot" data-step="3"></span>
+                    <span class="onboarding-dot" data-step="4"></span>
+                    <span class="onboarding-dot" data-step="5"></span>
+                </div>
+                <div class="onboarding-buttons">
+                    <button id="onboardingBackBtn" class="onboarding-nav-btn" style="display: none;">Back</button>
+                    <button id="onboardingNextBtn" class="onboarding-nav-btn">Next</button>
+                    <button id="onboardingCompleteBtn" class="onboarding-nav-btn primary" style="display: none;">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main class="container" id="mainContent" tabindex="-1">
         <div class="header-container">
             <h1 class="header-title">Argonaut</h1>
@@ -200,6 +252,7 @@
 
         <footer class="attribution">
             <small>Vibe-coded by Shern Ren Tee with Claude Code + Ollama Cloud GLM 4.7</small>
+            <button id="showOnboardingBtn" class="footer-link" type="button">Show onboarding guide</button>
             <nav class="social-links" aria-label="Social media links">
                 <a href="https://www.linkedin.com/in/shern-tee-phd-8172241b3/" target="_blank" rel="noopener noreferrer" aria-label="Connect on LinkedIn (opens in new tab)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -212,6 +265,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.6.5"></script>
+    <script src="script.js?v=1.6.6"></script>
 </body>
 </html>
