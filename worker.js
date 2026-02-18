@@ -125,6 +125,7 @@ function errorResponse(message, status = 400) {
  */
 function getSessionId(request) {
     const cookieHeader = request.headers.get('Cookie');
+    console.log('[Worker] Raw Cookie header:', cookieHeader);
     if (!cookieHeader) return null;
     const cookies = cookieHeader.split(';').map(c => c.trim());
     const sessionCookie = cookies.find(c => c.startsWith('argonaut_session='));

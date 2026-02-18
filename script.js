@@ -676,6 +676,7 @@ async function checkSession() {
         const res = await fetch(`${WORKER_BASE_URL}/session`, {
             credentials: 'include'
         });
+        console.log('[GitHub Auth] Request URL:', res.url);
         console.log('[GitHub Auth] Session response status:', res.status);
         if (!res.ok) {
             console.log('[GitHub Auth] Session response not OK');
