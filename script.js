@@ -1003,46 +1003,6 @@ function updateGitHubUI(user) {
 }
 
 /**
- * Load gist options from GitHub
- */
-async function loadGistOptions() {
-    console.log('[GitHub Gist] Loading gist options');
-    try {
-        const gists = await listGists();
-
-        // Clear existing options
-        gistSelector.innerHTML = '';
-
-        if (gists.length === 0) {
-            console.log('[GitHub Gist] No gists found');
-            gistSelector.innerHTML = '<option value="">No gists found</option>';
-            return;
-        }
-
-        // Add options for each gist
-        gists.forEach(gist => {
-            const option = document.createElement('option');
-            option.value = gist.id;
-            // Use description or first filename as label
-            const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
-            option.textContent = label;
-            gistSelector.appendChild(option);
-        });
-
-        // Restore selected gist from localStorage if exists
-        const savedGistId = localStorage.getItem('github_selected_gist');
-        if (savedGistId && gists.find(g => g.id === savedGistId)) {
-            gistSelector.value = savedGistId;
-            console.log('[GitHub Gist] Restored selected gist:', savedGistId);
-        }
-        console.log('[GitHub Gist] Loaded', gists.length, 'gist options');
-    } catch (err) {
-        console.error('[GitHub Gist] Error loading gists:', err);
-        gistSelector.innerHTML = '<option value="">Failed to load gists</option>';
-    }
-}
-
-/**
  * Load gist options for the Load JSON Collection section
  */
 async function loadGistOptionsForLoadSelector() {
@@ -1099,59 +1059,6 @@ async function loadGistOptionsForSaveSelector() {
             saveGistSelector.appendChild(newGistOption);
 
             if (gists.length === 0) {
-                console.log('[GitHub Gist] No gists found');
-                const noGistsOption = document.createElement('option');
-                noGistsOption.value = '';
-                noGistsOption.textContent = '-- No existing gists --';
-                saveGistSelector.appendChild(noGistsOption);
-                return;
-            }
-
-            // Add separator
-            const separator = document.createElement('option');
-            separator.disabled = true;
-            separator.textContent = '--- Existing gists ---';
-            saveGistSelector.appendChild(separator);
-
-            // Add options for each gist
-            gists.forEach(gist => {
-                const option = document.createElement('option');
-                option.value = gist.id;
-                // Use description or first filename as label
-                const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
-                option.textContent = label;
-                saveGistSelector.appendChild(option);
-            });
-
-            console.log('[GitHub Gist] Loaded', gists.length, 'gist options for save selector');
-        }
-    } catch (err) {
-        console.error('[GitHub Gist] Error loading gists for save selector:', err);
-        if (saveGistSelector) {
-            saveGistSelector.innerHTML = '<option value="">Failed to load gists</option>';
-        }
-    }
-}
-
-/**
- * Load gist options for the Save JSON Collection section
- */
-async function loadGistOptionsForSaveSelector() {
-    console.log('[GitHub Gist] Loading gist options for save selector');
-    try {
-        const gists = await listGists();
-
-        // Clear existing options
-        if (saveGistSelector) {
-            saveGistSelector.innerHTML = '';
-
-            // Add "(new gist)" as the first option
-            const newGistOption = document.createElement('option');
-            newGistOption.value = 'new';
-            newGistOption.textContent = '(new gist)';
-            saveGistSelector.appendChild(newGistOption);
-
-            if (gists.length === 0) {
                 console.log('[GitHub Gist] No existing gists found');
                 return;
             }
@@ -1177,102 +1084,6 @@ async function loadGistOptionsForSaveSelector() {
 }
 
 /**
- * Handle gist action selector change
- */
-function handleGistActionChange() {
-    const action = gistActionSelector.value;
-    existingGistContainer.style.display = action === 'select' ? 'block' : 'none';
-    loadFromGistBtn.disabled = action === 'create';
-}
-
-/**
- * Handle gist selector change
- */
-function handleGistSelectorChange() {
-    const gistId = gistSelector.value;
-    if (gistId) {
-        localStorage.setItem('github_selected_gist', gistId);
-        loadFromGistBtn.disabled = false;
-        saveToGistBtn.disabled = false;
-    } else {
-        localStorage.removeItem('github_selected_gist');
-        loadFromGistBtn.disabled = true;
-        saveToGistBtn.disabled = true;
-    }
-}
-
-/**
- * Load papers from selected gist
- */
-async function loadFromGist() {
-    console.log('[GitHub Gist] Loading from gist');
-    const action = gistActionSelector.value;
-
-    if (action === 'create') {
-        console.log('[GitHub Gist] Cannot load when in create mode');
-        showError('Please select an existing gist to load from');
-        return;
-    }
-
-    const gistId = gistSelector.value;
-    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
-        console.log('[GitHub Gist] Invalid gist selected');
-        showError('Please select a gist to load from');
-        return;
-    }
-
-    console.log('[GitHub Gist] Loading from gist:', gistId);
-    loadFromGistBtn.classList.add('loading');
-    showStatus('Loading from Gist...');
-
-    try {
-        const gist = await getGist(gistId);
-
-        // Find papers.json file in gist
-        const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
-
-        if (!papersFile) {
-            console.log('[GitHub Gist] No papers.json found in gist');
-            showError('Selected gist does not contain a papers.json file');
-            hideStatus();
-            loadFromGistBtn.classList.remove('loading');
-            return;
-        }
-
-        // Parse JSON
-        const data = JSON.parse(papersFile.content);
-        console.log('[GitHub Gist] Loaded', Object.keys(data).length, 'papers from gist');
-
-        // Clear current data and load new data
-        clearCurrentData();
-        papersData = data;
-
-        // Process and display papers
-        const processedPapers = await processPapers(data);
-        renderPapers(processedPapers);
-
-        // Switch to papers view
-        loadJsonSection.style.display = 'none';
-        saveJsonSection.style.display = 'block';
-            exportResetSection.style.display = 'block';
-        papersSection.style.display = 'block';
-
-        // Save selected gist
-        localStorage.setItem('github_selected_gist', gistId);
-
-        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
-        setTimeout(hideStatus, 3000);
-        console.log('[GitHub Gist] Successfully loaded papers from gist:', gistId);
-    } catch (err) {
-        console.error('[GitHub Gist] Error loading from gist:', err);
-        showError('Error loading from Gist: ' + err.message);
-        hideStatus();
-    } finally {
-        loadFromGistBtn.classList.remove('loading');
-    }
-}
-
-/**
  * Load papers from selected gist in Load JSON Collection section
  */
 async function loadFromGistCollection() {
@@ -1330,132 +1141,6 @@ async function loadFromGistCollection() {
         hideStatus();
     } finally {
         loadFromGistCollectionBtn.classList.remove('loading');
-    }
-}
-
-/**
- * Load papers from selected gist in Load JSON Collection section
- */
-async function loadFromGistCollection() {
-    console.log('[GitHub Gist] Loading from gist collection');
-    const gistId = loadGistSelector.value;
-    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
-        console.log('[GitHub Gist] Invalid gist selected');
-        showError('Please select a gist to load from');
-        return;
-    }
-
-    console.log('[GitHub Gist] Loading from gist:', gistId);
-    loadFromGistCollectionBtn.classList.add('loading');
-    showStatus('Loading from Gist...');
-
-    try {
-        const gist = await getGist(gistId);
-
-        // Find papers.json file in gist
-        const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
-
-        if (!papersFile) {
-            console.log('[GitHub Gist] No papers.json found in gist');
-            showError('Selected gist does not contain a papers.json file');
-            hideStatus();
-            loadFromGistCollectionBtn.classList.remove('loading');
-            return;
-        }
-
-        // Parse JSON
-        const data = JSON.parse(papersFile.content);
-        console.log('[GitHub Gist] Loaded', Object.keys(data).length, 'papers from gist');
-
-        // Clear current data and load new data
-        clearCurrentData();
-        papersData = data;
-
-        // Process and display papers
-        const processedPapers = await processPapers(data);
-        renderPapers(processedPapers);
-
-        // Switch to papers view
-        loadJsonSection.style.display = 'none';
-        saveJsonSection.style.display = 'block';
-            exportResetSection.style.display = 'block';
-        papersSection.style.display = 'block';
-
-        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
-        setTimeout(hideStatus, 3000);
-        console.log('[GitHub Gist] Successfully loaded papers from gist:', gistId);
-    } catch (err) {
-        console.error('[GitHub Gist] Error loading from gist:', err);
-        showError('Error loading from Gist: ' + err.message);
-        hideStatus();
-    } finally {
-        loadFromGistCollectionBtn.classList.remove('loading');
-    }
-}
-
-/**
- * Save papers to gist
- */
-async function saveToGist() {
-    console.log('[GitHub Gist] Saving papers to gist');
-    const action = gistActionSelector.value;
-    console.log('[GitHub Gist] Action:', action);
-
-    saveToGistOptionBtn.classList.add('loading');
-    showStatus('Saving to Gist...');
-
-    try {
-        if (!papersData || Object.keys(papersData).length === 0) {
-            console.log('[GitHub Gist] No papers to save');
-            showError('No papers to save');
-            hideStatus();
-            saveToGistOptionBtn.classList.remove('loading');
-            return;
-        }
-
-        const jsonStr = JSON.stringify(papersData, null, 2);
-        const files = { 'papers.json': { content: jsonStr } };
-        console.log('[GitHub Gist] Saving', Object.keys(papersData).length, 'papers');
-
-        if (action === 'create') {
-            console.log('[GitHub Gist] Creating new gist');
-            const gist = await createGist(files);
-            console.log('[GitHub Gist] Created gist:', gist.id);
-            showStatus('Created new Gist successfully');
-
-            // Reload gist options and select the new gist
-            await loadGistOptions();
-            gistSelector.value = gist.id;
-            localStorage.setItem('github_selected_gist', gist.id);
-
-            // Switch to select mode and update UI state
-            gistActionSelector.value = 'select';
-            handleGistActionChange();
-        } else {
-            const gistId = gistSelector.value;
-            if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
-                console.log('[GitHub Gist] Invalid gist selected');
-                showError('Please select a gist to save to');
-                hideStatus();
-                saveToGistOptionBtn.classList.remove('loading');
-                return;
-            }
-
-            console.log('[GitHub Gist] Updating existing gist:', gistId);
-            await updateGist(gistId, files);
-            localStorage.setItem('github_selected_gist', gistId);
-            console.log('[GitHub Gist] Updated gist:', gistId);
-            showStatus('Saved to Gist successfully');
-        }
-
-        console.log('[GitHub Gist] Successfully saved papers to gist');
-        setTimeout(hideStatus, 3000);
-    } catch (err) {
-        console.error('[GitHub Gist] Error saving to gist:', err);
-        showError('Error saving to Gist: ' + err.message);
-        hideStatus();
-    } finally {
-        saveToGistOptionBtn.classList.remove('loading');
     }
 }
 
@@ -2151,18 +1836,6 @@ if (githubConnectBtn) {
 if (githubLogoutBtn) {
     githubLogoutBtn.addEventListener('click', logout);
 }
-if (gistActionSelector) {
-    gistActionSelector.addEventListener('change', handleGistActionChange);
-}
-if (gistSelector) {
-    gistSelector.addEventListener('change', handleGistSelectorChange);
-}
-if (loadFromGistBtn) {
-    loadFromGistBtn.addEventListener('click', loadFromGist);
-}
-if (saveToGistBtn) {
-    saveToGistBtn.addEventListener('click', saveToGist);
-}
 
 // Load from gist button handler in Load JSON Collection section
 if (loadFromGistCollectionBtn) {
@@ -2189,12 +1862,6 @@ async function initGitHubAuth() {
         window.history.replaceState({}, document.title, window.location.pathname);
         showStatus('Successfully connected to GitHub');
         setTimeout(hideStatus, 3000);
-    }
-
-    // Legacy: Check for old code/state params (should not happen with new flow)
-    if (urlParams.has('code') || urlParams.has('state')) {
-        // Clean up URL parameters after callback
-        window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     await loadGitHubAuth();
