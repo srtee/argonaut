@@ -687,22 +687,36 @@ async function checkSession() {
 
         const contentType = res.headers.get('content-type');
         let data;
-
         if (contentType && contentType.includes('application/json')) {
             data = await res.json();
+            // Validate response structure
+            if (typeof data !== 'object' || data === null) {
+                console.error('Invalid session data: not an object');
+                return { authenticated: false };
+            }
+            if (typeof data.authenticated !== 'boolean') {
+                console.error('Invalid session data: missing or invalid authenticated field');
+                return { authenticated: false };
+            }
         } else {
             const text = await res.text();
+            // Handle empty response - treat as not authenticated
+            if (!text || text.trim() === '') {
+                console.warn('Empty response from session endpoint, treating as unauthenticated');
+                return { authenticated: false };
+            }
             console.error('Non-JSON response from session endpoint:', text);
             return { authenticated: false };
         }
-
         console.log('Session data:', data);
         return data;  // { authenticated: true/false, user: {...}, scopes: [...] }
+
     } catch (err) {
-        console.error('Error checking session:', err);
+        console.error('Error checking session:', err.message);
         return { authenticated: false };
     }
 }
+
 
 // Logout
 async function logoutFromGitHub() {
@@ -823,6 +837,12 @@ async function loadGitHubAuth() {
         console.log('Loading GitHub auth...');
         const session = await checkSession();
         console.log('Session response:', session);
+        // Safety check: ensure session is not null/undefined
+        if (!session) {
+            console.log('No session data received');
+            return;
+        }
+
         if (session.authenticated && session.user) {
             console.log('User is authenticated:', session.user);
             updateGitHubUI(session.user);
