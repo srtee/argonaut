@@ -21,17 +21,24 @@ const status = document.getElementById('status');
 
 // GitHub OAuth Elements
 const githubSection = document.getElementById('githubSection');
-const githubAuthStatus = document.getElementById('githubAuthStatus');
+const githubNotLoggedIn = document.getElementById('githubNotLoggedIn');
+const githubLoggedIn = document.getElementById('githubLoggedIn');
 const githubConnectBtn = document.getElementById('githubConnectBtn');
+const githubLogoutBtn = document.getElementById('githubLogoutBtn');
 const githubSyncControls = document.getElementById('githubSyncControls');
 const githubUserAvatar = document.getElementById('githubUserAvatar');
 const githubUserName = document.getElementById('githubUserName');
-const githubLogoutBtn = document.getElementById('githubLogoutBtn');
 const gistActionSelector = document.getElementById('gistActionSelector');
 const gistSelector = document.getElementById('gistSelector');
 const existingGistContainer = document.getElementById('existingGistContainer');
 const loadFromGistBtn = document.getElementById('loadFromGistBtn');
 const saveToGistBtn = document.getElementById('saveToGistBtn');
+
+// Load JSON Collection - Gist Elements
+const loadGistSelector = document.getElementById('loadGistSelector');
+const gistNotConnected = document.getElementById('gistNotConnected');
+const gistConnectedContent = document.getElementById('gistConnectedContent');
+const loadFromGistCollectionBtn = document.getElementById('loadFromGistCollectionBtn');
 
 // CloudFlare Worker Configuration
 // Replace with your actual worker URL
@@ -748,8 +755,14 @@ async function logout() {
         localStorage.removeItem('github_selected_gist');
     }
     // Update UI
-    githubAuthStatus.style.display = 'block';
-    githubSyncControls.style.display = 'none';
+    if (githubNotLoggedIn) githubNotLoggedIn.style.display = 'block';
+    if (githubLoggedIn) githubLoggedIn.style.display = 'none';
+    if (githubConnectBtn) githubConnectBtn.style.display = 'block';
+    if (githubLogoutBtn) githubLogoutBtn.style.display = 'none';
+    if (githubSyncControls) githubSyncControls.style.display = 'none';
+    // Update gist loading section
+    if (gistNotConnected) gistNotConnected.style.display = 'block';
+    if (gistConnectedContent) gistConnectedContent.style.display = 'none';
     console.log('[GitHub Auth] UI updated to logged-out state');
 }
 
@@ -880,11 +893,19 @@ async function loadGitHubAuth() {
  */
 function updateGitHubUI(user) {
     console.log('[GitHub Auth] updateGitHubUI called with user:', user);
-    githubAuthStatus.style.display = 'none';
+    githubNotLoggedIn.style.display = 'none';
+    githubLoggedIn.style.display = 'flex';
+    githubConnectBtn.style.display = 'none';
+    githubLogoutBtn.style.display = 'inline-block';
     githubSyncControls.style.display = 'block';
     githubUserAvatar.src = user.avatar_url;
     githubUserAvatar.alt = user.login;
     githubUserName.textContent = user.login;
+    // Update gist loading section
+    if (gistNotConnected) gistNotConnected.style.display = 'none';
+    if (gistConnectedContent) gistConnectedContent.style.display = 'flex';
+    // Load gists for the selector
+    loadGistOptionsForLoadSelector();
     console.log('[GitHub Auth] UI updated, hiding auth status and showing sync controls');
 }
 
@@ -925,6 +946,44 @@ async function loadGistOptions() {
     } catch (err) {
         console.error('[GitHub Gist] Error loading gists:', err);
         gistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+    }
+}
+
+/**
+ * Load gist options for the Load JSON Collection section
+ */
+async function loadGistOptionsForLoadSelector() {
+    console.log('[GitHub Gist] Loading gist options for load selector');
+    try {
+        const gists = await listGists();
+
+        // Clear existing options
+        if (loadGistSelector) {
+            loadGistSelector.innerHTML = '';
+
+            if (gists.length === 0) {
+                console.log('[GitHub Gist] No gists found');
+                loadGistSelector.innerHTML = '<option value="">No gists found</option>';
+                return;
+            }
+
+            // Add options for each gist
+            gists.forEach(gist => {
+                const option = document.createElement('option');
+                option.value = gist.id;
+                // Use description or first filename as label
+                const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
+                option.textContent = label;
+                loadGistSelector.appendChild(option);
+            });
+
+            console.log('[GitHub Gist] Loaded', gists.length, 'gist options for load selector');
+        }
+    } catch (err) {
+        console.error('[GitHub Gist] Error loading gists for load selector:', err);
+        if (loadGistSelector) {
+            loadGistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+        }
     }
 }
 
@@ -1020,6 +1079,125 @@ async function loadFromGist() {
         hideStatus();
     } finally {
         loadFromGistBtn.classList.remove('loading');
+    }
+}
+
+/**
+ * Load papers from selected gist in Load JSON Collection section
+ */
+async function loadFromGistCollection() {
+    console.log('[GitHub Gist] Loading from gist collection');
+    const gistId = loadGistSelector.value;
+
+    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        console.log('[GitHub Gist] Invalid gist selected');
+        showError('Please select a gist to load from');
+        return;
+    }
+
+    console.log('[GitHub Gist] Loading from gist:', gistId);
+    loadFromGistCollectionBtn.classList.add('loading');
+    showStatus('Loading from Gist...');
+
+    try {
+        const gist = await getGist(gistId);
+
+        // Find papers.json file in gist
+        const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
+
+        if (!papersFile) {
+            console.log('[GitHub Gist] No papers.json found in gist');
+            showError('Selected gist does not contain a papers.json file');
+            hideStatus();
+            loadFromGistCollectionBtn.classList.remove('loading');
+            return;
+        }
+
+        // Parse JSON
+        const data = JSON.parse(papersFile.content);
+        console.log('[GitHub Gist] Loaded', Object.keys(data).length, 'papers from gist');
+
+        // Clear current data and load new data
+        clearCurrentData();
+        papersData = data;
+
+        // Process and display papers
+        const processedPapers = await processPapers(data);
+        renderPapers(processedPapers);
+
+        // Switch to papers view
+        loadJsonSection.style.display = 'none';
+        exportSection.style.display = 'block';
+        papersSection.style.display = 'block';
+
+        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
+        setTimeout(hideStatus, 3000);
+        console.log('[GitHub Gist] Successfully loaded papers from gist:', gistId);
+    } catch (err) {
+        console.error('[GitHub Gist] Error loading from gist:', err);
+        showError('Error loading from Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        loadFromGistCollectionBtn.classList.remove('loading');
+    }
+}
+
+/**
+ * Load papers from selected gist in Load JSON Collection section
+ */
+async function loadFromGistCollection() {
+    console.log('[GitHub Gist] Loading from gist collection');
+    const gistId = loadGistSelector.value;
+    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        console.log('[GitHub Gist] Invalid gist selected');
+        showError('Please select a gist to load from');
+        return;
+    }
+
+    console.log('[GitHub Gist] Loading from gist:', gistId);
+    loadFromGistCollectionBtn.classList.add('loading');
+    showStatus('Loading from Gist...');
+
+    try {
+        const gist = await getGist(gistId);
+
+        // Find papers.json file in gist
+        const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
+
+        if (!papersFile) {
+            console.log('[GitHub Gist] No papers.json found in gist');
+            showError('Selected gist does not contain a papers.json file');
+            hideStatus();
+            loadFromGistCollectionBtn.classList.remove('loading');
+            return;
+        }
+
+        // Parse JSON
+        const data = JSON.parse(papersFile.content);
+        console.log('[GitHub Gist] Loaded', Object.keys(data).length, 'papers from gist');
+
+        // Clear current data and load new data
+        clearCurrentData();
+        papersData = data;
+
+        // Process and display papers
+        const processedPapers = await processPapers(data);
+        renderPapers(processedPapers);
+
+        // Switch to papers view
+        loadJsonSection.style.display = 'none';
+        exportSection.style.display = 'block';
+        papersSection.style.display = 'block';
+
+        showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
+        setTimeout(hideStatus, 3000);
+        console.log('[GitHub Gist] Successfully loaded papers from gist:', gistId);
+    } catch (err) {
+        console.error('[GitHub Gist] Error loading from gist:', err);
+        showError('Error loading from Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        loadFromGistCollectionBtn.classList.remove('loading');
     }
 }
 
@@ -1635,6 +1813,11 @@ if (loadFromGistBtn) {
 }
 if (saveToGistBtn) {
     saveToGistBtn.addEventListener('click', saveToGist);
+}
+
+// Load from gist button handler in Load JSON Collection section
+if (loadFromGistCollectionBtn) {
+    loadFromGistCollectionBtn.addEventListener('click', loadFromGistCollection);
 }
 
 // Load saved GitHub auth on page load
