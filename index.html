@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.4.0">
+    <link rel="stylesheet" href="styles.css?v=1.5.0">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -157,13 +157,62 @@
             </div>
         </section>
 
-        <!-- Export Buttons Section (hidden until papers are loaded) -->
-        <section class="export-section" id="exportSection" style="display: none;" aria-labelledby="exportHeading">
-            <h2 id="exportHeading" class="visually-hidden">Export Options</h2>
-            <div class="export-buttons">
-                <button id="saveToStorageBtn" type="button" aria-label="Save papers to browser storage">Save to Storage</button>
-                <button id="exportJsonLightBtn" type="button" aria-label="Export papers with only DOI, comments, tags, and alsoreads as JSON">Export JSON (light)</button>
-                <button id="exportJsonBtn" type="button" aria-label="Export all papers as JSON file">Export JSON (full)</button>
+        <!-- Save JSON Collection Section (hidden until papers are loaded) -->
+        <section class="save-json-section" id="saveJsonSection" style="display: none;" aria-labelledby="saveJsonHeading">
+            <h2 id="saveJsonHeading">Save JSON Collection:</h2>
+
+            <!-- Format selector row -->
+            <div class="format-selector-row">
+                <label for="jsonFormatSelector" class="format-label">Format:</label>
+                <select id="jsonFormatSelector" class="format-select">
+                    <option value="full">Full</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+
+            <!-- Save destination options -->
+            <div class="save-options">
+                <div class="save-option active" data-save="file">
+                    <label class="save-option-label">
+                        <input type="radio" name="saveMethod" value="file" checked id="saveMethodFile">
+                        To File
+                    </label>
+                    <div class="save-option-content" id="saveFileContent">
+                        <button id="exportJsonBtn" type="button" class="export-btn">Export JSON</button>
+                    </div>
+                </div>
+                <div class="save-option" data-save="storage">
+                    <label class="save-option-label">
+                        <input type="radio" name="saveMethod" value="storage" id="saveMethodStorage">
+                        To Local Storage
+                    </label>
+                    <div class="save-option-content" style="display: none;">
+                        <button id="saveToStorageBtn" type="button" class="export-btn">Save to Storage</button>
+                    </div>
+                </div>
+                <div class="save-option" data-save="gist">
+                    <label class="save-option-label">
+                        <input type="radio" name="saveMethod" value="gist" id="saveMethodGist">
+                        To GitHub Gist
+                    </label>
+                    <div class="save-option-content" style="display: none;">
+                        <div id="saveGistNotConnected" class="gist-not-connected">
+                            <p class="gist-not-connected-text">Not connected to GitHub</p>
+                        </div>
+                        <div id="saveGistConnectedContent" class="gist-connected-content" style="display: none;">
+                            <select id="saveGistSelector" class="gist-select">
+                                <option value="">Loading gists...</option>
+                            </select>
+                            <button id="saveToGistOptionBtn" type="button" class="save-gist-btn">Save to Gist</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export & Reset Section (hidden until papers are loaded) -->
+        <section class="export-reset-section" id="exportResetSection" style="display: none;" aria-labelledby="exportResetHeading">
+            <div class="export-reset-buttons">
                 <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                 <button id="exportBibtexTaggedBtn" type="button" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
                 <button id="loadNewBtn" type="button" aria-label="Reset all papers, comments, and tags">Reset All</button>
@@ -193,6 +242,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.4.0"></script>
+    <script src="script.js?v=1.5.0"></script>
 </body>
 </html>

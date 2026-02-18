@@ -1,7 +1,8 @@
 // DOM Elements
 const loadJsonSection = document.getElementById('loadJsonSection');
+const saveJsonSection = document.getElementById('saveJsonSection');
 const papersSection = document.getElementById('papersSection');
-const exportSection = document.getElementById('exportSection');
+const exportResetSection = document.getElementById('exportResetSection');
 const papersList = document.getElementById('papersList');
 const fileInput = document.getElementById('fileInput');
 const urlInput = document.getElementById('urlInput');
@@ -9,7 +10,6 @@ const loadUrlBtn = document.getElementById('loadUrlBtn');
 const loadFromStorageBtn = document.getElementById('loadFromStorageBtn');
 const loadNewBtn = document.getElementById('loadNewBtn');
 const saveToStorageBtn = document.getElementById('saveToStorageBtn');
-const exportJsonLightBtn = document.getElementById('exportJsonLightBtn');
 const exportJsonBtn = document.getElementById('exportJsonBtn');
 const exportBibtexAllBtn = document.getElementById('exportBibtexAllBtn');
 const exportBibtexTaggedBtn = document.getElementById('exportBibtexTaggedBtn');
@@ -18,6 +18,16 @@ const doiKeyInput = document.getElementById('doiKeyInput');
 const addDoiBtn = document.getElementById('addDoiBtn');
 const error = document.getElementById('error');
 const status = document.getElementById('status');
+
+// Save JSON Collection Elements
+const jsonFormatSelector = document.getElementById('jsonFormatSelector');
+const saveMethodFile = document.getElementById('saveMethodFile');
+const saveMethodStorage = document.getElementById('saveMethodStorage');
+const saveMethodGist = document.getElementById('saveMethodGist');
+const saveGistSelector = document.getElementById('saveGistSelector');
+const saveGistNotConnected = document.getElementById('saveGistNotConnected');
+const saveGistConnectedContent = document.getElementById('saveGistConnectedContent');
+const saveToGistOptionBtn = document.getElementById('saveToGistOptionBtn');
 
 // GitHub OAuth Elements
 const githubSection = document.getElementById('githubSection');
@@ -373,7 +383,8 @@ async function addPaperByDoi() {
 
         // Show export and papers sections if this is the first paper
         if (Object.keys(papersData).length === 1) {
-            exportSection.style.display = 'block';
+            saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
             papersSection.style.display = 'block';
         }
 
@@ -629,7 +640,23 @@ function saveToStorage() {
     }
 
     try {
-        const jsonStr = JSON.stringify(papersData);
+        // Get the format (full or light)
+        const format = jsonFormatSelector ? jsonFormatSelector.value : 'full';
+        let dataToSave = papersData;
+
+        if (format === 'light') {
+            dataToSave = {};
+            for (const [key, paper] of Object.entries(papersData)) {
+                dataToSave[key] = {
+                    doi: paper.doi,
+                    comments: paper.comments || [],
+                    tags: paper.tags || [],
+                    alsoreads: paper.alsoreads || []
+                };
+            }
+        }
+
+        const jsonStr = JSON.stringify(dataToSave);
         localStorage.setItem('argonautPapers', jsonStr);
         showStatus('Papers saved to browser storage');
     } catch (err) {
@@ -763,6 +790,9 @@ async function logout() {
     // Update gist loading section
     if (gistNotConnected) gistNotConnected.style.display = 'block';
     if (gistConnectedContent) gistConnectedContent.style.display = 'none';
+    // Update save gist section
+    if (saveGistNotConnected) saveGistNotConnected.style.display = 'block';
+    if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'none';
     console.log('[GitHub Auth] UI updated to logged-out state');
 }
 
@@ -906,6 +936,11 @@ function updateGitHubUI(user) {
     if (gistConnectedContent) gistConnectedContent.style.display = 'flex';
     // Load gists for the selector
     loadGistOptionsForLoadSelector();
+    // Update save gist section
+    if (saveGistNotConnected) saveGistNotConnected.style.display = 'none';
+    if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'flex';
+    // Load gists for the save selector
+    loadGistOptionsForSaveSelector();
     console.log('[GitHub Auth] UI updated, hiding auth status and showing sync controls');
 }
 
@@ -988,6 +1023,102 @@ async function loadGistOptionsForLoadSelector() {
 }
 
 /**
+ * Load gist options for the Save JSON Collection section
+ */
+async function loadGistOptionsForSaveSelector() {
+    console.log('[GitHub Gist] Loading gist options for save selector');
+    try {
+        const gists = await listGists();
+
+        // Clear existing options
+        if (saveGistSelector) {
+            saveGistSelector.innerHTML = '';
+
+            // Add "(new gist)" as the first option
+            const newGistOption = document.createElement('option');
+            newGistOption.value = 'new';
+            newGistOption.textContent = '(new gist)';
+            saveGistSelector.appendChild(newGistOption);
+
+            if (gists.length === 0) {
+                console.log('[GitHub Gist] No gists found');
+                const noGistsOption = document.createElement('option');
+                noGistsOption.value = '';
+                noGistsOption.textContent = '-- No existing gists --';
+                saveGistSelector.appendChild(noGistsOption);
+                return;
+            }
+
+            // Add separator
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- Existing gists ---';
+            saveGistSelector.appendChild(separator);
+
+            // Add options for each gist
+            gists.forEach(gist => {
+                const option = document.createElement('option');
+                option.value = gist.id;
+                // Use description or first filename as label
+                const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
+                option.textContent = label;
+                saveGistSelector.appendChild(option);
+            });
+
+            console.log('[GitHub Gist] Loaded', gists.length, 'gist options for save selector');
+        }
+    } catch (err) {
+        console.error('[GitHub Gist] Error loading gists for save selector:', err);
+        if (saveGistSelector) {
+            saveGistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+        }
+    }
+}
+
+/**
+ * Load gist options for the Save JSON Collection section
+ */
+async function loadGistOptionsForSaveSelector() {
+    console.log('[GitHub Gist] Loading gist options for save selector');
+    try {
+        const gists = await listGists();
+
+        // Clear existing options
+        if (saveGistSelector) {
+            saveGistSelector.innerHTML = '';
+
+            // Add "(new gist)" as the first option
+            const newGistOption = document.createElement('option');
+            newGistOption.value = 'new';
+            newGistOption.textContent = '(new gist)';
+            saveGistSelector.appendChild(newGistOption);
+
+            if (gists.length === 0) {
+                console.log('[GitHub Gist] No existing gists found');
+                return;
+            }
+
+            // Add options for each gist
+            gists.forEach(gist => {
+                const option = document.createElement('option');
+                option.value = gist.id;
+                // Use description or first filename as label
+                const label = gist.description || Object.keys(gist.files)[0] || 'Unnamed gist';
+                option.textContent = label;
+                saveGistSelector.appendChild(option);
+            });
+
+            console.log('[GitHub Gist] Loaded', gists.length, 'gist options for save selector');
+        }
+    } catch (err) {
+        console.error('[GitHub Gist] Error loading gists for save selector:', err);
+        if (saveGistSelector) {
+            saveGistSelector.innerHTML = '<option value="">Failed to load gists</option>';
+        }
+    }
+}
+
+/**
  * Handle gist action selector change
  */
 function handleGistActionChange() {
@@ -1064,7 +1195,8 @@ async function loadFromGist() {
 
         // Switch to papers view
         loadJsonSection.style.display = 'none';
-        exportSection.style.display = 'block';
+        saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
         papersSection.style.display = 'block';
 
         // Save selected gist
@@ -1127,7 +1259,8 @@ async function loadFromGistCollection() {
 
         // Switch to papers view
         loadJsonSection.style.display = 'none';
-        exportSection.style.display = 'block';
+        saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
         papersSection.style.display = 'block';
 
         showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
@@ -1186,7 +1319,8 @@ async function loadFromGistCollection() {
 
         // Switch to papers view
         loadJsonSection.style.display = 'none';
-        exportSection.style.display = 'block';
+        saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
         papersSection.style.display = 'block';
 
         showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
@@ -1209,7 +1343,7 @@ async function saveToGist() {
     const action = gistActionSelector.value;
     console.log('[GitHub Gist] Action:', action);
 
-    saveToGistBtn.classList.add('loading');
+    saveToGistOptionBtn.classList.add('loading');
     showStatus('Saving to Gist...');
 
     try {
@@ -1217,7 +1351,7 @@ async function saveToGist() {
             console.log('[GitHub Gist] No papers to save');
             showError('No papers to save');
             hideStatus();
-            saveToGistBtn.classList.remove('loading');
+            saveToGistOptionBtn.classList.remove('loading');
             return;
         }
 
@@ -1245,7 +1379,7 @@ async function saveToGist() {
                 console.log('[GitHub Gist] Invalid gist selected');
                 showError('Please select a gist to save to');
                 hideStatus();
-                saveToGistBtn.classList.remove('loading');
+                saveToGistOptionBtn.classList.remove('loading');
                 return;
             }
 
@@ -1263,7 +1397,147 @@ async function saveToGist() {
         showError('Error saving to Gist: ' + err.message);
         hideStatus();
     } finally {
-        saveToGistBtn.classList.remove('loading');
+        saveToGistOptionBtn.classList.remove('loading');
+    }
+}
+
+/**
+ * Save papers to gist from Save JSON Collection section
+ */
+async function saveToGistCollection() {
+    console.log('[GitHub Gist] Saving papers to gist from Save JSON Collection');
+    const gistId = saveGistSelector.value;
+
+    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        console.log('[GitHub Gist] Invalid gist selected');
+        showError('Please select a gist to save to');
+        return;
+    }
+
+    saveToGistOptionBtn.classList.add('loading');
+    showStatus('Saving to Gist...');
+
+    try {
+        if (!papersData || Object.keys(papersData).length === 0) {
+            console.log('[GitHub Gist] No papers to save');
+            showError('No papers to save');
+            hideStatus();
+            saveToGistOptionBtn.classList.remove('loading');
+            return;
+        }
+
+        // Get the format (full or light)
+        const format = jsonFormatSelector ? jsonFormatSelector.value : 'full';
+        let dataToSave = papersData;
+
+        if (format === 'light') {
+            dataToSave = {};
+            for (const [key, paper] of Object.entries(papersData)) {
+                dataToSave[key] = {
+                    doi: paper.doi,
+                    comments: paper.comments || [],
+                    tags: paper.tags || [],
+                    alsoreads: paper.alsoreads || []
+                };
+            }
+        }
+
+        const jsonStr = JSON.stringify(dataToSave, null, 2);
+        const files = { 'papers.json': { content: jsonStr } };
+        console.log('[GitHub Gist] Saving', Object.keys(dataToSave).length, 'papers');
+
+        if (gistId === 'new') {
+            console.log('[GitHub Gist] Creating new gist');
+            const gist = await createGist(files);
+            console.log('[GitHub Gist] Created gist:', gist.id);
+            showStatus('Created new Gist successfully');
+
+            // Reload gist options for save selector
+            await loadGistOptionsForSaveSelector();
+        } else {
+            console.log('[GitHub Gist] Updating existing gist:', gistId);
+            await updateGist(gistId, files);
+            console.log('[GitHub Gist] Updated gist:', gistId);
+            showStatus('Saved to Gist successfully');
+        }
+
+        setTimeout(hideStatus, 3000);
+    } catch (err) {
+        console.error('[GitHub Gist] Error saving to gist:', err);
+        showError('Error saving to Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        saveToGistOptionBtn.classList.remove('loading');
+    }
+}
+
+/**
+ * Save papers to gist from Save JSON Collection section
+ */
+async function saveToGistCollection() {
+    console.log('[GitHub Gist] Saving papers to gist from Save JSON Collection');
+    const gistId = saveGistSelector.value;
+
+    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        console.log('[GitHub Gist] Invalid gist selected');
+        showError('Please select a gist to save to');
+        return;
+    }
+
+    saveToGistOptionBtn.classList.add('loading');
+    showStatus('Saving to Gist...');
+
+    try {
+        if (!papersData || Object.keys(papersData).length === 0) {
+            console.log('[GitHub Gist] No papers to save');
+            showError('No papers to save');
+            hideStatus();
+            saveToGistOptionBtn.classList.remove('loading');
+            return;
+        }
+
+        // Get the format (full or light)
+        const format = jsonFormatSelector ? jsonFormatSelector.value : 'full';
+        let dataToSave = papersData;
+
+        if (format === 'light') {
+            dataToSave = {};
+            for (const [key, paper] of Object.entries(papersData)) {
+                dataToSave[key] = {
+                    doi: paper.doi,
+                    comments: paper.comments || [],
+                    tags: paper.tags || [],
+                    alsoreads: paper.alsoreads || []
+                };
+            }
+        }
+
+        const jsonStr = JSON.stringify(dataToSave, null, 2);
+        const files = { 'papers.json': { content: jsonStr } };
+        console.log('[GitHub Gist] Saving', Object.keys(dataToSave).length, 'papers');
+
+        if (gistId === 'new') {
+            console.log('[GitHub Gist] Creating new gist');
+            const gist = await createGist(files);
+            console.log('[GitHub Gist] Created gist:', gist.id);
+            showStatus('Created new Gist successfully');
+
+            // Reload gist options for save selector
+            await loadGistOptionsForSaveSelector();
+        } else {
+            console.log('[GitHub Gist] Updating existing gist:', gistId);
+            await updateGist(gistId, files);
+            console.log('[GitHub Gist] Updated gist:', gistId);
+            showStatus('Saved to Gist successfully');
+        }
+
+        setTimeout(hideStatus, 3000);
+    } catch (err) {
+        console.error('[GitHub Gist] Error saving to gist:', err);
+        showError('Error saving to Gist: ' + err.message);
+        hideStatus();
+    } finally {
+        saveToGistOptionBtn.classList.remove('loading');
     }
 }
 
@@ -1275,8 +1549,26 @@ async function exportJSON() {
     }
 
     try {
-        const jsonStr = JSON.stringify(papersData, null, 2);
-        const saved = await saveFileWithPicker(jsonStr, 'papers.json', 'application/json');
+        // Get the format (full or light)
+        const format = jsonFormatSelector ? jsonFormatSelector.value : 'full';
+        let dataToSave = papersData;
+        let filename = 'papers.json';
+
+        if (format === 'light') {
+            dataToSave = {};
+            for (const [key, paper] of Object.entries(papersData)) {
+                dataToSave[key] = {
+                    doi: paper.doi,
+                    comments: paper.comments || [],
+                    tags: paper.tags || [],
+                    alsoreads: paper.alsoreads || []
+                };
+            }
+            filename = 'papers-light.json';
+        }
+
+        const jsonStr = JSON.stringify(dataToSave, null, 2);
+        const saved = await saveFileWithPicker(jsonStr, filename, 'application/json');
         if (saved) {
             showStatus('JSON exported successfully');
         }
@@ -1558,7 +1850,8 @@ async function displayPapers() {
     // Hide load section, show papers and export sections
     loadJsonSection.style.display = 'none';
     papersSection.style.display = 'block';
-    exportSection.style.display = 'block';
+    saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
 }
 
 // Render papers
@@ -1677,7 +1970,8 @@ async function loadPapers(method) {
 
         // Switch to papers view
         loadJsonSection.style.display = 'none';
-        exportSection.style.display = 'block';
+        saveJsonSection.style.display = 'block';
+            exportResetSection.style.display = 'block';
         papersSection.style.display = 'block';
         showStatus(`Loaded ${processedPapers.length} papers successfully`);
         setTimeout(hideStatus, 3000);
@@ -1745,6 +2039,57 @@ function updateInputOptionUI(selectedValue) {
 }
 initInputOptions();
 
+// Initialize save option state on page load
+function initSaveOptions() {
+    const selectedRadio = document.querySelector('input[name="saveMethod"]:checked');
+    console.log('initSaveOptions: selectedRadio =', selectedRadio?.id);
+
+    if (selectedRadio) {
+        // Update UI state directly to ensure proper display
+        updateSaveOptionUI(selectedRadio.value);
+    } else {
+        // Default to "file" if nothing is selected
+        const fileRadio = document.getElementById('saveMethodFile');
+        if (fileRadio) {
+            fileRadio.checked = true;
+            updateSaveOptionUI('file');
+        }
+    }
+}
+
+// Update save option UI state
+function updateSaveOptionUI(selectedValue) {
+    console.log('updateSaveOptionUI: selectedValue =', selectedValue);
+
+    // Hide all option contents and remove active class
+    document.querySelectorAll('.save-option').forEach(option => {
+        option.classList.remove('active');
+        const content = option.querySelector('.save-option-content');
+        if (content) {
+            content.style.display = 'none';
+        }
+    });
+
+    // Show the selected option
+    const selectedOption = document.querySelector(`.save-option[data-save="${selectedValue}"]`);
+    console.log('updateSaveOptionUI: selectedOption =', selectedOption);
+
+    if (selectedOption) {
+        selectedOption.classList.add('active');
+        const selectedContent = selectedOption.querySelector('.save-option-content');
+        console.log('updateSaveOptionUI: selectedContent =', selectedContent);
+        if (selectedContent) {
+            selectedContent.style.display = 'block';
+        }
+    }
+}
+
+// Add event listeners for save method radio buttons
+document.querySelectorAll('input[name="saveMethod"]').forEach(radio => {
+    radio.addEventListener('change', () => updateSaveOptionUI(radio.value));
+});
+initSaveOptions();
+
 // File input handler
 fileInput.addEventListener('change', () => {
     if (fileInput.files[0]) {
@@ -1781,7 +2126,8 @@ loadNewBtn.addEventListener('click', () => {
 
         // Hide papers and export sections, show load section
         papersSection.style.display = 'none';
-        exportSection.style.display = 'none';
+        saveJsonSection.style.display = 'none';
+        exportResetSection.style.display = 'none';
         loadJsonSection.style.display = 'block';
         papersList.innerHTML = '';
         fileInput.value = '';
@@ -1793,6 +2139,11 @@ loadNewBtn.addEventListener('click', () => {
 // Save to browser storage button
 if (saveToStorageBtn) {
     saveToStorageBtn.addEventListener('click', saveToStorage);
+}
+
+// Save to gist button in Save JSON Collection section
+if (saveToGistOptionBtn) {
+    saveToGistOptionBtn.addEventListener('click', saveToGistCollection);
 }
 
 // GitHub OAuth event listeners
