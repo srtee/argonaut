@@ -35,14 +35,8 @@ const githubNotLoggedIn = document.getElementById('githubNotLoggedIn');
 const githubLoggedIn = document.getElementById('githubLoggedIn');
 const githubConnectBtn = document.getElementById('githubConnectBtn');
 const githubLogoutBtn = document.getElementById('githubLogoutBtn');
-const githubSyncControls = document.getElementById('githubSyncControls');
 const githubUserAvatar = document.getElementById('githubUserAvatar');
 const githubUserName = document.getElementById('githubUserName');
-const gistActionSelector = document.getElementById('gistActionSelector');
-const gistSelector = document.getElementById('gistSelector');
-const existingGistContainer = document.getElementById('existingGistContainer');
-const loadFromGistBtn = document.getElementById('loadFromGistBtn');
-const saveToGistBtn = document.getElementById('saveToGistBtn');
 
 // Load JSON Collection - Gist Elements
 const loadGistSelector = document.getElementById('loadGistSelector');
@@ -852,7 +846,6 @@ async function logout() {
     if (githubLoggedIn) githubLoggedIn.style.display = 'none';
     if (githubConnectBtn) githubConnectBtn.style.display = 'block';
     if (githubLogoutBtn) githubLogoutBtn.style.display = 'none';
-    if (githubSyncControls) githubSyncControls.style.display = 'none';
     // Update gist loading section
     if (gistNotConnected) gistNotConnected.style.display = 'block';
     if (gistConnectedContent) gistConnectedContent.style.display = 'none';

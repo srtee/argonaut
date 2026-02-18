@@ -131,29 +131,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Sync Controls (shown when authenticated) -->
-            <div id="githubSyncControls" style="display: none;">
-                <div class="github-gist-selector">
-                    <label for="gistActionSelector" class="input-label">Action:</label>
-                    <select id="gistActionSelector" class="gist-select">
-                        <option value="select">Select existing gist...</option>
-                        <option value="create">+ Create new gist</option>
-                    </select>
-                </div>
-
-                <div class="github-gist-selector" id="existingGistContainer" style="display: none;">
-                    <label for="gistSelector" class="input-label">Select Gist:</label>
-                    <select id="gistSelector" class="gist-select">
-                        <option value="">Loading gists...</option>
-                    </select>
-                </div>
-
-                <div class="github-sync-buttons">
-                    <button id="loadFromGistBtn" type="button" class="load-gist-btn">Load from Gist</button>
-                    <button id="saveToGistBtn" type="button" class="save-gist-btn">Save to Gist</button>
-                </div>
-            </div>
         </section>
 
         <!-- Save JSON Collection Section (hidden until papers are loaded) -->
@@ -187,6 +164,23 @@
                     </label>
                     <div class="save-option-content" style="display: none;">
                         <button id="saveToStorageBtn" type="button" class="export-btn">Save to Storage</button>
+                    </div>
+                </div>
+                <div class="save-option" data-save="gist">
+                    <label class="save-option-label">
+                        <input type="radio" name="saveMethod" value="gist" id="saveMethodGist">
+                        To GitHub Gist
+                    </label>
+                    <div class="save-option-content" style="display: none;">
+                        <div id="saveGistNotConnected" class="gist-not-connected">
+                            <p class="gist-not-connected-text">Not connected to GitHub</p>
+                        </div>
+                        <div id="saveGistConnectedContent" class="gist-connected-content" style="display: none;">
+                            <select id="saveGistSelector" class="gist-select">
+                                <option value="">Loading gists...</option>
+                            </select>
+                            <button id="saveToGistOptionBtn" type="button" class="save-gist-btn">Save to Gist</button>
+                        </div>
                     </div>
                 </div>
                 <div class="save-option" data-save="gist">
