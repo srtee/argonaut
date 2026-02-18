@@ -27,7 +27,7 @@ const githubUserInfo = document.getElementById('githubUserInfo');
 const gistSelector = document.getElementById('gistSelector');
 const loadFromGistBtn = document.getElementById('loadFromGistBtn');
 const saveToGistBtn = document.getElementById('saveToGistBtn');
-const githubDisconnectBtn = document.getElementById('githubDisconnectBtn');
+const githubLogoutBtn = document.getElementById('githubLogoutBtn');
 
 // Debug: Verify GitHub elements exist
 console.log('GitHub elements:', {
@@ -793,16 +793,28 @@ async function connectToGitHub() {
 }
 
 async function disconnectFromGitHub() {
+    console.log('Logging out from GitHub...');
     try {
+        // Add loading state
+        githubLogoutBtn.classList.add('loading');
+        githubLogoutBtn.disabled = true;
+
         await logoutFromGitHub();
         localStorage.removeItem('github_selected_gist');
 
+        // Reset UI to show connect button
         githubAuthStatus.style.display = 'block';
         githubSyncControls.style.display = 'none';
-        showStatus('Disconnected from GitHub');
+        gistSelector.innerHTML = '<option value="">Select a gist...</option>';
+
+        showStatus('Logged out from GitHub');
+        console.log('Successfully logged out from GitHub');
     } catch (err) {
-        console.error('Error disconnecting from GitHub:', err);
-        showError('Error disconnecting from GitHub: ' + err.message);
+        console.error('Error logging out from GitHub:', err);
+        showError('Error logging out from GitHub: ' + err.message);
+    } finally {
+        githubLogoutBtn.classList.remove('loading');
+        githubLogoutBtn.disabled = false;
     }
 }
 
@@ -1497,8 +1509,8 @@ if (saveToStorageBtn) {
 if (githubConnectBtn) {
     githubConnectBtn.addEventListener('click', connectToGitHub);
 }
-if (githubDisconnectBtn) {
-    githubDisconnectBtn.addEventListener('click', disconnectFromGitHub);
+if (githubLogoutBtn) {
+    githubLogoutBtn.addEventListener('click', disconnectFromGitHub);
 }
 if (loadFromGistBtn) {
     loadFromGistBtn.addEventListener('click', loadFromGist);

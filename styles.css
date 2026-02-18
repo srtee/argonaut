@@ -1362,17 +1362,50 @@ button:disabled {
     outline-offset: 2px;
 }
 
+/* GitHub Logout Container and Button */
+.github-logout-container {
+    margin-bottom: 16px;
+}
+
+.github-logout-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.github-logout-btn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.github-logout-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
 /* GitHub Loading State */
 .github-connect-btn.loading,
 .load-gist-btn.loading,
-.save-gist-btn.loading {
+.save-gist-btn.loading,
+.github-logout-btn.loading {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
 .github-connect-btn.loading::after,
 .load-gist-btn.loading::after,
-.save-gist-btn.loading::after {
+.save-gist-btn.loading::after,
+.github-logout-btn.loading::after {
     content: '';
     display: inline-block;
     width: 12px;
@@ -1382,6 +1415,11 @@ button:disabled {
     border-top-color: #FFFFFF;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+}
+
+.github-logout-btn.loading::after {
+    border-color: rgba(92, 87, 80, 0.3);
+    border-top-color: var(--text-secondary);
 }
 
 @keyframes spin {
