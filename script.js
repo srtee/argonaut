@@ -969,9 +969,7 @@ async function loadGitHubAuth() {
     if (session.authenticated && session.user) {
         console.log('[GitHub Auth] User authenticated, updating UI');
         updateGitHubUI(session.user);
-        await loadGistOptions();
-        // Initialize UI state - show gist container when "select" is active
-        handleGistActionChange();
+        await loadGistOptionsForLoadSelector();
     } else {
         console.log('[GitHub Auth] User not authenticated or no user data');
     }
@@ -986,21 +984,16 @@ function updateGitHubUI(user) {
     githubLoggedIn.style.display = 'flex';
     githubConnectBtn.style.display = 'none';
     githubLogoutBtn.style.display = 'inline-block';
-    githubSyncControls.style.display = 'block';
     githubUserAvatar.src = user.avatar_url;
     githubUserAvatar.alt = user.login;
     githubUserName.textContent = user.login;
     // Update gist loading section
     if (gistNotConnected) gistNotConnected.style.display = 'none';
     if (gistConnectedContent) gistConnectedContent.style.display = 'flex';
-    // Load gists for the selector
-    loadGistOptionsForLoadSelector();
     // Update save gist section
     if (saveGistNotConnected) saveGistNotConnected.style.display = 'none';
     if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'flex';
-    // Load gists for the save selector
-    loadGistOptionsForSaveSelector();
-    console.log('[GitHub Auth] UI updated, hiding auth status and showing sync controls');
+    console.log('[GitHub Auth] UI updated');
 }
 
 /**
@@ -1450,76 +1443,6 @@ async function saveToGist() {
         }
 
         console.log('[GitHub Gist] Successfully saved papers to gist');
-        setTimeout(hideStatus, 3000);
-    } catch (err) {
-        console.error('[GitHub Gist] Error saving to gist:', err);
-        showError('Error saving to Gist: ' + err.message);
-        hideStatus();
-    } finally {
-        saveToGistOptionBtn.classList.remove('loading');
-    }
-}
-
-/**
- * Save papers to gist from Save JSON Collection section
- */
-async function saveToGistCollection() {
-    console.log('[GitHub Gist] Saving papers to gist from Save JSON Collection');
-    const gistId = saveGistSelector.value;
-
-    if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
-        console.log('[GitHub Gist] Invalid gist selected');
-        showError('Please select a gist to save to');
-        return;
-    }
-
-    saveToGistOptionBtn.classList.add('loading');
-    showStatus('Saving to Gist...');
-
-    try {
-        if (!papersData || Object.keys(papersData).length === 0) {
-            console.log('[GitHub Gist] No papers to save');
-            showError('No papers to save');
-            hideStatus();
-            saveToGistOptionBtn.classList.remove('loading');
-            return;
-        }
-
-        // Get the format (full or light)
-        const format = jsonFormatSelector ? jsonFormatSelector.value : 'full';
-        let dataToSave = papersData;
-
-        if (format === 'light') {
-            dataToSave = {};
-            for (const [key, paper] of Object.entries(papersData)) {
-                dataToSave[key] = {
-                    doi: paper.doi,
-                    comments: paper.comments || [],
-                    tags: paper.tags || [],
-                    alsoreads: paper.alsoreads || []
-                };
-            }
-        }
-
-        const jsonStr = JSON.stringify(dataToSave, null, 2);
-        const files = { 'papers.json': { content: jsonStr } };
-        console.log('[GitHub Gist] Saving', Object.keys(dataToSave).length, 'papers');
-
-        if (gistId === 'new') {
-            console.log('[GitHub Gist] Creating new gist');
-            const gist = await createGist(files);
-            console.log('[GitHub Gist] Created gist:', gist.id);
-            showStatus('Created new Gist successfully');
-
-            // Reload gist options for save selector
-            await loadGistOptionsForSaveSelector();
-        } else {
-            console.log('[GitHub Gist] Updating existing gist:', gistId);
-            await updateGist(gistId, files);
-            console.log('[GitHub Gist] Updated gist:', gistId);
-            showStatus('Saved to Gist successfully');
-        }
-
         setTimeout(hideStatus, 3000);
     } catch (err) {
         console.error('[GitHub Gist] Error saving to gist:', err);
@@ -2094,6 +2017,11 @@ function updateInputOptionUI(selectedValue) {
         if (selectedContent) {
             selectedContent.style.display = 'block';
         }
+
+        // Load gist options if "gist" is selected and user is authenticated
+        if (selectedValue === 'gist' && getSessionId()) {
+            loadGistOptionsForLoadSelector();
+        }
     }
 }
 initInputOptions();
@@ -2139,6 +2067,11 @@ function updateSaveOptionUI(selectedValue) {
         console.log('updateSaveOptionUI: selectedContent =', selectedContent);
         if (selectedContent) {
             selectedContent.style.display = 'block';
+        }
+
+        // Load gist options if "gist" is selected and user is authenticated
+        if (selectedValue === 'gist' && getSessionId()) {
+            loadGistOptionsForSaveSelector();
         }
     }
 }
