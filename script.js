@@ -797,7 +797,8 @@ async function checkSession() {
         }
 
         const res = await fetch(`${WORKER_BASE_URL}/session`, {
-            headers
+            headers,
+            credentials: 'include'
         });
         console.log('[GitHub Auth] Request URL:', res.url);
         console.log('[GitHub Auth] Session response status:', res.status);
@@ -829,7 +830,8 @@ async function logout() {
 
         const res = await fetch(`${WORKER_BASE_URL}/logout`, {
             method: 'POST',
-            headers
+            headers,
+            credentials: 'include'
         });
         console.log('[GitHub Auth] Logout response status:', res.status);
         clearSessionId();
@@ -867,7 +869,8 @@ async function listGists() {
     }
 
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
-        headers
+        headers,
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -891,7 +894,8 @@ async function getGist(gistId) {
     }
 
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
-        headers
+        headers,
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -919,7 +923,8 @@ async function createGist(files, description = 'Argonaut Papers') {
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ description, public: false, files })
+        body: JSON.stringify({ description, public: false, files }),
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -947,7 +952,8 @@ async function updateGist(gistId, files, description = 'Argonaut Papers') {
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ description, files })
+        body: JSON.stringify({ description, files }),
+        credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
@@ -2165,15 +2171,20 @@ if (loadFromGistCollectionBtn) {
 
 // Load saved GitHub auth on page load
 async function initGitHubAuth() {
+    console.log('[GitHub Auth] initGitHubAuth called');
     const urlParams = new URLSearchParams(window.location.search);
+    console.log('[GitHub Auth] URL params:', Object.fromEntries(urlParams.entries()));
 
     // Check for OAuth callback with session_id
     const sessionId = urlParams.get('session_id');
     const authStatus = urlParams.get('auth');
+    console.log('[GitHub Auth] Session ID from URL:', sessionId ? sessionId.substring(0, 10) + '...' : 'null');
+    console.log('[GitHub Auth] Auth status from URL:', authStatus);
 
     if (sessionId && authStatus === 'success') {
         console.log('[GitHub Auth] OAuth callback received, storing session ID');
         setSessionId(sessionId);
+        console.log('[GitHub Auth] Session ID stored:', getSessionId() ? getSessionId().substring(0, 10) + '...' : 'null');
         // Clean up URL parameters after callback
         window.history.replaceState({}, document.title, window.location.pathname);
         showStatus('Successfully connected to GitHub');
