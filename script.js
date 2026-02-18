@@ -663,6 +663,7 @@ function loadFromStorage() {
  * Initiate GitHub OAuth login flow
  */
 async function initiateLogin() {
+    console.log('[GitHub Auth] Initiating login, redirecting to GitHub OAuth');
     window.location.href = `${WORKER_BASE_URL}/login`;
 }
 
@@ -670,16 +671,21 @@ async function initiateLogin() {
  * Check if user is authenticated
  */
 async function checkSession() {
+    console.log('[GitHub Auth] Checking session at:', `${WORKER_BASE_URL}/session`);
     try {
         const res = await fetch(`${WORKER_BASE_URL}/session`, {
             credentials: 'include'
         });
+        console.log('[GitHub Auth] Session response status:', res.status);
         if (!res.ok) {
+            console.log('[GitHub Auth] Session response not OK');
             return { authenticated: false };
         }
-        return await res.json();
+        const data = await res.json();
+        console.log('[GitHub Auth] Session data:', data);
+        return data;
     } catch (err) {
-        console.error('Error checking session:', err);
+        console.error('[GitHub Auth] Error checking session:', err);
         return { authenticated: false };
     }
 }
@@ -688,52 +694,65 @@ async function checkSession() {
  * Logout from GitHub
  */
 async function logout() {
+    console.log('[GitHub Auth] Initiating logout');
     try {
-        await fetch(`${WORKER_BASE_URL}/logout`, {
+        const res = await fetch(`${WORKER_BASE_URL}/logout`, {
             method: 'POST',
             credentials: 'include'
         });
+        console.log('[GitHub Auth] Logout response status:', res.status);
         localStorage.removeItem('github_selected_gist');
+        console.log('[GitHub Auth] User logged out successfully');
     } catch (err) {
-        console.error('Error logging out:', err);
+        console.error('[GitHub Auth] Error logging out:', err);
     }
     // Update UI
     githubAuthStatus.style.display = 'block';
     githubSyncControls.style.display = 'none';
+    console.log('[GitHub Auth] UI updated to logged-out state');
 }
 
 /**
  * List user's gists
  */
 async function listGists() {
+    console.log('[GitHub API] Listing user gists');
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
         credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
+        console.error('[GitHub API] Failed to list gists:', error);
         throw new Error(error.error || 'Failed to fetch gists');
     }
-    return await res.json();
+    const gists = await res.json();
+    console.log('[GitHub API] Listed gists:', gists.length);
+    return gists;
 }
 
 /**
  * Get specific gist content
  */
 async function getGist(gistId) {
+    console.log('[GitHub API] Getting gist:', gistId);
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
         credentials: 'include'
     });
     if (!res.ok) {
         const error = await res.json();
+        console.error('[GitHub API] Failed to get gist:', gistId, error);
         throw new Error(error.error || 'Failed to fetch gist');
     }
-    return await res.json();
+    const gist = await res.json();
+    console.log('[GitHub API] Got gist:', gistId);
+    return gist;
 }
 
 /**
  * Create new gist
  */
 async function createGist(files, description = 'Argonaut Papers') {
+    console.log('[GitHub API] Creating new gist with description:', description);
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -742,15 +761,19 @@ async function createGist(files, description = 'Argonaut Papers') {
     });
     if (!res.ok) {
         const error = await res.json();
+        console.error('[GitHub API] Failed to create gist:', error);
         throw new Error(error.error || 'Failed to create gist');
     }
-    return await res.json();
+    const gist = await res.json();
+    console.log('[GitHub API] Created gist:', gist.id);
+    return gist;
 }
 
 /**
  * Update existing gist
  */
 async function updateGist(gistId, files, description = 'Argonaut Papers') {
+    console.log('[GitHub API] Updating gist:', gistId);
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -759,19 +782,27 @@ async function updateGist(gistId, files, description = 'Argonaut Papers') {
     });
     if (!res.ok) {
         const error = await res.json();
+        console.error('[GitHub API] Failed to update gist:', gistId, error);
         throw new Error(error.error || 'Failed to update gist');
     }
-    return await res.json();
+    const gist = await res.json();
+    console.log('[GitHub API] Updated gist:', gistId);
+    return gist;
 }
 
 /**
  * Load GitHub auth status on page load
  */
 async function loadGitHubAuth() {
+    console.log('[GitHub Auth] loadGitHubAuth called');
     const session = await checkSession();
+    console.log('[GitHub Auth] Session result:', session);
     if (session.authenticated && session.user) {
+        console.log('[GitHub Auth] User authenticated, updating UI');
         updateGitHubUI(session.user);
         await loadGistOptions();
+    } else {
+        console.log('[GitHub Auth] User not authenticated or no user data');
     }
 }
 
@@ -779,17 +810,20 @@ async function loadGitHubAuth() {
  * Update GitHub UI with user info
  */
 function updateGitHubUI(user) {
+    console.log('[GitHub Auth] updateGitHubUI called with user:', user);
     githubAuthStatus.style.display = 'none';
     githubSyncControls.style.display = 'block';
     githubUserAvatar.src = user.avatar_url;
     githubUserAvatar.alt = user.login;
     githubUserName.textContent = user.login;
+    console.log('[GitHub Auth] UI updated, hiding auth status and showing sync controls');
 }
 
 /**
  * Load gist options from GitHub
  */
 async function loadGistOptions() {
+    console.log('[GitHub Gist] Loading gist options');
     try {
         const gists = await listGists();
 
@@ -797,6 +831,7 @@ async function loadGistOptions() {
         gistSelector.innerHTML = '';
 
         if (gists.length === 0) {
+            console.log('[GitHub Gist] No gists found');
             gistSelector.innerHTML = '<option value="">No gists found</option>';
             return;
         }
@@ -815,9 +850,11 @@ async function loadGistOptions() {
         const savedGistId = localStorage.getItem('github_selected_gist');
         if (savedGistId && gists.find(g => g.id === savedGistId)) {
             gistSelector.value = savedGistId;
+            console.log('[GitHub Gist] Restored selected gist:', savedGistId);
         }
+        console.log('[GitHub Gist] Loaded', gists.length, 'gist options');
     } catch (err) {
-        console.error('Error loading gists:', err);
+        console.error('[GitHub Gist] Error loading gists:', err);
         gistSelector.innerHTML = '<option value="">Failed to load gists</option>';
     }
 }
@@ -851,19 +888,23 @@ function handleGistSelectorChange() {
  * Load papers from selected gist
  */
 async function loadFromGist() {
+    console.log('[GitHub Gist] Loading from gist');
     const action = gistActionSelector.value;
 
     if (action === 'create') {
+        console.log('[GitHub Gist] Cannot load when in create mode');
         showError('Please select an existing gist to load from');
         return;
     }
 
     const gistId = gistSelector.value;
     if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+        console.log('[GitHub Gist] Invalid gist selected');
         showError('Please select a gist to load from');
         return;
     }
 
+    console.log('[GitHub Gist] Loading from gist:', gistId);
     loadFromGistBtn.classList.add('loading');
     showStatus('Loading from Gist...');
 
@@ -874,6 +915,7 @@ async function loadFromGist() {
         const papersFile = Object.values(gist.files).find(f => f.filename === 'papers.json');
 
         if (!papersFile) {
+            console.log('[GitHub Gist] No papers.json found in gist');
             showError('Selected gist does not contain a papers.json file');
             hideStatus();
             loadFromGistBtn.classList.remove('loading');
@@ -882,6 +924,7 @@ async function loadFromGist() {
 
         // Parse JSON
         const data = JSON.parse(papersFile.content);
+        console.log('[GitHub Gist] Loaded', Object.keys(data).length, 'papers from gist');
 
         // Clear current data and load new data
         clearCurrentData();
@@ -901,8 +944,9 @@ async function loadFromGist() {
 
         showStatus(`Loaded ${Object.keys(data).length} papers from Gist`);
         setTimeout(hideStatus, 3000);
+        console.log('[GitHub Gist] Successfully loaded papers from gist:', gistId);
     } catch (err) {
-        console.error('Error loading from Gist:', err);
+        console.error('[GitHub Gist] Error loading from gist:', err);
         showError('Error loading from Gist: ' + err.message);
         hideStatus();
     } finally {
@@ -914,13 +958,16 @@ async function loadFromGist() {
  * Save papers to gist
  */
 async function saveToGist() {
+    console.log('[GitHub Gist] Saving papers to gist');
     const action = gistActionSelector.value;
+    console.log('[GitHub Gist] Action:', action);
 
     saveToGistBtn.classList.add('loading');
     showStatus('Saving to Gist...');
 
     try {
         if (!papersData || Object.keys(papersData).length === 0) {
+            console.log('[GitHub Gist] No papers to save');
             showError('No papers to save');
             hideStatus();
             saveToGistBtn.classList.remove('loading');
@@ -929,9 +976,12 @@ async function saveToGist() {
 
         const jsonStr = JSON.stringify(papersData, null, 2);
         const files = { 'papers.json': { content: jsonStr } };
+        console.log('[GitHub Gist] Saving', Object.keys(papersData).length, 'papers');
 
         if (action === 'create') {
+            console.log('[GitHub Gist] Creating new gist');
             const gist = await createGist(files);
+            console.log('[GitHub Gist] Created gist:', gist.id);
             showStatus('Created new Gist successfully');
 
             // Reload gist options and select the new gist
@@ -945,20 +995,24 @@ async function saveToGist() {
         } else {
             const gistId = gistSelector.value;
             if (!gistId || gistId === 'Loading gists...' || gistId === 'No gists found' || gistId === 'Failed to load gists') {
+                console.log('[GitHub Gist] Invalid gist selected');
                 showError('Please select a gist to save to');
                 hideStatus();
                 saveToGistBtn.classList.remove('loading');
                 return;
             }
 
+            console.log('[GitHub Gist] Updating existing gist:', gistId);
             await updateGist(gistId, files);
             localStorage.setItem('github_selected_gist', gistId);
+            console.log('[GitHub Gist] Updated gist:', gistId);
             showStatus('Saved to Gist successfully');
         }
 
+        console.log('[GitHub Gist] Successfully saved papers to gist');
         setTimeout(hideStatus, 3000);
     } catch (err) {
-        console.error('Error saving to Gist:', err);
+        console.error('[GitHub Gist] Error saving to gist:', err);
         showError('Error saving to Gist: ' + err.message);
         hideStatus();
     } finally {

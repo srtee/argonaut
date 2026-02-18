@@ -9,13 +9,7 @@
  * - PKCE flow with client secret for enhanced security
  */
 
-// KV namespace will be bound in wrangler.toml
-// const SESSIONS = SESSIONS;
-
-// GitHub OAuth Configuration (set via wrangler secret:put)
-const GITHUB_CLIENT_ID = GITHUB_CLIENT_ID || 'your_client_id_here';
-const GITHUB_CLIENT_SECRET = GITHUB_CLIENT_SECRET || 'your_client_secret_here';
-const REDIRECT_URI = REDIRECT_URI || 'https://your-worker.workers.dev/callback';
+// KV namespace and secrets are accessed via env parameter in the fetch handler
 
 // Scopes needed for Gist operations
 const SCOPES = ['gist'];
@@ -73,12 +67,19 @@ async function verifyGitHubSignature(payload, signature, secret) {
     return signature === expectedSignature;
 }
 
+// Allowed origin for CORS (matches the Argonaut app)
+const ALLOWED_ORIGIN = 'https://srtee.github.io';
+
+// App URL for redirecting after OAuth callback
+const APP_URL = 'https://srtee.github.io/argonaut';
+
 /**
  * Handle CORS preflight requests
  */
 function handleCORS(request) {
     const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+        'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Max-Age': '86400',
@@ -91,7 +92,8 @@ function handleCORS(request) {
  */
 function getCorsHeaders() {
     return {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+        'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
@@ -100,12 +102,13 @@ function getCorsHeaders() {
 /**
  * JSON response helper
  */
-function jsonResponse(data, status = 200) {
+function jsonResponse(data, status = 200, additionalHeaders = {}) {
     return new Response(JSON.stringify(data), {
         status,
         headers: {
             ...getCorsHeaders(),
             'Content-Type': 'application/json',
+            ...additionalHeaders,
         },
     });
 }
@@ -132,20 +135,21 @@ function getSessionId(request) {
  * Set session cookie
  */
 function setSessionCookie(sessionId) {
-    return `argonaut_session=${sessionId}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 30}`; // 30 days
+    return `argonaut_session=${sessionId}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${60 * 60 * 24 * 30}`; // 30 days
 }
 
 /**
  * Clear session cookie
  */
 function clearSessionCookie() {
-    return 'argonaut_session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0';
+    return 'argonaut_session=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0';
 }
 
 /**
  * Initialize OAuth flow - redirect to GitHub
  */
-async function handleLogin() {
+async function handleLogin(env) {
+    console.log('[Worker] Initiating OAuth login flow');
     // Generate state for CSRF protection
     const state = generateRandomString(32);
 
@@ -155,12 +159,12 @@ async function handleLogin() {
 
     // Store state and code verifier temporarily in KV (with 10 min TTL)
     const stateKey = `oauth_state:${state}`;
-    await SESSIONS.put(stateKey, JSON.stringify({ codeVerifier }), { expirationTtl: 600 });
+    await env.SESSIONS.put(stateKey, JSON.stringify({ codeVerifier }), { expirationTtl: 600 });
 
     // Construct GitHub OAuth URL
     const params = new URLSearchParams({
-        client_id: GITHUB_CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
+        client_id: env.GITHUB_CLIENT_ID,
+        redirect_uri: env.REDIRECT_URI,
         scope: SCOPES.join(' '),
         state: state,
         code_challenge: codeChallenge,
@@ -168,6 +172,7 @@ async function handleLogin() {
     });
 
     const githubAuthUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
+    console.log('[Worker] Redirecting to GitHub OAuth');
 
     // Redirect to GitHub
     return Response.redirect(githubAuthUrl, 302);
@@ -176,28 +181,32 @@ async function handleLogin() {
 /**
  * Handle OAuth callback from GitHub
  */
-async function handleCallback(request) {
+async function handleCallback(request, env) {
+    console.log('[Worker] Handling OAuth callback');
     const url = new URL(request.url);
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
 
     if (!code || !state) {
+        console.error('[Worker] Missing code or state parameter in callback');
         return errorResponse('Missing code or state parameter', 400);
     }
 
     // Verify state and retrieve code verifier
     const stateKey = `oauth_state:${state}`;
-    const stateData = await SESSIONS.get(stateKey);
+    const stateData = await env.SESSIONS.get(stateKey);
 
     if (!stateData) {
+        console.error('[Worker] Invalid or expired state:', state);
         return errorResponse('Invalid or expired state', 400);
     }
 
-    await SESSIONS.delete(stateKey);
+    await env.SESSIONS.delete(stateKey);
 
     let { codeVerifier } = JSON.parse(stateData);
 
     // Exchange code for access token (using PKCE + client secret for enhanced security)
+    console.log('[Worker] Exchanging code for access token');
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
         method: 'POST',
         headers: {
@@ -205,24 +214,26 @@ async function handleCallback(request) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            client_id: GITHUB_CLIENT_ID,
-            client_secret: GITHUB_CLIENT_SECRET,
+            client_id: env.GITHUB_CLIENT_ID,
+            client_secret: env.GITHUB_CLIENT_SECRET,
             code: code,
             code_verifier: codeVerifier,
-            redirect_uri: REDIRECT_URI,
+            redirect_uri: env.REDIRECT_URI,
         }),
     });
 
     const tokenData = await tokenResponse.json();
 
     if (!tokenResponse.ok || tokenData.error) {
-        console.error('Token exchange failed:', tokenData);
+        console.error('[Worker] Token exchange failed:', tokenData);
         return errorResponse('Failed to exchange code for token', 400);
     }
 
+    console.log('[Worker] Token exchange successful');
     const { access_token, scope } = tokenData;
 
     // Fetch user info from GitHub
+    console.log('[Worker] Fetching user info from GitHub');
     const userResponse = await fetch('https://api.github.com/user', {
         headers: {
             'Authorization': `Bearer ${access_token}`,
@@ -231,10 +242,12 @@ async function handleCallback(request) {
     });
 
     if (!userResponse.ok) {
+        console.error('[Worker] Failed to fetch user info:', userResponse.status);
         return errorResponse('Failed to fetch user info', 400);
     }
 
     const user = await userResponse.json();
+    console.log('[Worker] User info fetched:', user.login);
 
     // Create new session
     const sessionId = generateSessionId();
@@ -251,29 +264,40 @@ async function handleCallback(request) {
 
     // Store session in KV (30 days expiry)
     const sessionKey = `session:${sessionId}`;
-    await SESSIONS.put(sessionKey, JSON.stringify(sessionData), { expirationTtl: 60 * 60 * 24 * 30 });
+    await env.SESSIONS.put(sessionKey, JSON.stringify(sessionData), { expirationTtl: 60 * 60 * 24 * 30 });
+    console.log('[Worker] Created session:', sessionId);
 
-    // Set session cookie and redirect
+    // Set session cookie and redirect with CORS headers
     const headers = new Headers();
     headers.set('Set-Cookie', setSessionCookie(sessionId));
-    headers.set('Location', '/'); // Redirect to app root
+    // Redirect back to the GitHub Pages app with the session cookie
+    headers.set('Location', env.APP_URL || 'https://srtee.github.io/argonaut/');
 
+    // Add CORS headers for cookie to work across origins
+    Object.entries(getCorsHeaders()).forEach(([key, value]) => {
+        headers.set(key, value);
+    });
+
+    console.log('[Worker] OAuth callback complete, redirecting to app');
     return new Response(null, { status: 302, headers });
 }
 
 /**
  * Check session status
  */
-async function handleSession(request) {
+async function handleSession(request, env) {
+    console.log('[Worker] Checking session status');
     const sessionId = getSessionId(request);
     if (!sessionId) {
+        console.log('[Worker] No session ID found');
         return jsonResponse({ authenticated: false });
     }
 
     const sessionKey = `session:${sessionId}`;
-    const sessionData = await SESSIONS.get(sessionKey);
+    const sessionData = await env.SESSIONS.get(sessionKey);
 
     if (!sessionData) {
+        console.log('[Worker] Session not found:', sessionId);
         return jsonResponse({ authenticated: false });
     }
 
@@ -281,10 +305,12 @@ async function handleSession(request) {
 
     // Check if session is expired
     if (Date.now() > session.expiresAt) {
-        await SESSIONS.delete(sessionKey);
+        console.log('[Worker] Session expired:', sessionId);
+        await env.SESSIONS.delete(sessionKey);
         return jsonResponse({ authenticated: false });
     }
 
+    console.log('[Worker] Session valid for user:', session.user.login);
     return jsonResponse({
         authenticated: true,
         user: session.user,
@@ -294,32 +320,38 @@ async function handleSession(request) {
 /**
  * Handle logout
  */
-async function handleLogout(request) {
+async function handleLogout(request, env) {
+    console.log('[Worker] Handling logout');
     const sessionId = getSessionId(request);
     if (sessionId) {
         const sessionKey = `session:${sessionId}`;
-        await SESSIONS.delete(sessionKey);
+        await env.SESSIONS.delete(sessionKey);
+        console.log('[Worker] Deleted session:', sessionId);
+    } else {
+        console.log('[Worker] No session ID to delete');
     }
 
-    const headers = new Headers();
-    headers.set('Set-Cookie', clearSessionCookie());
-
-    return jsonResponse({ success: true }, 200, headers);
+    return jsonResponse({ success: true }, 200, {
+        'Set-Cookie': clearSessionCookie(),
+    });
 }
 
 /**
  * Proxy request to GitHub API
  */
-async function proxyToGitHub(request, path, method = 'GET', body = null) {
+async function proxyToGitHub(request, path, method = 'GET', body = null, env) {
+    console.log('[Worker] Proxying to GitHub API:', method, path);
     const sessionId = getSessionId(request);
     if (!sessionId) {
+        console.log('[Worker] No session ID in proxy request');
         return errorResponse('Not authenticated', 401);
     }
 
     const sessionKey = `session:${sessionId}`;
-    const sessionData = await SESSIONS.get(sessionKey);
+    const sessionData = await env.SESSIONS.get(sessionKey);
 
     if (!sessionData) {
+        console.log('[Worker] Invalid session in proxy request:', sessionId);
         return errorResponse('Invalid session', 401);
     }
 
@@ -327,7 +359,8 @@ async function proxyToGitHub(request, path, method = 'GET', body = null) {
 
     // Check if session is expired
     if (Date.now() > session.expiresAt) {
-        await SESSIONS.delete(sessionKey);
+        console.log('[Worker] Session expired in proxy request:', sessionId);
+        await env.SESSIONS.delete(sessionKey);
         return errorResponse('Session expired', 401);
     }
 
@@ -353,6 +386,7 @@ async function proxyToGitHub(request, path, method = 'GET', body = null) {
 
     const response = await fetch(githubUrl, fetchOptions);
     const responseText = await response.text();
+    console.log('[Worker] GitHub API response status:', response.status);
 
     try {
         const responseData = JSON.parse(responseText);
@@ -365,7 +399,7 @@ async function proxyToGitHub(request, path, method = 'GET', body = null) {
 /**
  * Handle API routes
  */
-async function handleApiRequest(request) {
+async function handleApiRequest(request, env) {
     const url = new URL(request.url);
     const method = request.method;
     const path = url.pathname;
@@ -383,17 +417,17 @@ async function handleApiRequest(request) {
         case 'GET':
             if (gistId) {
                 // Get specific gist
-                return proxyToGitHub(request, `/gists/${gistId}`, 'GET');
+                return proxyToGitHub(request, `/gists/${gistId}`, 'GET', null, env);
             } else {
                 // List user's gists
-                return proxyToGitHub(request, '/gists?per_page=100', 'GET');
+                return proxyToGitHub(request, '/gists?per_page=100', 'GET', null, env);
             }
 
         case 'POST':
             if (!gistId) {
                 // Create new gist
                 const body = await request.json();
-                return proxyToGitHub(request, '/gists', 'POST', body);
+                return proxyToGitHub(request, '/gists', 'POST', body, env);
             }
             return errorResponse('Method not allowed', 405);
 
@@ -401,7 +435,7 @@ async function handleApiRequest(request) {
             if (gistId) {
                 // Update existing gist
                 const body = await request.json();
-                return proxyToGitHub(request, `/gists/${gistId}`, 'PATCH', body);
+                return proxyToGitHub(request, `/gists/${gistId}`, 'PATCH', body, env);
             }
             return errorResponse('Method not allowed', 405);
 
@@ -414,7 +448,7 @@ async function handleApiRequest(request) {
  * Main request handler
  */
 export default {
-    async fetch(request) {
+    async fetch(request, env) {
         const url = new URL(request.url);
 
         // Handle CORS preflight
@@ -431,30 +465,30 @@ export default {
                     if (request.method !== 'GET') {
                         return errorResponse('Method not allowed', 405);
                     }
-                    return handleLogin();
+                    return handleLogin(env);
 
                 case '/callback':
                     if (request.method !== 'GET') {
                         return errorResponse('Method not allowed', 405);
                     }
-                    return handleCallback(request);
+                    return handleCallback(request, env);
 
                 case '/session':
                     if (request.method !== 'GET') {
                         return errorResponse('Method not allowed', 405);
                     }
-                    return handleSession(request);
+                    return handleSession(request, env);
 
                 case '/logout':
                     if (request.method !== 'POST') {
                         return errorResponse('Method not allowed', 405);
                     }
-                    return handleLogout(request);
+                    return handleLogout(request, env);
 
                 default:
                     // Handle API routes
                     if (path.startsWith('/api/')) {
-                        return handleApiRequest(request);
+                        return handleApiRequest(request, env);
                     }
 
                     // Default response

@@ -14,11 +14,12 @@ id = "862ff8c8c49040b4a72b0216989c1eea"
 
 # Environment variables
 [vars]
-# Redirect URI - update with your worker URL
+# App URL - where the GitHub Pages app is hosted
+APP_URL = "https://srtee.github.io/argonaut"
+# Redirect URI - GitHub OAuth callback URL (must point to worker's /callback endpoint)
 REDIRECT_URI = "https://argonaut-github-proxy.shernren.workers.dev/callback"
 
 # Secrets (set with: wrangler secret put <name>)
 # Required secrets:
 # - GITHUB_CLIENT_ID: GitHub OAuth App client ID
-# - GITHUB_CLIENT_SECRET: GitHub OAuth App client secret
 # - GITHUB_CLIENT_SECRET: GitHub OAuth App client secret
