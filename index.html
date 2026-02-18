@@ -104,23 +104,23 @@
         <section class="input-section load-json-section" id="loadJsonSection" aria-labelledby="loadJsonHeading">
             <h2 id="loadJsonHeading">Load JSON Collection:</h2>
             <div class="input-options">
-                <div class="input-option active" data-input="file">
+                <div class="input-option" data-input="url">
                     <label class="input-option-label">
-                        <input type="radio" name="inputMethod" value="file" checked id="inputMethodFile">
+                        <input type="radio" name="inputMethod" value="url" checked id="inputMethodUrl">
+                        From URL
+                    </label>
+                    <div class="input-option-content" id="urlInputContent">
+                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json" placeholder="Enter JSON URL" class="url-input" aria-label="Enter JSON file URL">
+                        <button id="loadUrlBtn" type="button" aria-label="Load papers from URL">Load</button>
+                    </div>
+                </div>
+                <div class="input-option" data-input="file">
+                    <label class="input-option-label">
+                        <input type="radio" name="inputMethod" value="file" id="inputMethodFile">
                         From File
                     </label>
                     <div class="input-option-content" id="fileInputContent">
                         <input type="file" id="fileInput" accept=".json" class="file-input" aria-labelledby="inputMethodFile">
-                    </div>
-                </div>
-                <div class="input-option" data-input="url">
-                    <label class="input-option-label">
-                        <input type="radio" name="inputMethod" value="url" id="inputMethodUrl">
-                        From URL
-                    </label>
-                    <div class="input-option-content" style="display: none;">
-                        <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json" placeholder="Enter JSON URL" class="url-input" aria-label="Enter JSON file URL">
-                        <button id="loadUrlBtn" type="button" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
                 <div class="input-option" data-input="storage">
@@ -128,7 +128,7 @@
                         <input type="radio" name="inputMethod" value="storage" id="inputMethodStorage">
                         From Browser Storage
                     </label>
-                    <div class="input-option-content" style="display: none;">
+                    <div class="input-option-content" id="storageInputContent">
                         <button id="loadFromStorageBtn" type="button" aria-label="Load papers from browser storage">Load from Storage</button>
                     </div>
                 </div>
@@ -137,11 +137,11 @@
                         <input type="radio" name="inputMethod" value="gist" id="inputMethodGist">
                         From GitHub Gist
                     </label>
-                    <div class="input-option-content" style="display: none;">
+                    <div class="input-option-content" id="gistInputContent">
                         <div id="gistNotConnected" class="gist-not-connected">
                             <p class="gist-not-connected-text">Not connected to GitHub</p>
                         </div>
-                        <div id="gistConnectedContent" class="gist-connected-content" style="display: none;">
+                        <div id="gistConnectedContent" class="gist-connected-content">
                             <select id="loadGistSelector" class="gist-select">
                                 <option value="">Loading gists...</option>
                             </select>

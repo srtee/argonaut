@@ -859,11 +859,9 @@ async function logout() {
     if (githubConnectBtn) githubConnectBtn.style.display = 'block';
     if (githubLogoutBtn) githubLogoutBtn.style.display = 'none';
     // Update gist loading section
-    if (gistNotConnected) gistNotConnected.style.display = 'block';
-    if (gistConnectedContent) gistConnectedContent.style.display = 'none';
+    updateGistVisibility();
     // Update save gist section
-    if (saveGistNotConnected) saveGistNotConnected.style.display = 'block';
-    if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'none';
+    updateSaveGistVisibility();
     console.log('[GitHub Auth] UI updated to logged-out state');
 }
 
@@ -1004,12 +1002,29 @@ function updateGitHubUI(user) {
     githubUserAvatar.alt = user.login;
     githubUserName.textContent = user.login;
     // Update gist loading section
-    if (gistNotConnected) gistNotConnected.style.display = 'none';
-    if (gistConnectedContent) gistConnectedContent.style.display = 'flex';
+    updateGistVisibility();
     // Update save gist section
-    if (saveGistNotConnected) saveGistNotConnected.style.display = 'none';
-    if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'flex';
+    updateSaveGistVisibility();
     console.log('[GitHub Auth] UI updated');
+}
+
+/**
+ * Update save gist visibility based on GitHub auth state
+ */
+function updateSaveGistVisibility() {
+    const sessionId = getSessionId();
+    const saveGistNotConnected = document.getElementById('saveGistNotConnected');
+    const saveGistConnectedContent = document.getElementById('saveGistConnectedContent');
+
+    if (sessionId) {
+        // User is authenticated
+        if (saveGistNotConnected) saveGistNotConnected.style.display = 'none';
+        if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'flex';
+    } else {
+        // User is not authenticated
+        if (saveGistNotConnected) saveGistNotConnected.style.display = 'block';
+        if (saveGistConnectedContent) saveGistConnectedContent.style.display = 'none';
+    }
 }
 
 /**
@@ -1694,12 +1709,41 @@ function initInputOptions() {
         // Update UI state directly to ensure proper display
         updateInputOptionUI(selectedRadio.value);
     } else {
-        // Default to "file" if nothing is selected
-        const fileRadio = document.getElementById('inputMethodFile');
-        if (fileRadio) {
-            fileRadio.checked = true;
-            updateInputOptionUI('file');
+        // Default to "url" if nothing is selected
+        const urlRadio = document.getElementById('inputMethodUrl');
+        if (urlRadio) {
+            urlRadio.checked = true;
+            updateInputOptionUI('url');
         }
+    }
+
+    // Check for inputURL parameter and auto-load
+    checkInputURLParameter();
+}
+
+// Check for inputURL parameter and auto-load
+function checkInputURLParameter() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const inputURL = urlParams.get('inputURL');
+
+    if (inputURL) {
+        console.log('[URL Parameter] Found inputURL:', inputURL);
+        // Update the URL input field
+        if (urlInput) {
+            urlInput.value = inputURL;
+        }
+        // Select the URL option
+        const urlRadio = document.getElementById('inputMethodUrl');
+        if (urlRadio) {
+            urlRadio.checked = true;
+            updateInputOptionUI('url');
+        }
+        // Auto-load the papers
+        setTimeout(() => {
+            loadPapers('url');
+        }, 100);
+        // Clean up URL parameter after loading
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 }
 
@@ -1731,7 +1775,26 @@ function updateInputOptionUI(selectedValue) {
         // Load gist options if "gist" is selected and user is authenticated
         if (selectedValue === 'gist' && getSessionId()) {
             loadGistOptionsForLoadSelector();
+            // Update gist visibility based on auth state
+            updateGistVisibility();
         }
+    }
+}
+
+// Update gist visibility based on GitHub auth state
+function updateGistVisibility() {
+    const sessionId = getSessionId();
+    const gistNotConnected = document.getElementById('gistNotConnected');
+    const gistConnectedContent = document.getElementById('gistConnectedContent');
+
+    if (sessionId) {
+        // User is authenticated
+        if (gistNotConnected) gistNotConnected.style.display = 'none';
+        if (gistConnectedContent) gistConnectedContent.style.display = 'flex';
+    } else {
+        // User is not authenticated
+        if (gistNotConnected) gistNotConnected.style.display = 'block';
+        if (gistConnectedContent) gistConnectedContent.style.display = 'none';
     }
 }
 initInputOptions();
@@ -1782,6 +1845,8 @@ function updateSaveOptionUI(selectedValue) {
         // Load gist options if "gist" is selected and user is authenticated
         if (selectedValue === 'gist' && getSessionId()) {
             loadGistOptionsForSaveSelector();
+            // Update gist visibility based on auth state
+            updateSaveGistVisibility();
         }
     }
 }
