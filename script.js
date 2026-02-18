@@ -59,6 +59,72 @@ let papersData = {};
 let selectedTags = new Set();
 let processedPapersData = []; // Store processed papers for filtering
 
+// Dark mode toggle functionality
+const themeToggle = document.getElementById('themeToggle');
+const sunIcon = document.querySelector('.sun-icon');
+const moonIcon = document.querySelector('.moon-icon');
+const THEME_KEY = 'theme';
+
+function updateThemeIcons(isDark) {
+    if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
+    if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
+}
+
+function getSystemPreference() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getStoredTheme() {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'dark') return 'dark';
+    if (stored === 'light') return 'light';
+    return null;
+}
+
+function setTheme(theme) {
+    const isDark = theme === 'dark';
+    if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem(THEME_KEY, theme);
+    updateThemeIcons(isDark);
+}
+
+function initTheme() {
+    const storedTheme = getStoredTheme();
+    if (storedTheme) {
+        setTheme(storedTheme);
+    } else {
+        const isDark = getSystemPreference();
+        // Set initial theme without saving to localStorage
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        updateThemeIcons(isDark);
+    }
+}
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+}
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem(THEME_KEY)) {
+        setTheme(e.matches ? 'dark' : 'light');
+    }
+});
+
+// Initialize theme on page load
+initTheme();
+
 // Toggle tag selection and filter papers
 function toggleTag(tag) {
     if (selectedTags.has(tag)) {
@@ -2239,74 +2305,6 @@ if (doiInput) {
         }
     });
 }
-
-// Dark mode toggle functionality
-const themeToggle = document.getElementById('themeToggle');
-const sunIcon = document.querySelector('.sun-icon');
-const moonIcon = document.querySelector('.moon-icon');
-const THEME_KEY = 'theme';
-
-function updateThemeIcons(isDark) {
-    if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
-    if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
-}
-
-function getSystemPreference() {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
-function getStoredTheme() {
-    const stored = localStorage.getItem(THEME_KEY);
-    if (stored === 'dark') return 'dark';
-    if (stored === 'light') return 'light';
-    return null;
-}
-
-function setTheme(theme) {
-    const isDark = theme === 'dark';
-    if (isDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-    }
-    localStorage.setItem(THEME_KEY, theme);
-    updateThemeIcons(isDark);
-}
-
-function initTheme() {
-    const storedTheme = getStoredTheme();
-    if (storedTheme) {
-        setTheme(storedTheme);
-    } else {
-        const isDark = getSystemPreference();
-        // Set initial theme without saving to localStorage
-        if (isDark) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.removeAttribute('data-theme');
-        }
-        updateThemeIcons(isDark);
-    }
-}
-
-if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-    });
-} else {
-    console.error('themeToggle not found!');
-}
-
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(THEME_KEY)) {
-        setTheme(e.matches ? 'dark' : 'light');
-    }
-});
-
-// Initialize theme on page load
-initTheme();
 
 // ========== Inline Tag Management ==========
 

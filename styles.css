@@ -497,28 +497,6 @@ body {
     flex-wrap: wrap;
 }
 
-.export-reset-buttons button {
-    font-size: 14px;
-    padding: 10px 18px;
-    background: var(--input-bg);
-    color: var(--text-color);
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease-out;
-}
-
-.export-reset-buttons button:hover {
-    background: var(--bg-secondary);
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-}
-
-.export-reset-buttons button:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-}
-
 /* Save JSON Collection Section */
 .save-json-section {
     background: linear-gradient(135deg, var(--abstract-bg) 0%, var(--bg-secondary) 100%);
@@ -1244,6 +1222,30 @@ button:disabled {
     outline-offset: 2px;
 }
 
+/* Export & Reset Section - Override general button styles */
+.export-reset-buttons button {
+    font-size: 14px !important;
+    padding: 10px 18px !important;
+    background: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease-out !important;
+    transform: none !important;
+}
+
+.export-reset-buttons button:hover {
+    background: var(--bg-secondary) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+}
+
+.export-reset-buttons button:focus-visible {
+    outline: 2px solid var(--accent-color) !important;
+    outline-offset: 2px;
+}
+
 /* Error and Status */
 .error {
     color: var(--error-color);
@@ -1331,12 +1333,6 @@ button:disabled {
     padding: 16px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-soft);
-}
-
-.github-sync-section h2 {
-    color: var(--text-color);
-    font-size: 16px;
-    margin-bottom: 12px;
 }
 
 /* GitHub Auth Bar - Horizontal 2:3:1 layout */
