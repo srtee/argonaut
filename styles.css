@@ -1345,32 +1345,25 @@ button:disabled {
     gap: 12px;
 }
 
-.github-auth-left {
+.github-label {
     flex: 2;
     min-width: 50px;
-}
-
-.github-label {
     color: var(--text-color);
     font-weight: 600;
     font-size: 14px;
 }
 
-.github-auth-middle {
+.github-not-logged-in {
     flex: 3;
     min-width: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.github-not-logged-in {
     color: var(--text-secondary);
     font-size: 14px;
     font-style: italic;
 }
 
 .github-logged-in {
+    flex: 3;
+    min-width: 80px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1387,13 +1380,6 @@ button:disabled {
     font-weight: 500;
     color: var(--text-color);
     font-size: 14px;
-}
-
-.github-auth-right {
-    flex: 1;
-    min-width: 70px;
-    display: flex;
-    justify-content: flex-end;
 }
 
 .github-connect-btn {

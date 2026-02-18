@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.6.4">
+    <link rel="stylesheet" href="styles.css?v=1.6.5">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -168,30 +168,24 @@
             <!-- GitHub Auth Bar -->
             <div class="github-auth-bar">
                 <!-- Left: GitHub label -->
-                <div class="github-auth-left">
-                    <span class="github-label">GitHub:</span>
-                </div>
+                <span class="github-label">GitHub:</span>
 
                 <!-- Middle: User info or not logged in -->
-                <div class="github-auth-middle">
-                    <div id="githubNotLoggedIn" class="github-not-logged-in">
-                        not logged in
-                    </div>
-                    <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
-                        <img src="" alt="" class="github-user-avatar" id="githubUserAvatar">
-                        <span class="github-user-name" id="githubUserName"></span>
-                    </div>
+                <div id="githubNotLoggedIn" class="github-not-logged-in">
+                    not logged in
+                </div>
+                <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
+                    <img src="" alt="" class="github-user-avatar" id="githubUserAvatar">
+                    <span class="github-user-name" id="githubUserName"></span>
                 </div>
 
                 <!-- Right: Connect/Logout button -->
-                <div class="github-auth-right">
-                    <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">
-                        Connect
-                    </button>
-                    <button id="githubLogoutBtn" type="button" class="github-logout-btn" style="display: none;" aria-label="Disconnect from GitHub">
-                        Logout
-                    </button>
-                </div>
+                <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">
+                    Connect
+                </button>
+                <button id="githubLogoutBtn" type="button" class="github-logout-btn" style="display: none;" aria-label="Disconnect from GitHub">
+                    Logout
+                </button>
             </div>
         </section>
 
@@ -218,6 +212,6 @@
         </footer>
     </main>
 
-    <script src="script.js?v=1.6.4"></script>
+    <script src="script.js?v=1.6.5"></script>
 </body>
 </html>

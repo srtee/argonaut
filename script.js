@@ -758,6 +758,16 @@ function loadFromStorage() {
  */
 async function initiateLogin() {
     console.log('[GitHub Auth] Initiating login, redirecting to GitHub OAuth');
+
+    // Save current state before redirect so papers persist after OAuth callback
+    const stateToSave = {
+        hasPapers: Object.keys(papersData).length > 0,
+        saveJsonVisible: saveJsonSection?.style.display === 'block',
+        exportResetVisible: exportResetSection?.style.display === 'block',
+        papersVisible: papersSection?.style.display === 'block'
+    };
+    sessionStorage.setItem('argonaut_oauth_state', JSON.stringify(stateToSave));
+
     window.location.href = `${WORKER_BASE_URL}/login`;
 }
 
@@ -1871,9 +1881,37 @@ async function initGitHubAuth() {
         window.history.replaceState({}, document.title, window.location.pathname);
         showStatus('Successfully connected to GitHub');
         setTimeout(hideStatus, 3000);
+
+        // Restore papers state if it was saved before redirect
+        restorePapersState();
     }
 
     await loadGitHubAuth();
+}
+
+// Restore papers state after OAuth callback
+function restorePapersState() {
+    const savedState = sessionStorage.getItem('argonaut_oauth_state');
+    if (savedState) {
+        try {
+            const state = JSON.parse(savedState);
+            console.log('[GitHub Auth] Restoring state:', state);
+
+            if (state.hasPapers) {
+                // If papers were loaded, ensure the sections remain visible
+                if (state.saveJsonVisible) saveJsonSection.style.display = 'block';
+                if (state.exportResetVisible) exportResetSection.style.display = 'block';
+                if (state.papersVisible) papersSection.style.display = 'block';
+                // Keep load section hidden since papers are loaded
+                loadJsonSection.style.display = 'none';
+            }
+
+            // Clear the saved state
+            sessionStorage.removeItem('argonaut_oauth_state');
+        } catch (err) {
+            console.error('[GitHub Auth] Error restoring state:', err);
+        }
+    }
 }
 
 if (document.readyState === 'loading') {
