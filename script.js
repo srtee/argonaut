@@ -668,13 +668,42 @@ async function initiateLogin() {
 }
 
 /**
+ * Get the session ID from localStorage
+ */
+function getSessionId() {
+    return localStorage.getItem('github_session_id');
+}
+
+/**
+ * Set the session ID in localStorage
+ */
+function setSessionId(sessionId) {
+    localStorage.setItem('github_session_id', sessionId);
+}
+
+/**
+ * Clear the session ID from localStorage
+ */
+function clearSessionId() {
+    localStorage.removeItem('github_session_id');
+}
+
+/**
  * Check if user is authenticated
  */
 async function checkSession() {
     console.log('[GitHub Auth] Checking session at:', `${WORKER_BASE_URL}/session`);
+    const sessionId = getSessionId();
+    console.log('[GitHub Auth] Session ID from storage:', sessionId ? sessionId.substring(0, 10) + '...' : 'null');
+
     try {
+        const headers = {};
+        if (sessionId) {
+            headers['Authorization'] = `Bearer ${sessionId}`;
+        }
+
         const res = await fetch(`${WORKER_BASE_URL}/session`, {
-            credentials: 'include'
+            headers
         });
         console.log('[GitHub Auth] Request URL:', res.url);
         console.log('[GitHub Auth] Session response status:', res.status);
@@ -696,16 +725,27 @@ async function checkSession() {
  */
 async function logout() {
     console.log('[GitHub Auth] Initiating logout');
+    const sessionId = getSessionId();
+
     try {
+        const headers = {};
+        if (sessionId) {
+            headers['Authorization'] = `Bearer ${sessionId}`;
+        }
+
         const res = await fetch(`${WORKER_BASE_URL}/logout`, {
             method: 'POST',
-            credentials: 'include'
+            headers
         });
         console.log('[GitHub Auth] Logout response status:', res.status);
+        clearSessionId();
         localStorage.removeItem('github_selected_gist');
         console.log('[GitHub Auth] User logged out successfully');
     } catch (err) {
         console.error('[GitHub Auth] Error logging out:', err);
+        // Even if logout fails, clear local session
+        clearSessionId();
+        localStorage.removeItem('github_selected_gist');
     }
     // Update UI
     githubAuthStatus.style.display = 'block';
@@ -718,8 +758,14 @@ async function logout() {
  */
 async function listGists() {
     console.log('[GitHub API] Listing user gists');
+    const sessionId = getSessionId();
+    const headers = {};
+    if (sessionId) {
+        headers['Authorization'] = `Bearer ${sessionId}`;
+    }
+
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
-        credentials: 'include'
+        headers
     });
     if (!res.ok) {
         const error = await res.json();
@@ -736,8 +782,14 @@ async function listGists() {
  */
 async function getGist(gistId) {
     console.log('[GitHub API] Getting gist:', gistId);
+    const sessionId = getSessionId();
+    const headers = {};
+    if (sessionId) {
+        headers['Authorization'] = `Bearer ${sessionId}`;
+    }
+
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
-        credentials: 'include'
+        headers
     });
     if (!res.ok) {
         const error = await res.json();
@@ -754,10 +806,17 @@ async function getGist(gistId) {
  */
 async function createGist(files, description = 'Argonaut Papers') {
     console.log('[GitHub API] Creating new gist with description:', description);
+    const sessionId = getSessionId();
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (sessionId) {
+        headers['Authorization'] = `Bearer ${sessionId}`;
+    }
+
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers,
         body: JSON.stringify({ description, public: false, files })
     });
     if (!res.ok) {
@@ -775,10 +834,17 @@ async function createGist(files, description = 'Argonaut Papers') {
  */
 async function updateGist(gistId, files, description = 'Argonaut Papers') {
     console.log('[GitHub API] Updating gist:', gistId);
+    const sessionId = getSessionId();
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (sessionId) {
+        headers['Authorization'] = `Bearer ${sessionId}`;
+    }
+
     const res = await fetch(`${WORKER_BASE_URL}/api/github/gists/${gistId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers,
         body: JSON.stringify({ description, files })
     });
     if (!res.ok) {
@@ -1571,12 +1637,27 @@ if (saveToGistBtn) {
 
 // Load saved GitHub auth on page load
 async function initGitHubAuth() {
-    // Check for OAuth callback params
     const urlParams = new URLSearchParams(window.location.search);
+
+    // Check for OAuth callback with session_id
+    const sessionId = urlParams.get('session_id');
+    const authStatus = urlParams.get('auth');
+
+    if (sessionId && authStatus === 'success') {
+        console.log('[GitHub Auth] OAuth callback received, storing session ID');
+        setSessionId(sessionId);
+        // Clean up URL parameters after callback
+        window.history.replaceState({}, document.title, window.location.pathname);
+        showStatus('Successfully connected to GitHub');
+        setTimeout(hideStatus, 3000);
+    }
+
+    // Legacy: Check for old code/state params (should not happen with new flow)
     if (urlParams.has('code') || urlParams.has('state')) {
         // Clean up URL parameters after callback
         window.history.replaceState({}, document.title, window.location.pathname);
     }
+
     await loadGitHubAuth();
 }
 

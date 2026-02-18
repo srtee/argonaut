@@ -121,29 +121,14 @@ function errorResponse(message, status = 400) {
 }
 
 /**
- * Get session from request
+ * Get session from Authorization header
  */
 function getSessionId(request) {
-    const cookieHeader = request.headers.get('Cookie');
-    console.log('[Worker] Raw Cookie header:', cookieHeader);
-    if (!cookieHeader) return null;
-    const cookies = cookieHeader.split(';').map(c => c.trim());
-    const sessionCookie = cookies.find(c => c.startsWith('argonaut_session='));
-    return sessionCookie ? sessionCookie.substring('argonaut_session='.length) : null;
-}
-
-/**
- * Set session cookie
- */
-function setSessionCookie(sessionId) {
-    return `argonaut_session=${sessionId}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${60 * 60 * 24 * 30}`; // 30 days
-}
-
-/**
- * Clear session cookie
- */
-function clearSessionCookie() {
-    return 'argonaut_session=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0';
+    const authHeader = request.headers.get('Authorization');
+    console.log('[Worker] Auth header:', authHeader ? authHeader.substring(0, 20) + '...' : 'null');
+    if (!authHeader) return null;
+    if (!authHeader.startsWith('Bearer ')) return null;
+    return authHeader.substring(7);
 }
 
 /**
@@ -268,19 +253,12 @@ async function handleCallback(request, env) {
     await env.SESSIONS.put(sessionKey, JSON.stringify(sessionData), { expirationTtl: 60 * 60 * 24 * 30 });
     console.log('[Worker] Created session:', sessionId);
 
-    // Set session cookie and redirect with CORS headers
-    const headers = new Headers();
-    headers.set('Set-Cookie', setSessionCookie(sessionId));
-    // Redirect back to the GitHub Pages app with the session cookie
-    headers.set('Location', env.APP_URL || 'https://srtee.github.io/argonaut/');
-
-    // Add CORS headers for cookie to work across origins
-    Object.entries(getCorsHeaders()).forEach(([key, value]) => {
-        headers.set(key, value);
-    });
-
-    console.log('[Worker] OAuth callback complete, redirecting to app');
-    return new Response(null, { status: 302, headers });
+    // Redirect back to app with sessionId in URL
+    const redirectUrl = new URL(APP_URL);
+    redirectUrl.searchParams.set('session_id', sessionId);
+    redirectUrl.searchParams.set('auth', 'success');
+    console.log('[Worker] Redirecting to app with sessionId');
+    return Response.redirect(redirectUrl.toString(), 302);
 }
 
 /**
@@ -332,9 +310,7 @@ async function handleLogout(request, env) {
         console.log('[Worker] No session ID to delete');
     }
 
-    return jsonResponse({ success: true }, 200, {
-        'Set-Cookie': clearSessionCookie(),
-    });
+    return jsonResponse({ success: true });
 }
 
 /**
