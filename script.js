@@ -823,6 +823,31 @@ async function loadGistOptions() {
 }
 
 /**
+ * Handle gist action selector change
+ */
+function handleGistActionChange() {
+    const action = gistActionSelector.value;
+    existingGistContainer.style.display = action === 'select' ? 'block' : 'none';
+    loadFromGistBtn.disabled = action === 'create';
+}
+
+/**
+ * Handle gist selector change
+ */
+function handleGistSelectorChange() {
+    const gistId = gistSelector.value;
+    if (gistId) {
+        localStorage.setItem('github_selected_gist', gistId);
+        loadFromGistBtn.disabled = false;
+        saveToGistBtn.disabled = false;
+    } else {
+        localStorage.removeItem('github_selected_gist');
+        loadFromGistBtn.disabled = true;
+        saveToGistBtn.disabled = true;
+    }
+}
+
+/**
  * Load papers from selected gist
  */
 async function loadFromGist() {
