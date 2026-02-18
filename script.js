@@ -1191,7 +1191,16 @@ async function saveToGistCollection() {
 
         if (gistId === 'new') {
             console.log('[GitHub Gist] Creating new gist');
-            const gist = await createGist(files);
+            // Prompt user for gist name
+            const gistName = prompt('Enter a name for your new gist:', 'Argonaut Papers');
+            if (gistName === null) {
+                // User cancelled
+                hideStatus();
+                saveToGistOptionBtn.classList.remove('loading');
+                return;
+            }
+            const description = gistName.trim() || 'Argonaut Papers';
+            const gist = await createGist(files, description);
             console.log('[GitHub Gist] Created gist:', gist.id);
             showStatus('Created new Gist successfully');
 
