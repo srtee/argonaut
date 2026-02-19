@@ -1571,16 +1571,6 @@ button:disabled {
 
 /* GitHub Sync Section */
 .github-sync-section {
-    background: linear-gradient(135deg, var(--abstract-bg) 0%, var(--bg-secondary) 100%);
-    border: 1px solid var(--abstract-border);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow-soft);
-}
-
-/* GitHub Auth Bar - Horizontal 2:3:1 layout */
-.github-auth-bar {
     display: flex;
     align-items: center;
     padding: 10px 12px;

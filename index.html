@@ -138,7 +138,6 @@
                         From GitHub Gist
                     </label>
                     <div class="input-option-content" id="gistInputContent">
-                        <p id="gistNotConnected" class="gist-not-connected-text">Not connected to GitHub</p>
                         <div id="gistConnectedContent" class="gist-connected-content">
                             <label for="loadGistSelector" class="visually-hidden">Select a Gist to load</label>
                             <select id="loadGistSelector" class="gist-select">
@@ -190,7 +189,6 @@
                         To GitHub Gist
                     </label>
                     <div class="save-option-content" style="display: none;">
-                        <p id="saveGistNotConnected" class="gist-not-connected-text">Not connected to GitHub</p>
                         <div id="saveGistConnectedContent" class="gist-connected-content" style="display: none;">
                             <label for="saveGistSelector" class="visually-hidden">Select a Gist to save to</label>
                             <select id="saveGistSelector" class="gist-select">
@@ -216,29 +214,14 @@
         <!-- GitHub Gist Sync Section -->
         <section class="github-sync-section" id="githubSection" aria-labelledby="githubHeading">
             <h2 id="githubHeading" class="visually-hidden">GitHub Integration</h2>
-
-            <!-- GitHub Auth Bar -->
-            <div class="github-auth-bar">
-                <!-- Left: GitHub label -->
-                <span class="github-label">GitHub:</span>
-
-                <!-- Middle: User info or not logged in -->
-                <div id="githubNotLoggedIn" class="github-not-logged-in">
-                    not logged in
-                </div>
-                <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
-                    <img src="" alt="" class="github-user-avatar" id="githubUserAvatar">
-                    <span class="github-user-name" id="githubUserName"></span>
-                </div>
-
-                <!-- Right: Connect/Logout button -->
-                <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">
-                    Connect
-                </button>
-                <button id="githubLogoutBtn" type="button" class="github-logout-btn" style="display: none;" aria-label="Disconnect from GitHub">
-                    Logout
-                </button>
+            <span class="github-label">GitHub:</span>
+            <span id="githubNotLoggedIn" class="github-not-logged-in">not logged in</span>
+            <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
+                <img src="" alt="" class="github-user-avatar" id="githubUserAvatar">
+                <span class="github-user-name" id="githubUserName"></span>
             </div>
+            <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">Connect</button>
+            <button id="githubLogoutBtn" type="button" class="github-logout-btn" style="display: none;" aria-label="Disconnect from GitHub">Logout</button>
         </section>
 
         <!-- Papers List Section -->
