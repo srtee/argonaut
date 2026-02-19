@@ -47,13 +47,13 @@
                 <p>Click "Get Started" to begin using Argonaut. You can view this guide again from the help link in the footer.</p>
             </div>
             <div class="onboarding-navigation">
-                <div class="onboarding-dots">
-                    <span class="onboarding-dot active" data-step="0"></span>
-                    <span class="onboarding-dot" data-step="1"></span>
-                    <span class="onboarding-dot" data-step="2"></span>
-                    <span class="onboarding-dot" data-step="3"></span>
-                    <span class="onboarding-dot" data-step="4"></span>
-                    <span class="onboarding-dot" data-step="5"></span>
+                <div class="onboarding-dots" role="tablist" aria-label="Onboarding progress">
+                    <button type="button" class="onboarding-dot active" data-step="0" role="tab" aria-selected="true" aria-label="Step 1: Welcome"></button>
+                    <button type="button" class="onboarding-dot" data-step="1" role="tab" aria-selected="false" aria-label="Step 2: Load Papers"></button>
+                    <button type="button" class="onboarding-dot" data-step="2" role="tab" aria-selected="false" aria-label="Step 3: Add by DOI"></button>
+                    <button type="button" class="onboarding-dot" data-step="3" role="tab" aria-selected="false" aria-label="Step 4: Save and Export"></button>
+                    <button type="button" class="onboarding-dot" data-step="4" role="tab" aria-selected="false" aria-label="Step 5: Organize"></button>
+                    <button type="button" class="onboarding-dot" data-step="5" role="tab" aria-selected="false" aria-label="Step 6: Get Started"></button>
                 </div>
                 <div class="onboarding-buttons">
                     <button id="onboardingBackBtn" class="onboarding-nav-btn" style="visibility: hidden;">Back</button>
@@ -138,10 +138,9 @@
                         From GitHub Gist
                     </label>
                     <div class="input-option-content" id="gistInputContent">
-                        <div id="gistNotConnected" class="gist-not-connected">
-                            <p class="gist-not-connected-text">Not connected to GitHub</p>
-                        </div>
+                        <p id="gistNotConnected" class="gist-not-connected-text">Not connected to GitHub</p>
                         <div id="gistConnectedContent" class="gist-connected-content">
+                            <label for="loadGistSelector" class="visually-hidden">Select a Gist to load</label>
                             <select id="loadGistSelector" class="gist-select">
                                 <option value="">Loading gists...</option>
                             </select>
@@ -191,10 +190,9 @@
                         To GitHub Gist
                     </label>
                     <div class="save-option-content" style="display: none;">
-                        <div id="saveGistNotConnected" class="gist-not-connected">
-                            <p class="gist-not-connected-text">Not connected to GitHub</p>
-                        </div>
+                        <p id="saveGistNotConnected" class="gist-not-connected-text">Not connected to GitHub</p>
                         <div id="saveGistConnectedContent" class="gist-connected-content" style="display: none;">
+                            <label for="saveGistSelector" class="visually-hidden">Select a Gist to save to</label>
                             <select id="saveGistSelector" class="gist-select">
                                 <option value="">Loading gists...</option>
                             </select>
@@ -207,6 +205,7 @@
 
         <!-- Export & Reset Section (hidden until papers are loaded) -->
         <section class="export-reset-section" id="exportResetSection" style="display: none;" aria-labelledby="exportResetHeading">
+            <h2 id="exportResetHeading" class="visually-hidden">Export and Reset</h2>
             <div class="export-reset-buttons">
                 <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
                 <button id="exportBibtexTaggedBtn" type="button" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
@@ -216,6 +215,7 @@
 
         <!-- GitHub Gist Sync Section -->
         <section class="github-sync-section" id="githubSection" aria-labelledby="githubHeading">
+            <h2 id="githubHeading" class="visually-hidden">GitHub Integration</h2>
 
             <!-- GitHub Auth Bar -->
             <div class="github-auth-bar">
