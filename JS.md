@@ -20,7 +20,7 @@
 
 | Module | Purpose | Exports |
 |--------|---------|---------|
-| `lib/state.js` | Global state management | `state`, `WORKER_BASE_URL` |
+| `lib/state.js` | Global state management with immutability and auto-persistence | `state`, `store`, `WORKER_BASE_URL` |
 | `lib/auth.js` | GitHub OAuth session management | `getSessionId`, `setSessionId`, `clearSessionId`, `checkSession`, `initiateLogin`, `logout`, `updateGitHubUI`, `loadGitHubAuth`, `updateSaveGistVisibility`, `updateGistVisibility`, `initGitHubAuth`, `restorePapersState` |
 | `lib/github.js` | GitHub Gist CRUD operations | `listGists`, `getGist`, `createGist`, `updateGist`, `loadGistOptionsForLoadSelector`, `loadGistOptionsForSaveSelector`, `loadFromGistCollection`, `saveToGistCollection` |
 | `lib/papers.js` | DOI, BibTeX, processing, rendering | `extractDOI`, `fetchBibTeX`, `fetchAbstractFromSemanticScholar`, `fetchAbstractFromCrossref`, `fetchAbstract`, `fetchPagesFromCrossref`, `addPagesToBibTeX`, `parseBibTeX`, `formatAuthors`, `generateDefaultKey`, `addPaperByDoi`, `createPaperCard`, `processPapers`, `displayPapers`, `renderPapers`, `applyTagFilter`, `hasSelectedTag`, `updateTagVisuals` |
@@ -31,14 +31,24 @@
 
 ## Module: lib/state.js
 
-**Purpose**: Centralized state management and shared constants.
+**Purpose**: Immutable state store with auto-persistence to sessionStorage.
 
 ### Exports
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `state` | Object | Global state object containing all application state |
+| `store` | Object | Store API for immutable state mutations |
+| `state` | Proxy | Read-only proxy for backward compatibility (warns on writes) |
 | `WORKER_BASE_URL` | String | CloudFlare Worker base URL for GitHub OAuth proxy |
+
+### Store API
+
+| Method | Description | Auto-persist? |
+|--------|-------------|---------------|
+| `store.get()` | Get immutable copy of current state | No |
+| `store.set(updates)` | Update state with partial updates (immutable) | Yes |
+| `store.setSelectedTags(tags)` | Set selected tags (handles Set conversion) | Yes |
+| `store.subscribe(fn)` | Subscribe to state changes, returns unsubscribe | No |
 
 ### State Properties
 
@@ -50,6 +60,30 @@
 | `state.currentEditingKey` | String/null | Key of paper currently being edited |
 | `state.tentativeTags` | Array | Tags being added/edited (not yet saved) |
 | `state.tentativeTagsRemoved` | Array | Tags tentatively marked for removal |
+
+### Usage
+
+```javascript
+import { store, state } from './state.js';
+
+// Read state (works for both)
+console.log(state.papersData); // Backward compatible
+console.log(store.get().papersData); // New API
+
+// Update state (use store API)
+store.set({ papersData: newData });
+store.setSelectedTags(['tag1', 'tag2']);
+
+// Subscribe to changes
+const unsubscribe = store.subscribe((newState) => {
+    console.log('State changed:', newState);
+});
+unsubscribe(); // Stop listening
+```
+
+### Persistence
+
+State is automatically persisted to `sessionStorage` on every mutation. On page load, state is restored from storage. The `selectedTags` Set is converted to/from Array for JSON serialization.
 
 ---
 
