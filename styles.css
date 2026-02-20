@@ -226,6 +226,7 @@ body {
     padding: 0;
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-soft);
+    color: var(--color-icon-theme);
 }
 
 .theme-toggle:hover {
@@ -242,7 +243,7 @@ body {
 .theme-toggle__icon {
     width: 20px;
     height: 20px;
-    stroke: var(--color-icon-theme);
+    color: var(--color-icon-theme);
     transition: transform var(--transition-fast);
 }
 
@@ -637,6 +638,14 @@ body {
 .export-section__btn:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+}
+
+.export-section__btn:disabled {
+    background: var(--color-text-muted);
+    color: var(--color-bg);
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
 }
 
 /* ==========================================================================
@@ -1398,28 +1407,43 @@ body {
 }
 
 .onboarding__dot {
-    width: 10px;
-    height: 10px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: var(--color-border);
+    background: transparent;
     transition: all var(--transition-fast);
     cursor: pointer;
     border: none;
-    padding: 17px;
-    background-clip: content-box;
+    padding: 0;
+    position: relative;
 }
 
-.onboarding__dot:hover {
-    background: var(--color-bg-hover);
-    transform: scale(1.1);
+.onboarding__dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-text-secondary);
+    opacity: 0.5;
+    transition: all var(--transition-fast);
 }
 
-.onboarding__dot--active {
+.onboarding__dot:hover::after {
+    opacity: 0.75;
+}
+
+.onboarding__dot--active::after {
     background: var(--color-accent);
-    transform: scale(1.2);
+    width: 14px;
+    height: 14px;
+    opacity: 1;
 }
 
-.onboarding__dot--active:hover {
+.onboarding__dot--active:hover::after {
     background: var(--color-accent-hover);
 }
 
