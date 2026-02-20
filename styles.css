@@ -1402,7 +1402,7 @@ body {
 .onboarding__dots {
     display: flex;
     justify-content: center;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     margin-bottom: var(--space-xl);
 }
 
@@ -1548,7 +1548,7 @@ body {
 }
 
 .footer__social-link {
-    color: var(--color-text);
+    color: var(--color-text-secondary);
     opacity: 0.75;
     transition: all var(--transition-fast);
 }
@@ -1646,7 +1646,7 @@ body {
    EMPTY STATES
    ========================================================================== */
 
-.loading,
+.loading:not(.btn):not(.gist__btn),
 .no-papers {
     text-align: center;
     padding: 36px var(--space-xl);
