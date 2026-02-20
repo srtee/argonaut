@@ -6,7 +6,7 @@
     --container-bg: #FFFBF7;
     --text-color: #2D2A26;
     --text-secondary: #5C5750;
-    --muted-text: #9A958E;
+    --muted-text: #78746E;
     --input-border: #E5E2DB;
     --border-color: #D5D0C8;
     --input-bg: #FFFBF7;
@@ -22,7 +22,7 @@
     --tag-accent-3: #8B7B9E;
     --tag-accent-4: #6B7B8C;
     --alsoread-bg: #F5EFE6;
-    --alsoread-color: #8B6914;
+    --alsoread-color: #785E10;
     --abstract-bg: #F8F6F2;
     --abstract-border: #E5E2DB;
     --comments-color: #7A736A;
@@ -44,7 +44,7 @@
     --container-bg: #1A1F2C;
     --text-color: #E8E4DE;
     --text-secondary: #B8B4AC;
-    --muted-text: #6B6862;
+    --muted-text: #888681;
     --input-border: #3A404D;
     --border-color: #4A5060;
     --input-bg: #232938;
@@ -172,8 +172,8 @@ body {
     background: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: 999px;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -876,13 +876,14 @@ body {
 .tag {
     background: var(--tag-bg);
     color: var(--tag-color);
-    padding: 5px 12px;
+    padding: 8px 14px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease-out;
     border: 1px solid transparent;
+    min-height: 28px;
 }
 
 /* Default state (no tags selected) */
@@ -1414,14 +1415,15 @@ button:disabled {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease-out;
     z-index: 10;
+    color: #5C5750;
 }
 
 .onboarding-close-btn svg {
@@ -1430,7 +1432,6 @@ button:disabled {
 }
 
 .onboarding-close-btn svg line {
-    stroke: #5C5750;
     stroke-width: 2;
     stroke-linecap: round;
 }
@@ -1438,10 +1439,7 @@ button:disabled {
 .onboarding-close-btn:hover {
     background: var(--hover-bg);
     border-color: var(--accent-color);
-}
-
-.onboarding-close-btn:hover svg line {
-    stroke: #2D2A26;
+    color: #2D2A26;
 }
 
 .onboarding-close-btn:focus-visible {
@@ -1450,12 +1448,12 @@ button:disabled {
 }
 
 /* Dark mode close button */
-[data-theme="dark"] .onboarding-close-btn svg line {
-    stroke: #B8B4AC;
+[data-theme="dark"] .onboarding-close-btn {
+    color: #B8B4AC;
 }
 
-[data-theme="dark"] .onboarding-close-btn:hover svg line {
-    stroke: #E8E4DE;
+[data-theme="dark"] .onboarding-close-btn:hover {
+    color: #E8E4DE;
 }
 
 .onboarding-step {
@@ -1519,7 +1517,8 @@ button:disabled {
     transition: all 0.3s ease-out;
     cursor: pointer;
     border: none;
-    padding: 0;
+    padding: 17px;
+    background-clip: content-box;
 }
 
 .onboarding-dot:hover {

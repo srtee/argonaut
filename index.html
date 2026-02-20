@@ -18,8 +18,8 @@
         <div class="onboarding-content">
             <button id="closeOnboardingBtn" class="onboarding-close-btn" aria-label="Close onboarding" type="button">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                    <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+                    <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
                 </svg>
             </button>
             <div class="onboarding-step" data-step="0">
@@ -77,7 +77,7 @@
                     </g>
                     <!-- Moon icon (shown in light mode) -->
                     <g class="moon-icon">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="#4b5563" stroke-width="2" fill="none"/>
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none"/>
                     </g>
                 </svg>
             </button>
@@ -217,7 +217,7 @@
             <span class="github-label">GitHub:</span>
             <span id="githubNotLoggedIn" class="github-not-logged-in">not logged in</span>
             <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
-                <img src="" alt="" class="github-user-avatar" id="githubUserAvatar">
+                <img src="" alt="User avatar" class="github-user-avatar" id="githubUserAvatar">
                 <span class="github-user-name" id="githubUserName"></span>
             </div>
             <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">Connect</button>
