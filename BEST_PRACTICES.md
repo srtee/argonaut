@@ -46,21 +46,46 @@ dom.gistSelector().innerHTML = ''; // Fails fast if element missing
 
 ### Do: Use BEM naming and CSS custom properties
 
+**BEM (Block Element Modifier)** is a naming convention that makes CSS predictable and maintainable:
+
+- **Block**: Standalone component (`.paper`, `.tag`, `.onboarding`)
+- **Element**: Part of a block, separated by `__` (`.paper__title`, `.tag__remove`)
+- **Modifier**: Variation of block/element, separated by `--` (`.paper--highlight`, `.tag--selected`)
+
 ```css
-/* Good - Predictable specificity */
-.save-option--gist { }
-.save-option__select { }
-.save-option__btn {
+/* Good - Predictable BEM structure */
+.save-section { }              /* Block */
+.save-section__option { }      /* Element */
+.save-section__option--active { }  /* Modifier */
+.save-section__btn {
     background: var(--btn-primary-bg);
     color: var(--btn-primary-color);
 }
 
 /* Component variants, no overrides needed */
-.btn--primary { }
-.btn--secondary { }
+.btn { }                  /* Base block */
+.btn--primary { }         /* Primary modifier */
+.btn--secondary { }       /* Secondary modifier */
+
+/* Paper card example */
+.paper { }                      /* Block */
+.paper__header { }              /* Element */
+.paper__title { }               /* Element */
+.paper--highlight { }           /* Modifier */
+.paper--dimmed { }              /* Modifier */
+
+/* Tag example */
+.tag { }                        /* Block */
+.tag--selected { }              /* Modifier */
+.tag--deselected { }            /* Modifier */
 ```
 
-**Why**: Specificity becomes predictable. Theming is simple via custom properties. No `!important` needed.
+**Why**:
+- Single-class selectors (low specificity, easy to override)
+- Clear relationship between HTML and CSS
+- No nesting required (flatter CSS)
+- Theming via custom properties
+- No `!important` needed
 
 ---
 

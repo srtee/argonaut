@@ -8,142 +8,144 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1.6.7">
+    <link rel="stylesheet" href="styles.css?v=2.0.1">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
 
     <!-- Onboarding Modal -->
-    <div id="onboardingModal" class="onboarding-modal" role="dialog" aria-labelledby="onboardingHeading" aria-hidden="true">
-        <div class="onboarding-content">
-            <button id="closeOnboardingBtn" class="onboarding-close-btn" aria-label="Close onboarding" type="button">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <div id="onboardingModal" class="onboarding" role="dialog" aria-labelledby="onboardingHeading" aria-hidden="true">
+        <div class="onboarding__content">
+            <button id="closeOnboardingBtn" class="onboarding__close" aria-label="Close onboarding" type="button">
+                <svg class="onboarding__close-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
                     <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
                 </svg>
             </button>
-            <div class="onboarding-step" data-step="0">
-                <h2 id="onboardingHeading">Welcome to Argonaut!</h2>
-                <p>A browser-based bibliography manager that stores your papers as JSON.</p>
+            <div class="onboarding__step" data-step="0">
+                <h2 id="onboardingHeading" class="onboarding__title">Welcome to Argonaut!</h2>
+                <p class="onboarding__text">A browser-based bibliography manager that stores your papers as JSON.</p>
             </div>
-            <div class="onboarding-step" data-step="1">
-                <h2>Load Your Papers</h2>
-                <p>Import your collection from a JSON file, URL, browser storage, or GitHub Gist using the <strong>Load JSON Collection</strong> section.</p>
+            <div class="onboarding__step" data-step="1">
+                <h2 class="onboarding__title">Load Your Papers</h2>
+                <p class="onboarding__text">Import your collection from a JSON file, URL, browser storage, or GitHub Gist using the <strong>Load JSON Collection</strong> section.</p>
             </div>
-            <div class="onboarding-step" data-step="2">
-                <h2>Add Papers by DOI</h2>
-                <p>Quickly add papers by entering a DOI or URL in the <strong>Add A Paper By DOI</strong> section. We'll fetch the BibTeX and abstract automatically.</p>
+            <div class="onboarding__step" data-step="2">
+                <h2 class="onboarding__title">Add Papers by DOI</h2>
+                <p class="onboarding__text">Quickly add papers by entering a DOI or URL in the <strong>Add A Paper By DOI</strong> section. We'll fetch the BibTeX and abstract automatically.</p>
             </div>
-            <div class="onboarding-step" data-step="3">
-                <h2>Save & Export</h2>
-                <p>Save your collection to a file, browser storage, or GitHub Gist. Export as BibTeX for use in LaTeX or other citation managers.</p>
+            <div class="onboarding__step" data-step="3">
+                <h2 class="onboarding__title">Save & Export</h2>
+                <p class="onboarding__text">Save your collection to a file, browser storage, or GitHub Gist. Export as BibTeX for use in LaTeX or other citation managers.</p>
             </div>
-            <div class="onboarding-step" data-step="4">
-                <h2>Organize Your Papers</h2>
-                <p>Add tags to filter and group your papers. Use the comment box on each paper to add your notes and thoughts.</p>
+            <div class="onboarding__step" data-step="4">
+                <h2 class="onboarding__title">Organize Your Papers</h2>
+                <p class="onboarding__text">Add tags to filter and group your papers. Use the comment box on each paper to add your notes and thoughts.</p>
             </div>
-            <div class="onboarding-step" data-step="5">
-                <h2>You're Ready!</h2>
-                <p>Click "Get Started" to begin using Argonaut. You can view this guide again from the help link in the footer.</p>
+            <div class="onboarding__step" data-step="5">
+                <h2 class="onboarding__title">You're Ready!</h2>
+                <p class="onboarding__text">Click "Get Started" to begin using Argonaut. You can view this guide again from the help link in the footer.</p>
             </div>
-            <div class="onboarding-navigation">
-                <div class="onboarding-dots" role="tablist" aria-label="Onboarding progress">
-                    <button type="button" class="onboarding-dot active" data-step="0" role="tab" aria-selected="true" aria-label="Step 1: Welcome"></button>
-                    <button type="button" class="onboarding-dot" data-step="1" role="tab" aria-selected="false" aria-label="Step 2: Load Papers"></button>
-                    <button type="button" class="onboarding-dot" data-step="2" role="tab" aria-selected="false" aria-label="Step 3: Add by DOI"></button>
-                    <button type="button" class="onboarding-dot" data-step="3" role="tab" aria-selected="false" aria-label="Step 4: Save and Export"></button>
-                    <button type="button" class="onboarding-dot" data-step="4" role="tab" aria-selected="false" aria-label="Step 5: Organize"></button>
-                    <button type="button" class="onboarding-dot" data-step="5" role="tab" aria-selected="false" aria-label="Step 6: Get Started"></button>
+            <div class="onboarding__nav">
+                <div class="onboarding__dots" role="tablist" aria-label="Onboarding progress">
+                    <button type="button" class="onboarding__dot onboarding__dot--active" data-step="0" role="tab" aria-selected="true" aria-label="Step 1: Welcome"></button>
+                    <button type="button" class="onboarding__dot" data-step="1" role="tab" aria-selected="false" aria-label="Step 2: Load Papers"></button>
+                    <button type="button" class="onboarding__dot" data-step="2" role="tab" aria-selected="false" aria-label="Step 3: Add by DOI"></button>
+                    <button type="button" class="onboarding__dot" data-step="3" role="tab" aria-selected="false" aria-label="Step 4: Save and Export"></button>
+                    <button type="button" class="onboarding__dot" data-step="4" role="tab" aria-selected="false" aria-label="Step 5: Organize"></button>
+                    <button type="button" class="onboarding__dot" data-step="5" role="tab" aria-selected="false" aria-label="Step 6: Get Started"></button>
                 </div>
-                <div class="onboarding-buttons">
-                    <button id="onboardingBackBtn" class="onboarding-nav-btn" style="visibility: hidden;">Back</button>
-                    <button id="onboardingNextBtn" class="onboarding-nav-btn">Next</button>
-                    <button id="onboardingCompleteBtn" class="onboarding-nav-btn primary" style="display: none;">Get Started</button>
+                <div class="onboarding__buttons">
+                    <button id="onboardingBackBtn" class="onboarding__btn" style="visibility: hidden;">Back</button>
+                    <button id="onboardingNextBtn" class="onboarding__btn">Next</button>
+                    <button id="onboardingCompleteBtn" class="onboarding__btn onboarding__btn--primary" style="display: none;">Get Started</button>
                 </div>
             </div>
         </div>
     </div>
 
     <main class="container" id="mainContent" tabindex="-1">
-        <div class="header-container">
-            <h1 class="header-title">Argonaut</h1>
-            <p class="header-subtitle">browser-based, JSON-stored bibliographies</p>
-            <button id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false" type="button">
-                <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
-                    <!-- Sun icon (shown in dark mode) -->
-                    <g class="sun-icon" style="display: none;">
-                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </g>
-                    <!-- Moon icon (shown in light mode) -->
-                    <g class="moon-icon">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none"/>
-                    </g>
-                </svg>
-            </button>
+        <div class="header">
+            <h1 class="header__title">Argonaut</h1>
+            <p class="header__subtitle">browser-based, JSON-stored bibliographies</p>
+            <div class="header__toggle">
+                <button id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false" type="button">
+                    <svg id="themeIcon" class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <!-- Sun icon (shown in dark mode) -->
+                        <g class="theme-toggle__icon--sun" style="display: none;">
+                            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        <!-- Moon icon (shown in light mode) -->
+                        <g class="theme-toggle__icon--moon">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </g>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Add A Paper By DOI Section (always visible) -->
-        <section class="add-doi-section add-doi-input-section" id="addDoiSection" aria-labelledby="addDoiHeading">
-            <h2 id="addDoiHeading">Add A Paper By DOI:</h2>
-            <div class="add-doi-inputs">
-                <div class="input-group">
-                    <label for="doiInput" class="input-label">DOI or URL</label>
-                    <input type="text" id="doiInput" class="doi-input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx">
+        <section class="doi-section" id="addDoiSection" aria-labelledby="addDoiHeading">
+            <h2 id="addDoiHeading" class="doi-section__title">Add A Paper By DOI:</h2>
+            <div class="doi-section__inputs">
+                <div class="doi-section__group">
+                    <label for="doiInput" class="doi-section__label">DOI or URL</label>
+                    <input type="text" id="doiInput" class="doi-section__input" placeholder="10.xxxx/xxxx or https://doi.org/10.xxxx/xxxx">
                 </div>
-                <div class="input-group">
-                    <label for="doiKeyInput" class="input-label">Key (optional)</label>
-                    <input type="text" id="doiKeyInput" class="doi-key-input" placeholder="e.g., Smith2024">
+                <div class="doi-section__group">
+                    <label for="doiKeyInput" class="doi-section__label">Key (optional)</label>
+                    <input type="text" id="doiKeyInput" class="doi-section__input" placeholder="e.g., Smith2024">
                 </div>
-                <button id="addDoiBtn" type="button" class="add-doi-btn" aria-label="Add paper from DOI">Add DOI</button>
+                <button id="addDoiBtn" type="button" class="btn btn--doi" aria-label="Add paper from DOI">Add DOI</button>
             </div>
             <div id="status" class="status" role="status" aria-live="polite"></div>
         </section>
 
         <!-- Load JSON Collection Section -->
-        <section class="input-section load-json-section" id="loadJsonSection" aria-labelledby="loadJsonHeading">
-            <h2 id="loadJsonHeading">Load JSON Collection:</h2>
-            <div class="input-options">
-                <div class="input-option" data-input="url">
-                    <label class="input-option-label">
+        <section class="input-section input-section--load" id="loadJsonSection" aria-labelledby="loadJsonHeading">
+            <h2 id="loadJsonHeading" class="input-section__title">Load JSON Collection:</h2>
+            <div class="input-section__options">
+                <div class="input-section__option input-section__option--active" data-input="url">
+                    <label class="input-section__label">
                         <input type="radio" name="inputMethod" value="url" checked id="inputMethodUrl">
                         From URL
                     </label>
-                    <div class="input-option-content" id="urlInputContent">
+                    <div class="input-section__content" id="urlInputContent">
                         <input type="text" id="urlInput" value="https://gist.githubusercontent.com/srtee/04ee671f6f27d64de800f00eb9280a21/raw/papers.json" placeholder="Enter JSON URL" class="url-input" aria-label="Enter JSON file URL">
-                        <button id="loadUrlBtn" type="button" aria-label="Load papers from URL">Load</button>
+                        <button id="loadUrlBtn" type="button" class="btn" aria-label="Load papers from URL">Load</button>
                     </div>
                 </div>
-                <div class="input-option" data-input="file">
-                    <label class="input-option-label">
+                <div class="input-section__option" data-input="file">
+                    <label class="input-section__label">
                         <input type="radio" name="inputMethod" value="file" id="inputMethodFile">
                         From File
                     </label>
-                    <div class="input-option-content" id="fileInputContent">
+                    <div class="input-section__content" id="fileInputContent">
                         <input type="file" id="fileInput" accept=".json" class="file-input" aria-labelledby="inputMethodFile">
                     </div>
                 </div>
-                <div class="input-option" data-input="storage">
-                    <label class="input-option-label">
+                <div class="input-section__option" data-input="storage">
+                    <label class="input-section__label">
                         <input type="radio" name="inputMethod" value="storage" id="inputMethodStorage">
                         From Browser Storage
                     </label>
-                    <div class="input-option-content" id="storageInputContent">
-                        <button id="loadFromStorageBtn" type="button" aria-label="Load papers from browser storage">Load from Storage</button>
+                    <div class="input-section__content" id="storageInputContent">
+                        <button id="loadFromStorageBtn" type="button" class="btn" aria-label="Load papers from browser storage">Load from Storage</button>
                     </div>
                 </div>
-                <div class="input-option" data-input="gist">
-                    <label class="input-option-label">
+                <div class="input-section__option" data-input="gist">
+                    <label class="input-section__label">
                         <input type="radio" name="inputMethod" value="gist" id="inputMethodGist">
                         From GitHub Gist
                     </label>
-                    <div class="input-option-content" id="gistInputContent">
-                        <div id="gistConnectedContent" class="gist-connected-content">
+                    <div class="input-section__content" id="gistInputContent">
+                        <div id="gistConnectedContent" class="gist">
                             <label for="loadGistSelector" class="visually-hidden">Select a Gist to load</label>
-                            <select id="loadGistSelector" class="gist-select">
+                            <select id="loadGistSelector" class="gist__select">
                                 <option value="">Loading gists...</option>
                             </select>
-                            <button id="loadFromGistCollectionBtn" type="button" class="load-gist-btn">Load from Gist</button>
+                            <button id="loadFromGistCollectionBtn" type="button" class="btn gist__btn">Load from Gist</button>
                         </div>
                     </div>
                 </div>
@@ -151,50 +153,50 @@
         </section>
 
         <!-- Save JSON Collection Section (hidden until papers are loaded) -->
-        <section class="save-json-section" id="saveJsonSection" style="display: none;" aria-labelledby="saveJsonHeading">
-            <h2 id="saveJsonHeading">Save JSON Collection:</h2>
+        <section class="save-section" id="saveJsonSection" style="display: none;" aria-labelledby="saveJsonHeading">
+            <h2 id="saveJsonHeading" class="save-section__title">Save JSON Collection:</h2>
 
             <!-- Format selector row -->
-            <div class="format-selector-row">
-                <label for="jsonFormatSelector" class="format-label">Format:</label>
-                <select id="jsonFormatSelector" class="format-select">
+            <div class="save-section__format">
+                <label for="jsonFormatSelector" class="save-section__format-label">Format:</label>
+                <select id="jsonFormatSelector" class="save-section__format-select">
                     <option value="full">Full</option>
                     <option value="light">Light</option>
                 </select>
             </div>
 
             <!-- Save destination options -->
-            <div class="save-options">
-                <div class="save-option active" data-save="file">
-                    <label class="save-option-label">
+            <div class="save-section__options">
+                <div class="save-section__option save-section__option--active" data-save="file">
+                    <label class="save-section__option-label">
                         <input type="radio" name="saveMethod" value="file" checked id="saveMethodFile">
                         To File
                     </label>
-                    <div class="save-option-content" id="saveFileContent">
-                        <button id="exportJsonBtn" type="button" class="export-btn">Export JSON</button>
+                    <div class="save-section__option-content" id="saveFileContent">
+                        <button id="exportJsonBtn" type="button" class="btn btn--export">Export JSON</button>
                     </div>
                 </div>
-                <div class="save-option" data-save="storage">
-                    <label class="save-option-label">
+                <div class="save-section__option" data-save="storage">
+                    <label class="save-section__option-label">
                         <input type="radio" name="saveMethod" value="storage" id="saveMethodStorage">
                         To Local Storage
                     </label>
-                    <div class="save-option-content" style="display: none;">
-                        <button id="saveToStorageBtn" type="button" class="export-btn">Save to Storage</button>
+                    <div class="save-section__option-content" style="display: none;">
+                        <button id="saveToStorageBtn" type="button" class="btn btn--export">Save to Storage</button>
                     </div>
                 </div>
-                <div class="save-option" data-save="gist">
-                    <label class="save-option-label">
+                <div class="save-section__option" data-save="gist">
+                    <label class="save-section__option-label">
                         <input type="radio" name="saveMethod" value="gist" id="saveMethodGist">
                         To GitHub Gist
                     </label>
-                    <div class="save-option-content" style="display: none;">
-                        <div id="saveGistConnectedContent" class="gist-connected-content" style="display: none;">
+                    <div class="save-section__option-content" style="display: none;">
+                        <div id="saveGistConnectedContent" class="gist" style="display: none;">
                             <label for="saveGistSelector" class="visually-hidden">Select a Gist to save to</label>
-                            <select id="saveGistSelector" class="gist-select">
+                            <select id="saveGistSelector" class="gist__select">
                                 <option value="">Loading gists...</option>
                             </select>
-                            <button id="saveToGistOptionBtn" type="button" class="save-gist-btn">Save to Gist</button>
+                            <button id="saveToGistOptionBtn" type="button" class="btn gist__btn">Save to Gist</button>
                         </div>
                     </div>
                 </div>
@@ -202,41 +204,41 @@
         </section>
 
         <!-- Export & Reset Section (hidden until papers are loaded) -->
-        <section class="export-reset-section" id="exportResetSection" style="display: none;" aria-labelledby="exportResetHeading">
+        <section class="export-section" id="exportResetSection" style="display: none;" aria-labelledby="exportResetHeading">
             <h2 id="exportResetHeading" class="visually-hidden">Export and Reset</h2>
-            <div class="export-reset-buttons">
-                <button id="exportBibtexAllBtn" type="button" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
-                <button id="exportBibtexTaggedBtn" type="button" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
-                <button id="loadNewBtn" type="button" aria-label="Reset all papers, comments, and tags">Reset All</button>
+            <div class="export-section__buttons">
+                <button id="exportBibtexAllBtn" type="button" class="export-section__btn" aria-label="Export all papers as BibTeX file">Export BibTeX (all)</button>
+                <button id="exportBibtexTaggedBtn" type="button" class="export-section__btn" aria-label="Export only tagged papers as BibTeX file">Export BibTeX (only tagged)</button>
+                <button id="loadNewBtn" type="button" class="export-section__btn" aria-label="Reset all papers, comments, and tags">Reset All</button>
             </div>
         </section>
 
         <!-- GitHub Gist Sync Section -->
-        <section class="github-sync-section" id="githubSection" aria-labelledby="githubHeading">
+        <section class="github" id="githubSection" aria-labelledby="githubHeading">
             <h2 id="githubHeading" class="visually-hidden">GitHub Integration</h2>
-            <span class="github-label">GitHub:</span>
-            <span id="githubNotLoggedIn" class="github-not-logged-in">not logged in</span>
-            <div id="githubLoggedIn" class="github-logged-in" style="display: none;">
-                <img src="" alt="User avatar" class="github-user-avatar" id="githubUserAvatar">
-                <span class="github-user-name" id="githubUserName"></span>
+            <span class="github__label">GitHub:</span>
+            <span id="githubNotLoggedIn" class="github__not-logged-in">not logged in</span>
+            <div id="githubLoggedIn" class="github__logged-in" style="display: none;">
+                <img src="" alt="User avatar" class="github__avatar" id="githubUserAvatar">
+                <span class="github__username" id="githubUserName"></span>
             </div>
-            <button id="githubConnectBtn" type="button" class="github-connect-btn" aria-label="Connect to GitHub">Connect</button>
-            <button id="githubLogoutBtn" type="button" class="github-logout-btn" style="display: none;" aria-label="Disconnect from GitHub">Logout</button>
+            <button id="githubConnectBtn" type="button" class="btn" aria-label="Connect to GitHub">Connect</button>
+            <button id="githubLogoutBtn" type="button" class="btn btn--secondary" style="display: none;" aria-label="Disconnect from GitHub">Logout</button>
         </section>
 
         <!-- Papers List Section -->
-        <section class="papers-section" id="papersSection" style="display: none;" aria-live="polite">
-            <div id="papersList" class="papers-list" role="list" aria-label="List of papers">
+        <section class="papers" id="papersSection" style="display: none;" aria-live="polite">
+            <div id="papersList" class="papers__list" role="list" aria-label="List of papers">
                 <!-- Papers will be rendered here -->
             </div>
         </section>
 
         <div id="error" class="error" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
-        <footer class="attribution">
+        <footer class="footer">
             <small>Vibe-coded by Shern Ren Tee with Claude Code + Ollama Cloud GLM 4.7</small>
-            <button id="showOnboardingBtn" class="footer-link" type="button">Show onboarding guide</button>
-            <nav class="social-links" aria-label="Social media links">
+            <button id="showOnboardingBtn" class="footer__link" type="button">Show onboarding guide</button>
+            <nav class="footer__social" aria-label="Social media links">
                 <a href="https://www.linkedin.com/in/shern-tee-phd-8172241b3/" target="_blank" rel="noopener noreferrer" aria-label="Connect on LinkedIn (opens in new tab)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>

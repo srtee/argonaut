@@ -4,6 +4,22 @@
 
 ---
 
+## CSS Architecture: BEM Methodology
+
+This project follows the **BEM (Block Element Modifier)** naming convention for CSS classes:
+
+- **Block**: Standalone component (e.g., `.paper`, `.tag`, `.onboarding`)
+- **Element**: Part of a block, separated by double underscore (e.g., `.paper__title`, `.tag__remove`)
+- **Modifier**: Variation of a block/element, separated by double dash (e.g., `.paper--highlight`, `.tag--selected`)
+
+### Benefits
+- Predictable and maintainable CSS
+- No specificity wars
+- Reusable components
+- Clear relationship between HTML and CSS
+
+---
+
 ## Page Structure
 
 The page uses semantic HTML with a main container (`#mainContent`) containing several sections that show/hide based on application state.
@@ -36,7 +52,7 @@ The page uses semantic HTML with a main container (`#mainContent`) containing se
 
 | ID | Module | Usage |
 |----|--------|-------|
-| `#papersList` | `ui.js`, `papers.js` | Container for dynamically created `.paper-card` elements |
+| `#papersList` | `ui.js`, `papers.js` | Container for dynamically created `.paper` elements |
 
 ### Load JSON Collection
 
@@ -115,8 +131,8 @@ The page uses semantic HTML with a main container (`#mainContent`) containing se
 | `#onboardingNextBtn` | `ui.js` | Triggers `nextStep()` |
 | `#onboardingCompleteBtn` | `ui.js` | Triggers `completeOnboarding()` |
 | `#showOnboardingBtn` | `ui.js` | Footer link, triggers `showOnboarding()` |
-| `.onboarding-step` | `ui.js` | Content panels (6 steps, `data-step="0-5"`) |
-| `.onboarding-dot` | `ui.js` | Navigation dots (6 dots, `data-step="0-5"`) |
+| `.onboarding__step` | `ui.js` | Content panels (6 steps, `data-step="0-5"`) |
+| `.onboarding__dot` | `ui.js` | Navigation dots (6 dots, `data-step="0-5"`) |
 
 ---
 
@@ -124,66 +140,71 @@ The page uses semantic HTML with a main container (`#mainContent`) containing se
 
 | Attribute | Element | Stores | Usage |
 |-----------|---------|--------|-------|
-| `data-key` | `.paper-card`, `.tag`, `edit-tags-btn`, textarea.comments | Paper citation key | Identifies which paper/element belongs to which paper |
-| `data-tag` | `.tag`, `.edit-tag-item` | Tag name | For filtering and editing |
-| `data-step` | `.onboarding-step`, `.onboarding-dot` | Step number (0-5) | For onboarding navigation |
-| `data-input` | `.input-option` | Input method value | Maps radio button to content section |
-| `data-save` | `.save-option` | Save method value | Maps radio button to content section |
+| `data-key` | `.paper`, `.tag`, `.tag-edit-btn`, textarea.comments | Paper citation key | Identifies which paper/element belongs to which paper |
+| `data-tag` | `.tag`, `.tag-editor__item` | Tag name | For filtering and editing |
+| `data-step` | `.onboarding__step`, `.onboarding__dot` | Step number (0-5) | For onboarding navigation |
+| `data-input` | `.input-section__option` | Input method value | Maps radio button to content section |
+| `data-save` | `.save-section__option` | Save method value | Maps radio button to content section |
 | `data-theme` | `<html>` | "dark" or not set | Toggles dark mode CSS |
 
 ---
 
 ## Dynamic Content Structure
 
-### Paper Card (`.paper-card`)
+### Paper Card (`.paper`)
 
 Created dynamically by `createPaperCard()` in `papers.js`:
 
 ```html
-<article class="paper-card" data-key="Smith2024">
-    <div class="paper-header">
-        <h3 class="paper-title">Paper Title</h3>
+<article class="paper" data-key="Smith2024">
+    <div class="paper__header">
+        <h3 class="paper__title">Paper Title</h3>
     </div>
-    <p class="citation-line">Authors. Journal. Year. Vol. No. pp. <a href="...">DOI</a></p>
+    <p class="citation">
+        <span class="citation__authors">Authors</span>
+        <span class="citation__journal">Journal</span>
+        <span class="citation__year">Year</span>
+        <a href="..." class="citation__link">DOI</a>
+    </p>
     <textarea class="comments" data-key="Smith2024" aria-label="Notes for this paper">User notes</textarea>
-    <div class="tags-container">
-        <button class="edit-tags-btn" data-key="Smith2024" aria-label="Edit tags">
-            <svg>...</svg>
+    <div class="tags">
+        <button class="tag-edit-btn" data-key="Smith2024" aria-label="Edit tags">
+            <svg class="tag-edit-btn__icon">...</svg>
         </button>
         <button type="button" class="tag" data-tag="AI" aria-pressed="false" tabindex="0">AI</button>
         <button type="button" class="tag" data-tag="NLP" aria-pressed="false" tabindex="0">NLP</button>
     </div>
-    <div class="alsoread-container" role="group" aria-label="Also read papers">
-        <span class="alsoread-label">Also read:</span>
-        <button type="button" class="alsoread-link" data-ref="Other2023" tabindex="0">Other2023</button>
+    <div class="also-read" role="group" aria-label="Also read papers">
+        <span class="also-read__label">Also read:</span>
+        <button type="button" class="also-read__link" data-ref="Other2023" tabindex="0">Other2023</button>
     </div>
     <button class="abstract-toggle" aria-expanded="false" aria-label="Toggle abstract" type="button">
-        <svg>...</svg>
+        <svg class="abstract-toggle__icon">...</svg>
         Abstract
     </button>
-    <div class="abstract-container" aria-hidden="true">
-        <div class="abstract-content">Abstract text...</div>
+    <div class="abstract" aria-hidden="true">
+        <div class="abstract__content">Abstract text...</div>
     </div>
 </article>
 ```
 
-### Tag Editor (`.edit-controls`)
+### Tag Editor (`.tag-editor`)
 
 Created dynamically by `renderInlineTagEditor()` in `ui.js` when editing tags:
 
 ```html
-<div class="edit-controls">
-    <div class="tag-add-container">
-        <input type="text" class="tag-edit-input" placeholder="Add new tag..." aria-label="New tag name">
-        <button type="button" class="add-edit-tag-btn">Add</button>
+<div class="tag-editor">
+    <div class="tag-editor__add">
+        <input type="text" class="tag-editor__input" placeholder="Add new tag..." aria-label="New tag name">
+        <button type="button" class="tag-editor__add-btn">Add</button>
     </div>
-    <div class="edit-tags-list" role="list" aria-label="Tags for this paper">
-        <button type="button" class="edit-tag-item" data-tag="AI" aria-label="Remove tag: AI">AI <span class="tag-remove">×</span></button>
-        <button type="button" class="edit-tag-item tentatively-removed" data-tag="OldTag" aria-label="Restore tag: OldTag">OldTag <span class="tag-restore">+</span></button>
+    <div class="tag-editor__list" role="list" aria-label="Tags for this paper">
+        <button type="button" class="tag-editor__item" data-tag="AI" aria-label="Remove tag: AI">AI <span class="tag-editor__remove">×</span></button>
+        <button type="button" class="tag-editor__item tag-editor__item--removed" data-tag="OldTag" aria-label="Restore tag: OldTag">OldTag <span class="tag-editor__restore">+</span></button>
     </div>
-    <div class="edit-buttons">
-        <button type="button" class="cancel-edit-tags-btn">Cancel</button>
-        <button type="button" class="save-edit-tags-btn">Save Tag Changes</button>
+    <div class="tag-editor__buttons">
+        <button type="button" class="tag-editor__cancel">Cancel</button>
+        <button type="button" class="tag-editor__save">Save Tag Changes</button>
     </div>
 </div>
 ```
@@ -208,14 +229,14 @@ Error and status announcements for screen readers.
 ### ARIA Attributes
 | Attribute | Element | Purpose |
 |-----------|---------|---------|
-| `role="list"` | `#papersList`, `.edit-tags-list` | Semantics for lists |
-| `role="group"` | `.alsoread-container` | Groups related controls |
+| `role="list"` | `#papersList`, `.tag-editor__list` | Semantics for lists |
+| `role="group"` | `.also-read` | Groups related controls |
 | `role="dialog"` | `#onboardingModal` | Modal semantics |
-| `aria-pressed` | `.tag`, `.edit-tags-btn` | Toggle button state |
+| `aria-pressed` | `.tag`, `.tag-edit-btn` | Toggle button state |
 | `aria-expanded` | `.abstract-toggle` | Abstract visibility |
-| `aria-hidden` | `.abstract-container`, `#onboardingModal` | Hide from screen readers when closed |
+| `aria-hidden` | `.abstract`, `#onboardingModal` | Hide from screen readers when closed |
 | `aria-label` | Icon-only buttons | Descriptive label for accessibility |
-| `tabindex="0"` | `.tag`, `.edit-tag-item`, `.alsoread-link` | Make elements keyboard focusable |
+| `tabindex="0"` | `.tag`, `.tag-editor__item`, `.also-read__link` | Make elements keyboard focusable |
 | `aria-labelledby` | Sections | Associate heading with section |
 
 ---
@@ -248,7 +269,7 @@ The following listeners are attached at module load time:
 
 | Event | Delegated Target | Handler | Module |
 |-------|------------------|---------|--------|
-| `click` | `#papersList` | `.edit-tags-btn` clicks | `ui.js` |
+| `click` | `#papersList` | `.tag-edit-btn` clicks | `ui.js` |
 | `blur` (capture) | `#papersList` | `.comments` blur (auto-save) | `ui.js` |
 | `keydown` (Escape) | `document` | Close tag editor | `ui.js` |
 | `click` | `document` | Click outside tag editor | `ui.js` |
@@ -257,19 +278,24 @@ The following listeners are attached at module load time:
 
 ---
 
-## CSS Classes Used by JS
+## CSS Classes Used by JS (BEM Format)
 
 | Class | Added By | Purpose |
 |-------|----------|---------|
-| `.visible` | `showError()`, `showStatus()` | Show error/status notifications |
-| `.active` | Onboarding, input/save options | Mark active step/option |
-| `.editing` | `openTagDialog()` | Mark tags container as being edited |
-| `.expanded` | Abstract toggle | Show abstract content |
-| `.selected` | Tag filtering | Mark tag as selected |
-| `.deselected` | Tag filtering | Mark tag as not selected |
-| `.dimmed` | Tag filtering | Dim paper cards without selected tags |
-| `.highlight` | Added paper focus | Flash effect on new paper |
-| `.loading` | Gist operations | Show loading state on buttons |
+| `.error--visible` | `showError()` | Show error notification |
+| `.status--visible` | `showStatus()` | Show status notification |
+| `.onboarding--active` | Onboarding modal | Show onboarding modal |
+| `.onboarding__step--active` | Onboarding navigation | Mark active step |
+| `.onboarding__dot--active` | Onboarding navigation | Mark active dot |
+| `.input-section__option--active` | Input option toggle | Mark selected input option |
+| `.save-section__option--active` | Save option toggle | Mark selected save option |
+| `.tags--editing` | `openTagDialog()` | Mark tags container as being edited |
+| `.abstract--expanded` | Abstract toggle | Show abstract content |
+| `.tag--selected` | Tag filtering | Mark tag as selected |
+| `.tag--deselected` | Tag filtering | Mark tag as not selected |
+| `.paper--dimmed` | Tag filtering | Dim paper cards without selected tags |
+| `.paper--highlight` | Added paper focus | Flash effect on new paper |
+| `.btn--loading` | Gist operations | Show loading state on buttons |
 
 ---
 
@@ -278,7 +304,7 @@ The following listeners are attached at module load time:
 | Action | `#loadJsonSection` | `#saveJsonSection` | `#exportResetSection` | `#papersSection` | `#githubSection` | `#onboardingModal` |
 |--------|--------------------|---------------------|----------------------|---------------------|-------------------|--------------------|
 | Page load (no onboarding) | `block` | `none` | `none` | `none` | `block` | `none` |
-| Page load (with onboarding) | `block` | `none` | `none` | `none` | `block` | `block` |
+| Page load (with onboarding) | `block` | `none` | `none` | `none` | `block` | `flex` |
 | Papers loaded | `none` | `block` | `block` | `block` | `block` | unchanged |
 | Reset all | `block` | `none` | `none` | `none` | `block` | unchanged |
 | Onboarding complete | unchanged | unchanged | unchanged | unchanged | unchanged | `none` |
