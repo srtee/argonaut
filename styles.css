@@ -1420,29 +1420,25 @@ button:disabled {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-secondary);
     transition: all 0.3s ease-out;
     z-index: 10;
 }
 
 .onboarding-close-btn svg {
-    stroke: currentColor;
     width: 16px;
     height: 16px;
-}
-
-.onboarding-close-btn svg line {
-    stroke: currentColor;
+    stroke: var(--text-color);
+    stroke-width: 2;
+    stroke-linecap: round;
 }
 
 .onboarding-close-btn:hover {
     background: var(--hover-bg);
-    color: var(--text-color);
     border-color: var(--accent-color);
 }
 
-.onboarding-close-btn:hover svg line {
-    stroke: currentColor;
+.onboarding-close-btn:hover svg {
+    stroke: var(--accent-color);
 }
 
 .onboarding-close-btn:focus-visible {
