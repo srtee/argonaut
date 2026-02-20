@@ -1425,10 +1425,24 @@ button:disabled {
     z-index: 10;
 }
 
+.onboarding-close-btn svg {
+    stroke: currentColor;
+    width: 16px;
+    height: 16px;
+}
+
+.onboarding-close-btn svg line {
+    stroke: currentColor;
+}
+
 .onboarding-close-btn:hover {
     background: var(--hover-bg);
     color: var(--text-color);
     border-color: var(--accent-color);
+}
+
+.onboarding-close-btn:hover svg line {
+    stroke: currentColor;
 }
 
 .onboarding-close-btn:focus-visible {
@@ -1557,16 +1571,21 @@ button:disabled {
 }
 
 /* Dark mode specific adjustments for buttons */
-[data-theme="dark"] .onboarding-nav-btn {
+[data-theme="dark"] .onboarding-nav-btn:not(.primary) {
     background: var(--bg-secondary);
 }
 
-[data-theme="dark"] .onboarding-nav-btn:hover {
+[data-theme="dark"] .onboarding-nav-btn:not(.primary):hover {
     background: var(--hover-bg);
 }
 
 [data-theme="dark"] .onboarding-nav-btn.primary {
+    background: var(--accent-color);
     color: #1A1F2C;
+}
+
+[data-theme="dark"] .onboarding-nav-btn.primary:hover {
+    background: var(--accent-hover);
 }
 
 /* GitHub Sync Section */
