@@ -1014,6 +1014,29 @@ body {
     box-shadow: 0 0 0 3px rgba(44, 76, 102, 0.15);
 }
 
+.tag-editor__add-btn {
+    padding: 10px 18px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+}
+
+.tag-editor__add-btn:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+.tag-editor__add-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
 .tag-editor__list {
     display: flex;
     flex-wrap: wrap;
