@@ -1427,7 +1427,10 @@ button:disabled {
 .onboarding-close-btn svg {
     width: 16px;
     height: 16px;
-    stroke: var(--text-color);
+}
+
+.onboarding-close-btn svg line {
+    stroke: #5C5750;
     stroke-width: 2;
     stroke-linecap: round;
 }
@@ -1437,13 +1440,22 @@ button:disabled {
     border-color: var(--accent-color);
 }
 
-.onboarding-close-btn:hover svg {
-    stroke: var(--accent-color);
+.onboarding-close-btn:hover svg line {
+    stroke: #2D2A26;
 }
 
 .onboarding-close-btn:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
+}
+
+/* Dark mode close button */
+[data-theme="dark"] .onboarding-close-btn svg line {
+    stroke: #B8B4AC;
+}
+
+[data-theme="dark"] .onboarding-close-btn:hover svg line {
+    stroke: #E8E4DE;
 }
 
 .onboarding-step {
