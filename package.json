@@ -8,10 +8,13 @@
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:auth": "playwright test auth.spec.js",
-    "test:workflow": "playwright test workflow.spec.js"
+    "test:workflow": "playwright test workflow.spec.js",
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "esbuild": "^0.27.3",
     "http-server": "^14.1.1"
   }
 }

@@ -1,0 +1,12 @@
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# Test results
+test-results/
+
+# IDE
+.vscode/
+.idea/
