@@ -4,6 +4,56 @@
 
 ---
 
+## DOM Registry Pattern
+
+The application uses a **centralized DOM Registry** (`lib/dom.js`) for DOM element management instead of decentralized module-level variables.
+
+### Benefits
+- **Single source of truth** - All DOM element references are in one place
+- **Lazy lookup** - Elements are looked up once and cached
+- **Validation** - Missing elements are logged as warnings on initialization
+- **Debugging** - Clear error messages when required elements are missing
+
+### API
+
+```javascript
+import { get, getMultiple, getRequired, has, initAll } from './dom.js';
+
+// Get element by ID (returns null if not found)
+const element = get('elementId');
+
+// Get required element (throws if not found)
+const element = getRequired('elementId');
+
+// Get multiple elements at once
+const { element1, element2 } = getMultiple('element1', 'element2');
+
+// Check if element exists
+const exists = has('elementId');
+
+// Initialize all registered elements
+initAll();
+```
+
+### Module Registration
+
+Elements are registered by module in `lib/dom.js`:
+
+- **UI Module**: Main sections, inputs, buttons, theme, onboarding
+- **Auth Module**: GitHub authentication elements
+- **Papers Module**: DOI input, papers list
+- **GitHub Module**: Gist selectors and buttons
+
+### Initialization Flow
+
+1. `main.js` calls `dom.initAll()` on `DOMContentLoaded`
+2. `initAll()` registers all elements from each module
+3. Registry validates all elements exist in DOM
+4. Warnings logged for missing elements
+5. Individual modules access elements via `get()` or `getMultiple()`
+
+---
+
 ## CSS Architecture: BEM Methodology
 
 This project follows the **BEM (Block Element Modifier)** naming convention for CSS classes:
@@ -33,6 +83,42 @@ The page uses semantic HTML with a main container (`#mainContent`) containing se
 | GitHub Gist Sync | `#githubSection` | Yes | GitHub authentication and status |
 | Add Paper by DOI | `#addDoiSection` | Yes | Quick DOI entry (always visible) |
 | Onboarding Modal | `#onboardingModal` | Conditional | First-time user guide |
+
+---
+
+## DOM Registry Pattern
+
+The application uses a centralized **DOM Registry** (`lib/dom.js`) for managing DOM element references. This provides a single source of truth for all DOM elements, eliminating duplication and providing validation.
+
+### Registry API
+
+| Function | Description |
+|----------|-------------|
+| `dom.get(id)` | Get element by ID (returns null if not found) |
+| `dom.getRequired(id)` | Get element by ID (throws if not found) |
+| `dom.getMultiple(...ids)` | Get multiple elements at once |
+| `dom.has(id)` | Check if element exists |
+| `dom.initAll()` | Initialize all registered elements |
+| `dom.getStats()` | Get registry statistics |
+
+### Module Registration
+
+Elements are registered by module:
+
+- **UI Module**: `loadJsonSection`, `saveJsonSection`, `papersSection`, `exportResetSection`, `papersList`, `fileInput`, `urlInput`, `loadUrlBtn`, `loadFromStorageBtn`, `loadNewBtn`, `saveToStorageBtn`, `exportJsonBtn`, `exportBibtexAllBtn`, `exportBibtexTaggedBtn`, `jsonFormatSelector`, `error`, `status`, `themeToggle`, `onboardingModal`, `closeOnboardingBtn`, `showOnboardingBtn`
+
+- **Auth Module**: `githubSection`, `githubNotLoggedIn`, `githubLoggedIn`, `githubConnectBtn`, `githubLogoutBtn`, `githubUserAvatar`, `githubUserName`, `gistConnectedContent`, `saveGistConnectedContent`
+
+- **Papers Module**: `papersList`, `loadJsonSection`, `saveJsonSection`, `exportResetSection`, `papersSection`, `doiInput`, `doiKeyInput`, `addDoiBtn`, `status`, `exportBibtexTaggedBtn`
+
+- **GitHub Module**: `loadGistSelector`, `saveGistSelector`, `loadFromGistCollectionBtn`, `saveToGistOptionBtn`, `gistConnectedContent`, `saveGistConnectedContent`, `jsonFormatSelector`
+
+### Initialization Flow
+
+1. `main.js` calls `dom.initAll()` on DOMContentLoaded
+2. Registry registers all elements from all modules
+3. Validation runs to check for missing elements (warnings logged)
+4. Individual module `initDOM()` functions get elements via `get()` or `getMultiple()`
 
 ---
 
