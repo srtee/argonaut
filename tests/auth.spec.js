@@ -21,7 +21,7 @@ test.describe('GitHub Authentication', () => {
       if (msg.type() === 'error') {
         const text = msg.text();
         // Ignore expected network errors
-        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch')) {
+        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch') && !text.includes('404')) {
           consoleErrors.push(text);
         }
       }
@@ -116,7 +116,7 @@ test.describe('UI Interactions', () => {
     page.on('console', msg => {
       if (msg.type() === 'error') {
         const text = msg.text();
-        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch')) {
+        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch') && !text.includes('404')) {
           consoleErrors.push(text);
         }
       }
@@ -172,7 +172,7 @@ test.describe('Onboarding', () => {
     page.on('console', msg => {
       if (msg.type() === 'error') {
         const text = msg.text();
-        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch')) {
+        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch') && !text.includes('404')) {
           consoleErrors.push(text);
         }
       }

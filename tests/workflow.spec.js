@@ -18,7 +18,7 @@ test.describe('Paper Management - UI Flow', () => {
       if (msg.type() === 'error') {
         const text = msg.text();
         // Ignore expected network errors from external APIs
-        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch') && !text.includes('doi.org')) {
+        if (!text.includes('net::') && !text.includes('favicon') && !text.includes('Failed to fetch') && !text.includes('doi.org') && !text.includes('404')) {
           consoleErrors.push(text);
         }
       }

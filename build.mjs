@@ -30,7 +30,7 @@ const buildOptions = {
 };
 
 // Files to copy to dist
-const staticFiles = ['index.html', 'styles.css'];
+const staticFiles = ['index.html', 'styles.css', 'papers.json'];
 
 // Copy static files to dist
 function copyStaticFiles() {
