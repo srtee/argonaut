@@ -3,6 +3,7 @@
 
 import * as esbuild from 'esbuild';
 import fs from 'fs';
+import path from 'path';
 
 const isWatch = process.argv.includes('--watch');
 
@@ -28,20 +29,33 @@ const buildOptions = {
     },
 };
 
+// Files to copy to dist
+const staticFiles = ['index.html', 'styles.css'];
+
+// Copy static files to dist
+function copyStaticFiles() {
+    for (const file of staticFiles) {
+        if (fs.existsSync(file)) {
+            fs.copyFileSync(file, path.join('dist', file));
+            console.log(`Copied ${file} to dist/`);
+        }
+    }
+}
+
 // Read current index.html and update it with the new bundle path
 function updateIndexHtml(bundleFileName) {
-    const htmlPath = 'index.html';
-    let html = fs.readFileSync(htmlPath, 'utf8');
+    const htmlPath = 'dist/index.html';
+    let html = fs.readFileSync('index.html', 'utf8');
 
     // Replace the script src - handle both lib/main.js and dist/main.*.js
     html = html.replace(
         /<script type="module" src="lib\/main\.js(\?[^"]*)"><\/script>/,
-        `<script type="module" src="dist/${bundleFileName}"></script>`
+        `<script type="module" src="${bundleFileName}"></script>`
     );
     // Also handle case where dist path already exists (rebuild)
     html = html.replace(
         /<script type="module" src="dist\/main\.[^"]+"><\/script>/,
-        `<script type="module" src="dist/${bundleFileName}"></script>`
+        `<script type="module" src="${bundleFileName}"></script>`
     );
 
     // Replace CSS version with hash (use same hash as JS)
@@ -52,7 +66,7 @@ function updateIndexHtml(bundleFileName) {
     );
 
     fs.writeFileSync(htmlPath, html);
-    console.log(`Updated index.html with bundle: ${bundleFileName}`);
+    console.log(`Updated dist/index.html with bundle: ${bundleFileName}`);
 }
 
 // Build function
@@ -60,8 +74,16 @@ async function build() {
     console.log('Building with esbuild...');
 
     try {
+        // Ensure dist directory exists
+        if (!fs.existsSync('dist')) {
+            fs.mkdirSync('dist');
+        }
+
         const result = await esbuild.build(buildOptions);
         console.log('Build complete!');
+
+        // Copy static files
+        copyStaticFiles();
 
         // Get the output file name
         const outputDir = 'dist';
