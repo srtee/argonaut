@@ -22,9 +22,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'python3 -m http.server 8081',
+    command: 'npm run build && python3 -m http.server 8081 -d dist',
     port: 8081,
     reuseExistingServer: !process.env.CI,
-    timeout: 30000,
+    timeout: 60000,
   },
 });
