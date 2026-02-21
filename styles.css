@@ -772,10 +772,14 @@ body {
 
 .paper__header {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: flex-start;
-    gap: 14px;
+    gap: var(--space-sm);
     margin-bottom: 10px;
+}
+
+.paper__header .key-edit-btn {
+    order: -1;
 }
 
 .paper__title {
@@ -1199,21 +1203,13 @@ body {
 
 .key-editor {
     display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 100;
-    width: 280px;
-    margin-top: var(--space-xs);
-    padding: var(--space-md);
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    padding: var(--space-sm) 0;
 }
 
 .key-editor--open {
     display: block;
+    animation: slideDown 0.2s ease-out;
 }
 
 .key-editor__content {
