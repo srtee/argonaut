@@ -33,9 +33,14 @@ function updateIndexHtml(bundleFileName) {
     const htmlPath = 'index.html';
     let html = fs.readFileSync(htmlPath, 'utf8');
 
-    // Replace the script src
+    // Replace the script src - handle both lib/main.js and dist/main.*.js
     html = html.replace(
         /<script type="module" src="lib\/main\.js(\?[^"]*)"><\/script>/,
+        `<script type="module" src="dist/${bundleFileName}"></script>`
+    );
+    // Also handle case where dist path already exists (rebuild)
+    html = html.replace(
+        /<script type="module" src="dist\/main\.[^"]+"><\/script>/,
         `<script type="module" src="dist/${bundleFileName}"></script>`
     );
 
