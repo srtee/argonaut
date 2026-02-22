@@ -386,6 +386,45 @@ body {
     box-shadow: 0 0 0 3px rgba(44, 76, 102, 0.15);
 }
 
+.doi-section__checkbox {
+    margin-top: var(--space-md);
+}
+
+.doi-section__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.doi-section__checkbox-input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+}
+
+.doi-section__checkbox {
+    margin-top: var(--space-sm);
+}
+
+.doi-section__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.doi-section__checkbox-input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
 /* ==========================================================================
    BUTTON BLOCK
    ========================================================================== */
