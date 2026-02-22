@@ -298,6 +298,16 @@ body {
     margin-bottom: 10px;
 }
 
+.input-section__label:has(input[type="radio"]:disabled) {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+.input-section__label:has(input[type="radio"]:disabled) {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
 .input-section__label:focus-within {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
@@ -582,6 +592,16 @@ body {
     font-weight: 500;
     color: var(--color-text);
     margin-bottom: 10px;
+}
+
+.save-section__option-label:has(input[type="radio"]:disabled) {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+.save-section__option-label:has(input[type="radio"]:disabled) {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
 }
 
 .save-section__option-label:focus-within {
