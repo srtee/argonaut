@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?E5J7KZLS">
+    <link rel="stylesheet" href="styles.css?WMO6CJP5">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -234,6 +234,15 @@
 
         <!-- Papers List Section -->
         <section class="papers" id="papersSection" style="display: none;" aria-live="polite">
+            <nav class="papers__pagination" id="papersPagination" aria-label="Papers pagination">
+                <button id="paginationPrev" type="button" class="pagination__btn" aria-label="Previous page">Previous</button>
+                <div class="pagination__info">
+                    <label for="paginationPageInput" class="pagination__label">Page</label>
+                    <input type="number" id="paginationPageInput" class="pagination__input" min="1" value="1">
+                    <span class="pagination__total">of <span id="paginationTotal">1</span></span>
+                </div>
+                <button id="paginationNext" type="button" class="pagination__btn" aria-label="Next page">Next</button>
+            </nav>
             <div id="papersList" class="papers__list" role="list" aria-label="List of papers">
                 <!-- Papers will be rendered here -->
             </div>
@@ -256,6 +265,6 @@
         </footer>
     </main>
 
-    <script type="module" src="main.E5J7KZLS.js"></script>
+    <script type="module" src="main.WMO6CJP5.js"></script>
 </body>
 </html>
