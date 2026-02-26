@@ -1935,11 +1935,13 @@ body {
     animation: fadeOut 0.5s ease-out forwards;
 }
 
-/* Reduced motion for status toasts */
+/* Reduced motion for status and error toasts */
 @media (prefers-reduced-motion: reduce) {
     .status--visible,
     .status--fading,
-    .status--fade-out {
+    .status--fade-out,
+    .error--visible,
+    .error--fading {
         animation: none;
     }
 }
@@ -1951,19 +1953,33 @@ body {
 
 .error {
     color: var(--color-error);
-    margin-top: var(--space-lg);
-    font-size: var(--font-size-base);
+    position: fixed;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    font-size: var(--font-size-sm);
     display: none;
     font-weight: 500;
-    padding: var(--space-md);
-    background: rgba(168, 61, 61, 0.1);
-    border-radius: 10px;
-    border-left: 3px solid var(--color-error);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-error);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90vw;
 }
 
 .error--visible {
     display: block;
     animation: fadeIn 0.3s ease-out;
+}
+
+.error--fading {
+    display: block;
+    animation: fadeOut 0.5s ease-out forwards;
 }
 
 /* ==========================================================================
