@@ -242,6 +242,12 @@
         <!-- Papers List Section -->
         <section class="papers" id="papersSection" style="display: none;" aria-live="polite">
             <nav class="papers__pagination" id="papersPagination" aria-label="Papers pagination">
+                <button id="focusModeToggle" type="button" class="pagination__btn pagination__focus-toggle" aria-label="Toggle focus mode" aria-pressed="false">
+                    <svg class="focus-toggle__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
                 <button id="paginationPrev" type="button" class="pagination__btn" aria-label="Previous page">Previous</button>
                 <div class="pagination__info">
                     <label for="paginationPageInput" class="pagination__label">Page</label>

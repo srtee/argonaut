@@ -812,6 +812,26 @@ body {
     cursor: not-allowed;
 }
 
+.pagination__focus-toggle {
+    padding: var(--space-xs) var(--space-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination__focus-toggle svg {
+    transition: transform var(--transition-fast);
+}
+
+.pagination__focus-toggle:hover svg {
+    transform: scale(1.1);
+}
+
+.focus-toggle--active svg {
+    stroke: var(--color-accent);
+    transform: scale(1.1);
+}
+
 .pagination__info {
     display: flex;
     align-items: center;
