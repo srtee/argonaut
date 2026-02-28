@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?ZJVUPPWU">
+    <link rel="stylesheet" href="styles.css?7U3HVQ2Z">
 </head>
 <body>
     <a href="#mainContent" class="skip-link" role="navigation">Skip to main content</a>
@@ -169,13 +169,16 @@
         <section class="save-section" id="saveJsonSection" style="display: none;" aria-labelledby="saveJsonHeading">
             <h2 id="saveJsonHeading" class="save-section__title">Save JSON Collection:</h2>
 
-            <!-- Format selector row -->
-            <div class="save-section__format">
-                <label for="jsonFormatSelector" class="save-section__format-label">Format:</label>
-                <select id="jsonFormatSelector" class="save-section__format-select">
-                    <option value="full">Full</option>
-                    <option value="light">Light</option>
-                </select>
+            <!-- Checkbox options for JSON export -->
+            <div class="save-section__options-inline">
+                <label class="save-section__checkbox-label">
+                    <input type="checkbox" id="includeBibInfo" class="save-section__checkbox">
+                    with bib. info
+                </label>
+                <label class="save-section__checkbox-label">
+                    <input type="checkbox" id="includeAbstracts" class="save-section__checkbox">
+                    with abstracts
+                </label>
             </div>
 
             <!-- Save destination options -->
@@ -283,6 +286,6 @@
         </footer>
     </main>
 
-    <script type="module" src="main.ZJVUPPWU.js"></script>
+    <script type="module" src="main.7U3HVQ2Z.js"></script>
 </body>
 </html>
