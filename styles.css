@@ -567,11 +567,17 @@ body {
     margin-bottom: var(--space-md);
 }
 
+.save-section__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
 .save-section__options-inline {
     display: flex;
     align-items: center;
     gap: var(--space-lg);
-    margin-bottom: var(--space-md);
     padding: var(--space-sm) var(--space-md);
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
@@ -2050,6 +2056,22 @@ body {
 
     .citation span:not(:last-child)::after {
         content: "";
+    }
+
+    .save-section__header {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 601px) {
+    .save-section__header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .save-section__options-inline {
+        margin-bottom: 0;
     }
 }
 
