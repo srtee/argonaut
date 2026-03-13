@@ -1,13 +1,13 @@
 import { state } from '../state.js';
+import { BibInfo } from '../types.js';
 
-export function addPagesToBibTeX(bibtex, pages) {
+export function addPagesToBibTeX(bibtex: string, pages: string): string {
     if (!pages) return bibtex;
 
     const pagesRegex = /pages\s*=\s*(?:\{([^}]*)\}|"([^"]*)")/i;
     const match = bibtex.match(pagesRegex);
 
     if (match) {
-        const currentPages = match[1] || match[2];
         return bibtex.replace(match[0], `pages = {${pages}}`);
     } else {
         const yearRegex = /year\s*=\s*(?:\{([^}]*)\}|"([^"]*)")/i;
@@ -28,8 +28,8 @@ export function addPagesToBibTeX(bibtex, pages) {
     return bibtex;
 }
 
-export function parseBibTeX(bibtex) {
-    const result = {
+export function parseBibTeX(bibtex: string): BibInfo {
+    const result: BibInfo = {
         title: '',
         author: '',
         journal: '',
@@ -47,15 +47,15 @@ export function parseBibTeX(bibtex) {
         const field = match[1].toLowerCase();
         const value = match[2] || match[3];
 
-        if (result.hasOwnProperty(field)) {
-            result[field] = value;
+        if (field in result) {
+            result[field as keyof BibInfo] = value;
         }
     }
 
     return result;
 }
 
-export function formatAuthors(authorString) {
+export function formatAuthors(authorString: string): string {
     if (!authorString) return 'Unknown authors';
 
     return authorString.split(/\s+and\s+/i).map(author => {
@@ -67,7 +67,7 @@ export function formatAuthors(authorString) {
     }).join(', ');
 }
 
-export function generateDefaultKey(bibInfo) {
+export function generateDefaultKey(bibInfo: BibInfo): string {
     const author = bibInfo.author || '';
     const year = bibInfo.year || '';
 

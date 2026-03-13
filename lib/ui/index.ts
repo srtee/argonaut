@@ -254,13 +254,13 @@ export function initEventListeners() {
             if (hasUnsavedChanges()) {
                 if (confirm('You have unsaved changes. Discard them?')) {
                     closeTagDialog();
-                    import('../papers.js').then(({ applyTagFilter }) => {
+                    import('../papers/index.js').then(({ applyTagFilter }) => {
                         applyTagFilter();
                     });
                 }
             } else {
                 closeTagDialog();
-                import('../papers.js').then(({ applyTagFilter }) => {
+                import('../papers/index.js').then(({ applyTagFilter }) => {
                     applyTagFilter();
                 });
             }
@@ -276,13 +276,13 @@ export function initEventListeners() {
                     if (hasUnsavedChanges()) {
                         if (confirm('You have unsaved changes. Discard them?')) {
                             closeTagDialog();
-                            import('../papers.js').then(({ applyTagFilter }) => {
+                            import('../papers/index.js').then(({ applyTagFilter }) => {
                                 applyTagFilter();
                             });
                         }
                     } else {
                         closeTagDialog();
-                        import('../papers.js').then(({ applyTagFilter }) => {
+                        import('../papers/index.js').then(({ applyTagFilter }) => {
                             applyTagFilter();
                         });
                     }

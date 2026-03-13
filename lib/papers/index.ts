@@ -10,16 +10,16 @@ export { updateTagVisuals } from './tags.js';
 
 import { get } from '../dom.js';
 
-export function initDOM() {
+export function initDOM(): void {
     console.log('[Papers] DOM elements registered via dom.js registry');
 }
 
-export async function initEventListeners() {
+export async function initEventListeners(): Promise<void> {
     console.log('[Papers] Initializing event listeners');
 
-    const addDoiBtn = get('addDoiBtn');
-    const doiInput = get('doiInput');
-    const focusModeToggle = get('focusModeToggle');
+    const addDoiBtn = get('addDoiBtn') as HTMLButtonElement | null;
+    const doiInput = get('doiInput') as HTMLInputElement | null;
+    const focusModeToggle = get('focusModeToggle') as HTMLButtonElement | null;
 
     const { addPaperByDoi } = await import('./doi.js');
 
@@ -43,7 +43,7 @@ export async function initEventListeners() {
         focusModeToggle.addEventListener('click', () => {
             const isFocusMode = toggleFocusMode();
             focusModeToggle.classList.toggle('focus-toggle--active', isFocusMode);
-            focusModeToggle.setAttribute('aria-pressed', isFocusMode);
+            focusModeToggle.setAttribute('aria-pressed', String(isFocusMode));
         });
     }
 

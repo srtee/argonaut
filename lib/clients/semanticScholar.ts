@@ -1,24 +1,16 @@
-/**
- * Semantic Scholar Client - Fetch paper abstracts
- */
-
 import { jsonRequest } from './httpClient.js';
+import { SemanticScholarResponse } from '../types.js';
 
 const SEMANTIC_SCHOLAR_BASE_URL = 'https://api.semanticscholar.org/graph/v1/paper';
 
-/**
- * Fetch abstract from Semantic Scholar API
- * @param {string} doi - The DOI of the paper
- * @returns {Promise<string|null>} - The abstract or null if not found
- */
-export async function fetchAbstract(doi) {
+export async function fetchAbstract(doi: string): Promise<string | null> {
     try {
-        const data = await jsonRequest(
+        const data = await jsonRequest<SemanticScholarResponse>(
             `${SEMANTIC_SCHOLAR_BASE_URL}/DOI:${encodeURIComponent(doi)}?fields=abstract`
         );
 
-        if (data.abstract) {
-            return data.abstract;
+        if (data.data?.[0]?.abstract) {
+            return data.data[0].abstract;
         }
 
         return null;

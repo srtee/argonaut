@@ -5,7 +5,7 @@ import { parseBibTeX, generateDefaultKey } from './bibtex.js';
 
 export { extractDOI };
 
-export async function fetchAbstract(doi) {
+export async function fetchAbstract(doi: string): Promise<string | null> {
     const { fetchAbstractFromSemanticScholar, fetchAbstractFromCrossref } = await import('../clients/index.js');
     let abstract = await fetchAbstractFromSemanticScholar(doi);
     if (abstract) {
@@ -15,12 +15,12 @@ export async function fetchAbstract(doi) {
     return abstract;
 }
 
-export async function addPaperByDoi() {
-    const doiInput = get('doiInput');
-    const doiKeyInput = get('doiKeyInput');
+export async function addPaperByDoi(): Promise<void> {
+    const doiInput = get('doiInput') as HTMLInputElement | null;
+    const doiKeyInput = get('doiKeyInput') as HTMLInputElement | null;
 
-    const input = doiInput.value.trim();
-    const customKey = doiKeyInput.value.trim();
+    const input = doiInput?.value.trim() || '';
+    const customKey = doiKeyInput?.value.trim() || '';
 
     if (!input) {
         const { showError } = await import('../ui/index.js');
@@ -72,7 +72,7 @@ export async function addPaperByDoi() {
             }
         });
 
-        const { applyTagFilter, goToPage } = await import('./index.js');
+        const { applyTagFilter } = await import('./index.js');
         applyTagFilter();
 
         const { showPapersState } = await import('../ui/visibility.js');
@@ -80,7 +80,7 @@ export async function addPaperByDoi() {
             showPapersState();
         }
 
-        const fetchReferencesCheckbox = get('fetchReferencesCheckbox');
+        const fetchReferencesCheckbox = get('fetchReferencesCheckbox') as HTMLInputElement | null;
 
         if (fetchReferencesCheckbox && fetchReferencesCheckbox.checked) {
             showStatus(`Fetching references for "${key}"...`);
@@ -92,6 +92,8 @@ export async function addPaperByDoi() {
 
                 let addedCount = 0;
                 for (const ref of referencesWithDoi) {
+                    if (!ref.DOI) continue;
+                    
                     showStatus(`Fetching reference ${addedCount + 1} of ${referencesWithDoi.length}: ${ref.DOI}...`);
 
                     await new Promise(resolve => setTimeout(resolve, 200));
@@ -153,6 +155,6 @@ export async function addPaperByDoi() {
     } catch (err) {
         console.error('Error adding paper:', err);
         const { showError } = await import('../ui/index.js');
-        showError('Error adding paper: ' + err.message);
+        showError('Error adding paper: ' + (err as Error).message);
     }
 }

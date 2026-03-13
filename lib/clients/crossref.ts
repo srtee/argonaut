@@ -1,24 +1,16 @@
-/**
- * Crossref Client - Fetch paper metadata including abstracts and page numbers
- */
-
 import { jsonRequest } from './httpClient.js';
+import { CrossrefResponse } from '../types.js';
 
 const CROSSREF_BASE_URL = 'https://api.crossref.org/works';
 
-/**
- * Fetch abstract from Crossref API
- * @param {string} doi - The DOI of the paper
- * @returns {Promise<string|null>} - The abstract or null if not found
- */
-export async function fetchAbstract(doi) {
+export async function fetchAbstract(doi: string): Promise<string | null> {
     try {
         const url = `${CROSSREF_BASE_URL}/${encodeURIComponent(doi)}`;
         console.log('[CrossrefClient] fetchAbstract URL:', url);
-        const data = await jsonRequest(url);
+        const data = await jsonRequest<CrossrefResponse>(url);
 
         console.log('[CrossrefClient] fetchAbstract response:', data.message);
-        if (data.message && data.message.abstract) {
+        if (data.message?.abstract) {
             return data.message.abstract;
         }
 
@@ -29,25 +21,18 @@ export async function fetchAbstract(doi) {
     }
 }
 
-/**
- * Fetch page numbers from Crossref API
- * @param {string} doi - The DOI of the paper
- * @returns {Promise<string|null>} - The page numbers or article number, or null if not found
- */
-export async function fetchPages(doi) {
+export async function fetchPages(doi: string): Promise<string | null> {
     console.log('[CrossrefClient] fetchPages called with doi:', doi, 'type:', typeof doi);
     try {
         const url = `${CROSSREF_BASE_URL}/${encodeURIComponent(doi)}`;
         console.log('[CrossrefClient] fetchPages URL:', url);
-        const data = await jsonRequest(url);
+        const data = await jsonRequest<CrossrefResponse>(url);
 
         console.log('[CrossrefClient] fetchPages response:', data.message);
         if (data.message) {
-            // Check for page field first
             if (data.message.page) {
                 return data.message.page;
             }
-            // Some journals use article-number instead of pages
             if (data.message['article-number']) {
                 return data.message['article-number'];
             }
@@ -56,24 +41,19 @@ export async function fetchPages(doi) {
         return null;
     } catch (err) {
         console.error('[CrossrefClient] Error fetching pages:', err);
-        console.error('[CrossrefClient] Error stack:', err.stack);
+        console.error('[CrossrefClient] Error stack:', (err as Error).stack);
         return null;
     }
 }
 
-/**
- * Fetch references (cited by) from Crossref API
- * @param {string} doi - The DOI of the paper
- * @returns {Promise<Array|null>} - Array of reference objects or null if not found
- */
-export async function fetchReferences(doi) {
+export async function fetchReferences(doi: string): Promise<CrossrefResponse['message']['reference'] | null> {
     try {
         const url = `${CROSSREF_BASE_URL}/${encodeURIComponent(doi)}`;
         console.log('[CrossrefClient] fetchReferences URL:', url);
-        const data = await jsonRequest(url);
+        const data = await jsonRequest<CrossrefResponse>(url);
 
         console.log('[CrossrefClient] fetchReferences response:', data.message);
-        if (data.message && data.message.reference) {
+        if (data.message?.reference) {
             return data.message.reference;
         }
 

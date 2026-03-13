@@ -9,7 +9,7 @@ const isWatch = process.argv.includes('--watch');
 
 // Configuration for the bundle
 const buildOptions = {
-    entryPoints: ['lib/main.js'],
+    entryPoints: ['lib/main.ts'],
     bundle: true,
     outdir: 'dist',
     format: 'esm',

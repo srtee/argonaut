@@ -39,12 +39,14 @@ Modules follow `initDOM()` and `initEventListeners()` patterns, making initializ
 
 ## Areas for Improvement
 
-### 1. Large Monolithic Files
-`papers.js` is 1015 lines (37KB) - the largest file. It handles DOI fetching, BibTeX parsing, pagination, rendering, and more. This should be split into smaller, focused modules:
-- `papers/doi.js` - DOI handling
-- `papers/bibtex.js` - BibTeX processing
-- `papers/rendering.js` - DOM rendering
-- `papers/pagination.js` - Pagination logic
+### 1. Large Monolithic Files (RESOLVED)
+`papers.js` has been split into modular structure in `lib/papers/`:
+- `bibtex.js` - BibTeX parsing and key generation
+- `doi.js` - DOI fetching and paper addition
+- `rendering.js` - Paper card creation and display
+- `pagination.js` - Pagination state and controls
+- `tags.js` - Tag visual updates
+- `index.js` - Main module exports
 
 ### 2. Debug Code in Production
 Excessive logging throughout the codebase:
@@ -73,19 +75,19 @@ While Playwright E2E tests exist, there are no unit tests for:
 - State management (`lib/state.js`)
 - API client logic
 
-### 6. Global Variable in Papers Module
-`papers.js` declares module-level variables (lines 10-26) that depend on `initDOM()` being called first. This creates implicit ordering dependencies.
+### 6. Global Variable Dependencies (RESOLVED)
+Module-level DOM element variables have been removed. Functions now fetch elements directly from the DOM registry when needed, eliminating implicit initialization order dependencies.
 
 ---
 
 ## Recommendations
 
-1. **Split `papers.js`** into smaller modules following the client pattern
+1. **Split `papers.js`** into smaller modules following the client pattern (DONE)
 2. **Add build flag** to strip debug logs in production
 3. **Consider TypeScript** for type safety, especially in the clients/
 4. **Add unit tests** for pure functions and utilities
 5. **Standardize error handling** across API clients
-6. **Document the initialization order** requirements explicitly
+6. **Document the initialization order** requirements (DONE - now self-documenting)
 
 ---
 

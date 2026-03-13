@@ -1,15 +1,16 @@
 import { state } from '../state.js';
 import { formatAuthors } from './bibtex.js';
 import { removeCachedPaper } from '../bibCache.js';
+import { PaperData, BibInfo, ProcessPapersOptions } from '../types.js';
 
-function escapeHtmlStr(text) {
+function escapeHtmlStr(text: string): string {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-export function createPaperCard(doi, paperData, bibInfo, abstract) {
+export function createPaperCard(doi: string, paperData: PaperData, bibInfo: BibInfo, abstract?: string): HTMLElement {
     const citationKey = paperData._key || doi;
     const escapedCitationKey = escapeHtmlStr(citationKey);
 
@@ -30,7 +31,7 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
 
     const abstractContent = abstract ? `<div class="abstract__content">${escapeHtmlStr(abstract)}</div>` : '<p class="abstract__empty">No abstract available</p>';
 
-    const citationParts = [];
+    const citationParts: string[] = [];
     if (formatAuthors(bibInfo.author)) {
         citationParts.push(`<span class="citation__authors">${formatAuthors(bibInfo.author)}</span>`);
     }
@@ -98,8 +99,8 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
         </div>
     `;
 
-    const keyEditBtn = card.querySelector('.key-edit-btn');
-    const keyEditor = card.querySelector('.key-editor');
+    const keyEditBtn = card.querySelector('.key-edit-btn') as HTMLButtonElement;
+    const keyEditor = card.querySelector('.key-editor') as HTMLElement;
 
     keyEditBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -112,9 +113,9 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
         keyEditor.classList.toggle('key-editor--open');
     });
 
-    const keySaveBtn = keyEditor.querySelector('.key-editor__save');
-    const keyInput = keyEditor.querySelector('.key-editor__input');
-    const keyDeleteBtn = keyEditor.querySelector('.key-editor__delete');
+    const keySaveBtn = keyEditor.querySelector('.key-editor__save') as HTMLButtonElement;
+    const keyInput = keyEditor.querySelector('.key-editor__input') as HTMLInputElement;
+    const keyDeleteBtn = keyEditor.querySelector('.key-editor__delete') as HTMLButtonElement;
 
     keySaveBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -148,10 +149,10 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
         card.dataset.key = escapedNewKey;
         keyEditBtn.dataset.key = escapedNewKey;
         keyEditor.dataset.key = escapedNewKey;
-        keyEditor.querySelector('.key-editor__current').textContent = newKey;
+        keyEditor.querySelector('.key-editor__current')!.textContent = newKey;
 
-        card.querySelector('.comments').dataset.key = escapedNewKey;
-        card.querySelector('.tag-edit-btn').dataset.key = escapedNewKey;
+        card.querySelector('.comments')!.dataset.key = escapedNewKey;
+        card.querySelector('.tag-edit-btn')!.dataset.key = escapedNewKey;
 
         keyInput.value = '';
         keyEditor.classList.remove('key-editor--open');
@@ -195,31 +196,32 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
     });
 
     document.addEventListener('click', (e) => {
-        if (!card.contains(e.target) && keyEditor.classList.contains('key-editor--open')) {
+        if (!card.contains(e.target as Node) && keyEditor.classList.contains('key-editor--open')) {
             keyEditor.classList.remove('key-editor--open');
         }
     });
 
-    const toggleBtn = card.querySelector('.abstract-toggle');
-    const abstractContainer = card.querySelector('.abstract');
+    const toggleBtn = card.querySelector('.abstract-toggle') as HTMLButtonElement;
+    const abstractContainer = card.querySelector('.abstract') as HTMLElement;
 
     toggleBtn.addEventListener('click', () => {
         const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-        toggleBtn.setAttribute('aria-expanded', !isExpanded);
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
         abstractContainer.classList.toggle('abstract--expanded');
-        abstractContainer.setAttribute('aria-hidden', isExpanded);
-        toggleBtn.querySelector('svg').style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+        abstractContainer.setAttribute('aria-hidden', String(isExpanded));
+        toggleBtn.querySelector('svg')!.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
     });
 
     card.querySelectorAll('.also-read__link').forEach(link => {
         const handleClick = () => {
-            const refKey = link.dataset.ref;
+            const refKey = (link as HTMLElement).dataset.ref;
+            if (!refKey) return;
             const escapedRefKey = CSS.escape(refKey);
             const refCard = document.querySelector(`.paper[data-key="${escapedRefKey}"]`);
             if (refCard) {
                 refCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 refCard.classList.add('paper--highlight');
-                refCard.focus();
+                (refCard as HTMLElement).focus();
                 setTimeout(() => refCard.classList.remove('paper--highlight'), 2000);
             } else {
                 import('../ui/index.js').then(({ showError }) => {
@@ -238,8 +240,10 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
 
     card.querySelectorAll('.tag').forEach(tag => {
         const handleClick = () => {
+            const tagName = (tag as HTMLElement).dataset.tag;
+            if (!tagName) return;
             import('../ui/index.js').then(({ toggleTag }) => {
-                toggleTag(tag.dataset.tag);
+                toggleTag(tagName);
             });
         };
         tag.addEventListener('click', handleClick);
@@ -254,7 +258,7 @@ export function createPaperCard(doi, paperData, bibInfo, abstract) {
     return card;
 }
 
-export async function processPapers(data, options = {}) {
+export async function processPapers(data: Record<string, PaperData>, options: ProcessPapersOptions = {}): Promise<Record<string, PaperData>> {
     const { useCache = true } = options;
 
     const { store } = await import('../state.js');
@@ -283,12 +287,12 @@ export async function processPapers(data, options = {}) {
     return data;
 }
 
-export async function displayPapers() {
+export async function displayPapers(): Promise<void> {
     const { applyTagFilter } = await import('./index.js');
     applyTagFilter();
 }
 
-export async function renderPapers() {
+export async function renderPapers(): Promise<void> {
     const { applyTagFilter } = await import('./index.js');
     applyTagFilter();
 }

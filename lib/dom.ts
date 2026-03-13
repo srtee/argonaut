@@ -1,42 +1,18 @@
-/**
- * DOM Registry - Centralized DOM element management
- *
- * Provides a single source of truth for all DOM element references.
- * Modules register their elements, and the registry validates and provides access.
- */
+type ElementMap = Record<string, HTMLElement | null>;
 
-// Registry storage
-const registry = new Map();
+const registry = new Map<string, HTMLElement>();
+const moduleElements = new Map<string, ElementMap>();
 
-// Module registrations
-const moduleElements = new Map();
-
-/**
- * Register elements for a specific module
- * @param {string} moduleName - Name of the module (e.g., 'ui', 'auth', 'papers', 'github')
- * @param {Object} elements - Object mapping element IDs to their DOM references
- */
-export function register(moduleName, elements) {
+export function register(moduleName: string, elements: ElementMap): void {
     moduleElements.set(moduleName, elements);
     console.log(`[DOM Registry] Registered ${Object.keys(elements).length} elements for module: ${moduleName}`);
 }
 
-/**
- * Get an element by ID
- * @param {string} id - Element ID
- * @returns {HTMLElement|null} - The element or null if not found
- */
-export function get(id) {
+export function get(id: string): HTMLElement | null {
     return registry.get(id) || null;
 }
 
-/**
- * Get an element by ID, throwing if not found
- * @param {string} id - Element ID
- * @returns {HTMLElement} - The element
- * @throws {Error} - If element is not found
- */
-export function getRequired(id) {
+export function getRequired(id: string): HTMLElement {
     const element = registry.get(id);
     if (!element) {
         throw new Error(`[DOM Registry] Required element not found: #${id}`);
@@ -44,84 +20,52 @@ export function getRequired(id) {
     return element;
 }
 
-/**
- * Get multiple elements at once
- * @param {...string} ids - Element IDs to retrieve
- * @returns {Object} - Object mapping IDs to elements (null for missing)
- */
-export function getMultiple(...ids) {
-    const result = {};
+export function getMultiple(...ids: string[]): ElementMap {
+    const result: ElementMap = {};
     for (const id of ids) {
         result[id] = registry.get(id) || null;
     }
     return result;
 }
 
-/**
- * Check if an element exists in the registry
- * @param {string} id - Element ID
- * @returns {boolean} - True if element exists
- */
-export function has(id) {
+export function has(id: string): boolean {
     return registry.has(id);
 }
 
-/**
- * Initialize all registered elements
- * Calls all module registration functions and validates elements
- */
-export function initAll() {
+export function initAll(): void {
     console.log('[DOM Registry] Initializing all DOM elements...');
 
-    // Register all module elements
     registerUI();
     registerAuth();
     registerPapers();
     registerGitHub();
 
-    // Validate all required elements
     validateRegistry();
 
     console.log('[DOM Registry] Initialization complete');
 }
 
-/**
- * Register UI module elements
- */
-function registerUI() {
+function registerUI(): void {
     register('ui', {
-        // Main sections
         loadJsonSection: document.getElementById('loadJsonSection'),
         saveJsonSection: document.getElementById('saveJsonSection'),
         papersSection: document.getElementById('papersSection'),
         exportResetSection: document.getElementById('exportResetSection'),
         papersList: document.getElementById('papersList'),
-
-        // Load inputs
         fileInput: document.getElementById('fileInput'),
         urlInput: document.getElementById('urlInput'),
         loadUrlBtn: document.getElementById('loadUrlBtn'),
         loadFromStorageBtn: document.getElementById('loadFromStorageBtn'),
         loadNewBtn: document.getElementById('loadNewBtn'),
-
-        // Save/Export
         saveToStorageBtn: document.getElementById('saveToStorageBtn'),
         exportJsonBtn: document.getElementById('exportJsonBtn'),
         exportBibtexAllBtn: document.getElementById('exportBibtexAllBtn'),
         exportBibtexTaggedBtn: document.getElementById('exportBibtexTaggedBtn'),
-
-        // Export options
         includeBibInfo: document.getElementById('includeBibInfo'),
         includeAbstracts: document.getElementById('includeAbstracts'),
-
-        // Notifications
         error: document.getElementById('error'),
         status: document.getElementById('status'),
-
-        // Theme
         themeToggle: document.getElementById('themeToggle'),
-
-        // Onboarding
         onboardingModal: document.getElementById('onboardingModal'),
         closeOnboardingBtn: document.getElementById('closeOnboardingBtn'),
         showOnboardingBtn: document.getElementById('showOnboardingBtn'),
@@ -131,12 +75,8 @@ function registerUI() {
     });
 }
 
-/**
- * Register Auth module elements
- */
-function registerAuth() {
+function registerAuth(): void {
     register('auth', {
-        // GitHub auth
         githubSection: document.getElementById('githubSection'),
         githubNotLoggedIn: document.getElementById('githubNotLoggedIn'),
         githubLoggedIn: document.getElementById('githubLoggedIn'),
@@ -144,71 +84,45 @@ function registerAuth() {
         githubLogoutBtn: document.getElementById('githubLogoutBtn'),
         githubUserAvatar: document.getElementById('githubUserAvatar'),
         githubUserName: document.getElementById('githubUserName'),
-
-        // Visibility toggles (shared with other modules)
         gistConnectedContent: document.getElementById('gistConnectedContent'),
         saveGistConnectedContent: document.getElementById('saveGistConnectedContent'),
     });
 }
 
-/**
- * Register Papers module elements
- */
-function registerPapers() {
+function registerPapers(): void {
     register('papers', {
-        // Main sections (shared with ui)
         papersList: document.getElementById('papersList'),
         loadJsonSection: document.getElementById('loadJsonSection'),
         saveJsonSection: document.getElementById('saveJsonSection'),
         exportResetSection: document.getElementById('exportResetSection'),
         papersSection: document.getElementById('papersSection'),
-
-        // DOI input
         doiInput: document.getElementById('doiInput'),
         doiKeyInput: document.getElementById('doiKeyInput'),
         addDoiBtn: document.getElementById('addDoiBtn'),
         fetchReferencesCheckbox: document.getElementById('fetchReferencesCheckbox'),
-
-        // Pagination
         paginationControls: document.getElementById('papersPagination'),
         paginationPrev: document.getElementById('paginationPrev'),
         paginationNext: document.getElementById('paginationNext'),
         paginationPageInput: document.getElementById('paginationPageInput'),
         paginationTotal: document.getElementById('paginationTotal'),
-
-        // Focus mode toggle
         focusModeToggle: document.getElementById('focusModeToggle'),
-
-        // Status (shared with ui)
         status: document.getElementById('status'),
-
-        // Export buttons
         exportBibtexTaggedBtn: document.getElementById('exportBibtexTaggedBtn'),
     });
 }
 
-/**
- * Register GitHub module elements
- */
-function registerGitHub() {
+function registerGitHub(): void {
     register('github', {
-        // Gist selectors
         loadGistSelector: document.getElementById('loadGistSelector'),
         saveGistSelector: document.getElementById('saveGistSelector'),
         loadFromGistCollectionBtn: document.getElementById('loadFromGistCollectionBtn'),
         saveToGistOptionBtn: document.getElementById('saveToGistOptionBtn'),
-
-        // Visibility toggles
         gistConnectedContent: document.getElementById('gistConnectedContent'),
         saveGistConnectedContent: document.getElementById('saveGistConnectedContent'),
     });
 }
 
-/**
- * Validate that all registered elements exist in the DOM
- * Logs warnings for missing elements
- */
-function validateRegistry() {
+function validateRegistry(): void {
     let missingCount = 0;
 
     for (const [moduleName, elements] of moduleElements) {
@@ -217,7 +131,6 @@ function validateRegistry() {
                 console.warn(`[DOM Registry] Missing element: #${name} (module: ${moduleName})`);
                 missingCount++;
             } else {
-                // Add to registry
                 registry.set(name, element);
             }
         }
@@ -230,20 +143,17 @@ function validateRegistry() {
     console.log(`[DOM Registry] ${registry.size} elements registered`);
 }
 
-/**
- * Get all registered element IDs
- * @returns {string[]} - Array of registered element IDs
- */
-export function getRegisteredIds() {
+export function getRegisteredIds(): string[] {
     return Array.from(registry.keys());
 }
 
-/**
- * Get registry statistics
- * @returns {Object} - Statistics about registered elements
- */
-export function getStats() {
-    const stats = {
+interface RegistryStats {
+    total: number;
+    byModule: Record<string, { found: number; total: number }>;
+}
+
+export function getStats(): RegistryStats {
+    const stats: RegistryStats = {
         total: registry.size,
         byModule: {}
     };

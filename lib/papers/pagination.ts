@@ -1,11 +1,12 @@
 import { state } from '../state.js';
 import { get } from '../dom.js';
 import { createPaperCard } from './rendering.js';
+import { PaperData } from '../types.js';
 
 const PAPERS_PER_PAGE = 10;
 let currentPage = 1;
 
-export function goToPage(pageNum) {
+export function goToPage(pageNum: number): void {
     const papersArray = Object.entries(state.papersData);
     const totalPages = Math.ceil(papersArray.length / PAPERS_PER_PAGE);
 
@@ -24,11 +25,11 @@ export function goToPage(pageNum) {
     window.history.replaceState({}, '', url);
 }
 
-function updatePaginationControls(totalPages) {
-    const paginationPrev = get('paginationPrev');
-    const paginationNext = get('paginationNext');
-    const paginationPageInput = get('paginationPageInput');
-    const paginationTotal = get('paginationTotal');
+function updatePaginationControls(totalPages: number): void {
+    const paginationPrev = get('paginationPrev') as HTMLButtonElement | null;
+    const paginationNext = get('paginationNext') as HTMLButtonElement | null;
+    const paginationPageInput = get('paginationPageInput') as HTMLInputElement | null;
+    const paginationTotal = get('paginationTotal') as HTMLElement | null;
 
     if (!paginationPrev || !paginationNext || !paginationPageInput || !paginationTotal) return;
 
@@ -36,26 +37,28 @@ function updatePaginationControls(totalPages) {
         paginationPrev.disabled = true;
         paginationNext.disabled = true;
         paginationPageInput.disabled = true;
-        paginationPageInput.value = 1;
+        paginationPageInput.value = '1';
         paginationTotal.textContent = '1';
     } else {
         paginationPrev.disabled = currentPage <= 1;
         paginationNext.disabled = currentPage >= totalPages;
         paginationPageInput.disabled = false;
-        paginationPageInput.value = currentPage;
-        paginationPageInput.max = totalPages;
+        paginationPageInput.value = currentPage.toString();
+        paginationPageInput.max = totalPages.toString();
         paginationTotal.textContent = totalPages.toString();
     }
 }
 
-export function hasSelectedTag(paper) {
+export function hasSelectedTag(paper: PaperData): boolean {
     const paperTags = paper._tags || [];
     if (state.selectedTags.size === 0) return true;
     return paperTags.some(tag => state.selectedTags.has(tag));
 }
 
-export function applyTagFilter() {
-    const papersList = get('papersList');
+export function applyTagFilter(): void {
+    const papersList = get('papersList') as HTMLElement | null;
+    if (!papersList) return;
+    
     papersList.innerHTML = '';
 
     const papersArray = Object.entries(state.papersData);
@@ -92,15 +95,17 @@ export function applyTagFilter() {
 
     pagePapers.forEach(([doi, paper]) => {
         const citationKey = paper._key || doi;
-        const bibInfo = { title: paper.title || citationKey, ...paper };
+        const bibInfo = { title: paper.title || citationKey, author: '', journal: '', year: '', month: '', volume: '', number: '', pages: '', ...paper };
         const card = createPaperCard(doi, paper, bibInfo, paper.abstract);
 
         if (state.selectedTags.size > 0 && !hasSelectedTag(paper)) {
             card.classList.add('paper--dimmed');
         }
 
-        const papersListEl = get('papersList');
-        papersListEl.appendChild(card);
+        const papersListEl = get('papersList') as HTMLElement | null;
+        if (papersListEl) {
+            papersListEl.appendChild(card);
+        }
     });
 
     updatePaginationControls(totalPages);
@@ -114,10 +119,10 @@ export function applyTagFilter() {
     });
 }
 
-export function initEventListeners() {
-    const paginationPrev = get('paginationPrev');
-    const paginationNext = get('paginationNext');
-    const paginationPageInput = get('paginationPageInput');
+export function initEventListeners(): void {
+    const paginationPrev = get('paginationPrev') as HTMLButtonElement | null;
+    const paginationNext = get('paginationNext') as HTMLButtonElement | null;
+    const paginationPageInput = get('paginationPageInput') as HTMLInputElement | null;
 
     if (paginationPrev) {
         paginationPrev.addEventListener('click', () => {
@@ -142,7 +147,7 @@ export function initEventListeners() {
         });
 
         paginationPageInput.addEventListener('change', (e) => {
-            const page = parseInt(e.target.value, 10);
+            const page = parseInt((e.target as HTMLInputElement).value, 10);
             if (!isNaN(page)) {
                 goToPage(page);
             }

@@ -1,8 +1,10 @@
 import { state } from '../state.js';
 
-export function updateTagVisuals() {
+export function updateTagVisuals(): void {
     document.querySelectorAll('.tag').forEach(tagElement => {
-        const tag = tagElement.dataset.tag;
+        const tag = (tagElement as HTMLElement).dataset.tag;
+        if (!tag) return;
+        
         if (state.selectedTags.size === 0) {
             tagElement.classList.remove('tag--selected', 'tag--deselected');
             tagElement.setAttribute('aria-pressed', 'false');

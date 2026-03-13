@@ -1,52 +1,36 @@
-/**
- * Base HTTP client for making fetch requests with consistent headers and error handling
- */
+import { HttpClientOptions } from '../types.js';
 
 const WORKER_BASE_URL = 'https://argonaut-github-proxy.shernren.workers.dev';
 
-/**
- * Check if a URL is same-origin (internal API)
- */
-function isInternalApi(url) {
+function isInternalApi(url: string): boolean {
     return url.startsWith(WORKER_BASE_URL);
 }
 
-/**
- * Make an HTTP request with common configuration
- * @param {string} url - The URL to request
- * @param {object} options - Fetch options
- * @returns {Promise<Response>} - The fetch response
- */
-export async function httpClient(url, options = {}) {
+export async function httpClient(url: string, options: HttpClientOptions = {}): Promise<Response> {
     console.log('[httpClient] Request:', url, 'options:', JSON.stringify({...options, credentials: options.credentials || 'default'}));
     const { body, ...restOptions } = options;
 
-    // Only include credentials for internal API calls
     const shouldIncludeCredentials = isInternalApi(url);
 
-    // For Crossref and DOI.org, omit credentials and set CORS mode
     const isCrossOriginApi = url.includes('api.crossref.org') || url.includes('doi.org');
     const credentials = isCrossOriginApi ? 'omit'
         : (shouldIncludeCredentials ? 'include' : 'same-origin');
 
-    const defaultOptions = {
+    const defaultOptions: RequestInit = {
         credentials,
         mode: isCrossOriginApi ? 'cors' : undefined,
         ...restOptions,
     };
 
-    // Handle headers - merge with defaults
-    const headers = {
+    const headers: Record<string, string> = {
         ...options.headers,
     };
     defaultOptions.headers = headers;
 
-    // Remove Content-Type if body is FormData (browser sets it automatically)
     if (body instanceof FormData) {
         delete defaultOptions.headers['Content-Type'];
     }
 
-    // Add body to options
     if (body !== undefined) {
         defaultOptions.body = body;
     }
@@ -62,22 +46,13 @@ export async function httpClient(url, options = {}) {
     }
 }
 
-/**
- * Make a JSON request with error handling
- * @param {string} url - The URL to request
- * @param {object} options - Fetch options
- * @returns {Promise<object>} - The parsed JSON response
- * @throws {Error} - If the response is not OK
- */
-export async function jsonRequest(url, options = {}) {
-    // Build headers - include Content-Type and Accept for JSON APIs
-    const headers = {
+export async function jsonRequest<T = unknown>(url: string, options: HttpClientOptions = {}): Promise<T> {
+    const headers: Record<string, string> = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         ...options.headers,
     };
 
-    // Stringify body if it's an object
     const body = options.body && typeof options.body === 'object'
         ? JSON.stringify(options.body)
         : options.body;
@@ -91,28 +66,20 @@ export async function jsonRequest(url, options = {}) {
     if (!response.ok) {
         let errorMessage = `Request failed with status ${response.status}`;
         try {
-            const errorData = await response.json();
+            const errorData = await response.json() as { error?: string; message?: string };
             errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch (e) {
+        } catch {
             // Response might not be JSON
         }
         throw new Error(errorMessage);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
 }
 
-/**
- * Make a text request (e.g., for BibTeX)
- * @param {string} url - The URL to request
- * @param {object} options - Fetch options
- * @returns {Promise<string>} - The response text
- * @throws {Error} - If the response is not OK
- */
-export async function textRequest(url, options = {}) {
+export async function textRequest(url: string, options: HttpClientOptions = {}): Promise<string> {
     const response = await httpClient(url, {
         ...options,
-        // Don't override Accept header if user provided one
         headers: options.headers || {},
     });
 

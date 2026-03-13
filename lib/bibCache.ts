@@ -1,29 +1,28 @@
-/**
- * Bibliography Cache Module
- * Caches bibliographic data (BibTeX, abstracts, page numbers) for quick reload
- * Uses DOI as the reference key for each paper
- */
+import { PaperData, BibInfo } from './types.js';
 
 const CACHE_KEY = 'bibCache';
 const MAX_CACHED_PAPERS = 10;
 
-/**
- * Get the current cache
- */
-function getCache() {
+interface CachedPaperData {
+    bibtex: string | null;
+    bibInfo: BibInfo | null;
+    abstract: string | null;
+    cachedAt: number;
+}
+
+type Cache = Record<string, CachedPaperData>;
+
+function getCache(): Cache {
     try {
         const cached = localStorage.getItem(CACHE_KEY);
-        return cached ? JSON.parse(cached) : {};
+        return cached ? JSON.parse(cached) : {} as Cache;
     } catch (e) {
         console.warn('[BibCache] Failed to load cache:', e);
-        return {};
+        return {} as Cache;
     }
 }
 
-/**
- * Save the cache
- */
-function saveCache(cache) {
+function saveCache(cache: Cache): void {
     try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
     } catch (e) {
@@ -31,25 +30,16 @@ function saveCache(cache) {
     }
 }
 
-/**
- * Get cached data for a specific DOI
- */
-export function getCachedPaper(doi) {
+export function getCachedPaper(doi: string): CachedPaperData | null {
     const cache = getCache();
     return cache[doi] || null;
 }
 
-/**
- * Get all cached papers
- */
-export function getAllCachedPapers() {
+export function getAllCachedPapers(): Cache {
     return getCache();
 }
 
-/**
- * Cache bibliographic data for a paper (using DOI as key)
- */
-export function cachePaper(doi, data) {
+export function cachePaper(doi: string, data: { bibtex?: string | null; bibInfo?: BibInfo | null; abstract?: string | null }): void {
     const cache = getCache();
 
     cache[doi] = {
@@ -59,12 +49,10 @@ export function cachePaper(doi, data) {
         cachedAt: Date.now()
     };
 
-    // Limit cache to MAX_CACHED_PAPERS entries
     const keys = Object.keys(cache);
     if (keys.length > MAX_CACHED_PAPERS) {
-        // Remove oldest entries
         const sortedKeys = keys.sort((a, b) => {
-            return (cache[a].cachedAt || 0) - (cache[b].cachedAt || 0);
+            return (cache[a]?.cachedAt || 0) - (cache[b]?.cachedAt || 0);
         });
         const toRemove = sortedKeys.slice(0, keys.length - MAX_CACHED_PAPERS);
         toRemove.forEach(k => delete cache[k]);
@@ -74,10 +62,7 @@ export function cachePaper(doi, data) {
     console.log('[BibCache] Cached paper:', doi);
 }
 
-/**
- * Cache multiple papers (for batch processing)
- */
-export function cachePapers(papersData) {
+export function cachePapers(papersData: Record<string, PaperData>): void {
     const entries = Object.entries(papersData);
     const toCache = entries.slice(0, MAX_CACHED_PAPERS);
 
@@ -86,7 +71,7 @@ export function cachePapers(papersData) {
     toCache.forEach(([doi, paper]) => {
         cache[doi] = {
             bibtex: paper.bibtex || null,
-            bibInfo: paper.bibInfo || null,
+            bibInfo: null,
             abstract: paper.abstract || null,
             cachedAt: Date.now()
         };
@@ -96,44 +81,28 @@ export function cachePapers(papersData) {
     console.log('[BibCache] Cached', toCache.length, 'papers');
 }
 
-/**
- * Update cache for a DOI (no-op since DOI is immutable)
- */
-export function updateCacheKey(oldDoi, newDoi) {
-    // DOI is immutable - no update needed
+export function updateCacheKey(oldDoi: string, newDoi: string): void {
     console.log('[BibCache] DOI update not needed:', oldDoi, '->', newDoi);
 }
 
-/**
- * Remove a paper from cache
- */
-export function removeCachedPaper(doi) {
+export function removeCachedPaper(doi: string): void {
     const cache = getCache();
     delete cache[doi];
     saveCache(cache);
     console.log('[BibCache] Removed cached paper:', doi);
 }
 
-/**
- * Clear all cached data
- */
-export function clearCache() {
+export function clearCache(): void {
     localStorage.removeItem(CACHE_KEY);
     console.log('[BibCache] Cache cleared');
 }
 
-/**
- * Check if cache has data for a DOI
- */
-export function hasCachedPaper(doi) {
+export function hasCachedPaper(doi: string): boolean {
     const cache = getCache();
     return !!cache[doi];
 }
 
-/**
- * Get cache statistics
- */
-export function getCacheStats() {
+export function getCacheStats(): { count: number; max: number; keys: string[] } {
     const cache = getCache();
     return {
         count: Object.keys(cache).length,

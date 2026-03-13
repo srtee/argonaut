@@ -1,23 +1,18 @@
-// Shared utility functions
+import { PaperData } from './types.js';
 
-/**
- * Convert papers data from key-indexed to DOI-indexed format
- */
-export function convertToDoiIndexed(data) {
-    if (!data || typeof data !== 'object') return {};
+export function convertToDoiIndexed(data: Record<string, PaperData>): Record<string, PaperData> {
+    if (!data || typeof data !== 'object') return {} as Record<string, PaperData>;
 
-    // Check if already in new format (DOI-indexed with _key)
     const firstEntry = Object.values(data)[0];
     if (firstEntry && firstEntry._key !== undefined) {
-        return data; // Already in new format
+        return data;
     }
 
-    const result = {};
+    const result: Record<string, PaperData> = {};
     for (const [key, paper] of Object.entries(data)) {
         if (paper._doi) {
             result[paper._doi] = { ...paper, _key: key };
         } else {
-            // Papers without DOI - generate a temporary identifier
             const tempId = `temp_${key}`;
             result[tempId] = { ...paper, _key: key };
         }
